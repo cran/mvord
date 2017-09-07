@@ -1,0 +1,1615 @@
+%\documentclass[11pt,a4paper, oneside]{article}
+\documentclass[nojss]{jss}
+
+\usepackage{Sweave}
+\usepackage{amsmath,amsfonts,enumerate}
+\usepackage{bm}
+\usepackage{multirow}
+\usepackage{verbatim}
+\usepackage{mathrsfs}
+\usepackage{bbm}
+\usepackage{tabularx}
+\usepackage{booktabs}
+
+\renewcommand{\P}{\mathbb{P}}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+
+%%\VignetteIndexEntry{mvord: An R Package for Fitting Multivariate Ordinal Regression Models}
+%%\VignetteDepends{mvord}
+
+\author{Rainer Hirk\\
+WU Wirtschaftsuniversit\"at\\
+Wien
+\And Kurt Hornik\\
+WU Wirtschaftsuniversit\"at\\
+Wien
+\And Laura Vana\\
+WU Wirtschaftsuniversit\"at\\
+Wien}
+\Plainauthor{Rainer Hirk, Kurt Hornik and Laura Vana}
+
+\Address{
+Rainer Hirk\\
+Institute for Statistics and Mathematics\\
+WU Wirtschaftsuniversit\"at Wien\\
+1020 Vienna, Austria\\
+E-mail: \email{rainer.hirk@wu.ac.at}\\ \ \\
+Kurt Hornik\\
+Institute for Statistics and Mathematics\\
+WU Wirtschaftsuniversit\"at Wien\\
+1020 Vienna, Austria\\
+E-mail: \email{kurt.hornik@wu.ac.at}
+\\ \ \\
+Laura Vana\\
+Institute for Statistics and Mathematics\\
+WU Wirtschaftsuniversit\"at Wien\\
+1020 Vienna, Austria\\
+E-mail: \email{laura.vana@wu.ac.at}
+}
+
+\title{\pkg{mvord}: An \proglang{R} Package for Fitting Multivariate Ordinal Regression Models}
+\Plaintitle{mvord: An R Package for Fitting Multivariate Ordinal Regression Models}
+
+\Abstract{The \proglang{R} package \pkg{mvord} implements composite likelihood
+  estimation in the class of multivariate ordinal regression models with probit and logit link.
+  % error structures
+  A flexible modeling framework for ordinal repeated measurements on
+  the same subject is set up, which takes into consideration the
+  dependence among the multiple observations by employing different
+  error structures.
+  % covariate dependent errors
+  Heterogeneity in the error structure across the subjects can be
+  accounted for by the package, which allows for covariate dependent
+  error structures.
+  % constraints
+  In addition, regression coefficients and threshold parameters are
+  varying across the multiple response dimensions in the default
+  implementation. However, constraints can be defined by the user if a
+  reduction of the parameter space is desired.}
+
+%\proglang{R}
+\Keywords{Composite likelihood, Multivariate ordered logit, Multivariate ordered probit, \proglang{R} package}
+
+\Plainkeywords{Composite likelihood, Multivariate ordered logit, Multivariate ordered probit, R package}
+
+%\SweaveOpts{engine=R, eps=FALSE, echo=FALSE, results=hide, fig=FALSE, width=8, height=4}
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+<<echo = FALSE, results = hide, keep.source = F>>=
+options(width=65, prompt = "R> ", continue = "+  ", useFancyQuotes = FALSE)
+cache <- TRUE
+library(mvord)
+data(data_cr_panel)
+data(data_cr_multord)
+data(data_cr_multord2)
+@
+
+\maketitle
+
+\section{Model Class}
+%introduce multivariate ordinal regression models
+%notation
+Multivariate ordinal regression models are based on \textit{cumulative
+  link models} \citep{Tutz12} which are amongst the most popular models for
+univariate ordinal data analysis. In cumulative link models the
+observed ordinal outcome $Y$ is assumed to be a coarser (categorized)
+version of a latent continuous variable $\widetilde Y$. If multiple
+observations on the same subject are observed, univariate cumulative
+link models can be extended to a multivariate framework. These
+repeated measurements for each subject may take place either at the
+same time yielding a cross-sectional multivariate ordinal regression
+model or at different points in time yielding a longitudinal multivariate
+ordinal regression model.
+%%
+\subsection{Model formulation}
+Let $Y_{ij}$ denote the ordinal observation and $\bm x_{ij}$ be a
+$p$-dimensional vector of covariates for subject~$i$ and outcome~$j$,
+where $i=1,\dots,n$ and $j\in J_i$, for $J_i$ a subset of all
+available outcomes $J$ in the data set. Moreover, we denote by $q=|J|$
+and $q_i = |J_i|$ the number of elements in the set $J$ and $J_i$,
+respectively. Following the cumulative link modeling approach
+\citep{Agresti02}, the ordinal response $Y_{ij}$ is assumed to be a
+coarser (categorized) version of a latent continuous variable
+$\widetilde Y_{ij}$.  The observable categorical outcome $Y_{ij}$ and
+the unobservable latent variable $\widetilde Y_{ij}$ are connected by:
+% Let us suppose to have $J$ repeated measurements on $n$ different
+% subjects $i$, where each repeated ordinal observation (indexed by $j
+% \in J$) is denoted by $Y_{ij}$.
+\begin{align*}
+  Y_{ij} = r_{ij} \quad \Leftrightarrow \quad \theta_{j,r_{ij}-1} <
+        \widetilde{Y}_{ij} \leq \theta_{j, r_{ij}}, \qquad r_{ij} \in
+        \{1, \dots, K_j\}
+\end{align*}
+where $r_{ij}$ is a category out of $K_j$ ordered categories and $\bm
+\theta_{j}$ is a vector of suitable threshold parameters for
+outcome~$j$ with the following restriction: $ - \infty < \theta_{j,1}<
+\dots < \theta_{j,K_j-1} < \infty$. Note that in this setting binary
+observations can be treated as ordinal observations with two categories
+($K_j = 2$).
+
+For the relationship between the
+latent variable $\widetilde{Y}_{ij}$ and the vector of covariates
+$\bm{x}_{ij}$ we assume the following linear model:
+\begin{align}\label{eqn:model}
+    \widetilde{Y}_{ij} &= \beta_{j0} + \bm{x}_{ij}^\top
+        \bm{\beta}_j + \epsilon_{ij}, %% \qquad \bm{\epsilon}_i = (\epsilon_{i1}, \epsilon_{i2}, \ldots, \epsilon_{iJ})^\top \sim F_{J}(\bm{0},\bm{\Sigma}),
+\end{align}
+where $\beta_{j0}$ is an intercept term, $\bm{\beta}_j = (\beta_{j1},
+\ldots, \beta_{jp})^\top$ is a vector of regression coefficients, both
+corresponding to outcome~$j$, and $\epsilon_{ij}$ is a mean zero error
+term. The number of ordered categories $K_j$ as well as the
+threshold parameters $\bm\theta_j$ and the regression coefficients
+$\bm\beta_j$ are allowed to vary across outcome dimensions $j \in J$
+to account for possible heterogeneity across the response variables.
+We further assume the $n$~subjects to be independent and that the error
+terms are uncorrelated with the covariates.
+
+%% Links
+The dependence among the different responses is accounted for by
+assuming the vector of error terms for each subject $\bm{\epsilon}_i =
+[\epsilon_{ij}]_{j\in J_i}$ to follow a multivariate distribution.
+The multivariate distribution functions we consider are the
+multivariate normal distribution $\bm{\epsilon}_i \sim N(\bm 0,
+\bm\Sigma_i)$, which corresponds to the probit link, and the multivariate
+logistic distribution $\bm{\epsilon}_i \sim \mathcal{L}(\bm 0,
+\bm\Sigma_i)$ yielding the logit link, where the covariance
+matrix $\bm \Sigma_i$ captures the correlation between the vector of
+responses for subject~$i$. For the logit link we approximate the
+multivariate logistic distribution by a multivariate $t$-distribution
+with fixed degrees of freedom \citep[following the
+  approach of][]{o2004bayesian}.  More details can be found in \cite{epubwu5389}.
+
+% Suppose that $q$ repeated measurements on $n$ different subjects $i$
+% are available, where each repeated ordinal observation (indexed by
+% $j \in J$) is denoted by $Y_{ij}$. Each observable categorical
+% outcome $Y_{ij}$ and the unobservable latent variable $\widetilde
+% Y_{ij}$ are connected by: \begin{align*} Y_{ij} = r_{ij} \quad
+% \Leftrightarrow \quad \theta_{j,r_{ij}-1} < \widetilde{Y}_{ij} \leq
+% \theta_{j, r_{ij}}, \qquad r_{ij} \in \{1, \dots,
+% K_j\}, \end{align*} where $r_{ij}$ is a category out of $K_j$
+% ordered categories and $\bm \theta_{j}$ is a vector of suitable
+% threshold parameters for outcome~$j$ with the following restriction:
+% $ - \infty < \theta_{j,1} < \dots < \theta_{j,K_j-1} < \infty$. The
+% number of threshold categories $K_j$ as well as the threshold
+% parameters themselves are allowed to vary across outcome dimensions
+% $j \in J$ in order to account for differences in the repeated
+% measurements. Given an $n \times p$ matrix $X_j$ of covariates for
+% each $j \in J$, where each $\bm{x}_{ij}$ is a $p$-dimensional vector
+% (i-th row of $X_j$) for subject~$i$ and repeated measurement~$j$,
+% the following linear model for the relationship between
+% $\widetilde{Y}_{ij}$ and the vector of covariates $\bm{x}_{ij}$ is
+% assumed: \begin{align}\label{eqn:model} \widetilde{Y}_{ij} &=
+% \beta_{j0} + \bm{x}_{ij}^\top \bm{\beta}_j + \epsilon_{ij}, \qquad
+% \bm{\epsilon}_i = (\epsilon_{i1}, \epsilon_{i2}, \ldots,
+% \epsilon_{iq})^\top \sim F_{q}(\bm{0},\bm{\Sigma}), \end{align}
+% where \begin{itemize} \item[-] $\beta_{j0}$ is an intercept term
+% corresponding to outcome~$j$, \item[-] $\bm{\beta}_j = (\beta_{j1},
+% \ldots, \beta_{jp})^\top$ is a vector of regression coefficients
+% corresponding to outcome~$j$, \item[-] $\epsilon_{ij}$ is an error
+% term with mean zero and distributed according to a $q$-dimensional
+% distribution function $F_q$.  \end{itemize} The regression
+% parameters $\bm{\beta}_j$ are allowed to vary between the repeated
+% measurements~$j$ and account for heterogeneity in the latent
+% processes of the outcome dimensions. The errors are assumed to be
+% independent across subjects and uncorrelated with the covariates
+% $\bm{x}_{ij}$. Typical multivariate distribution functions $F$ are
+% the multivariate normal distribution yielding a probit link between
+% the linear predictor and the cumulative probabilities, and an
+% approximate multivariate logistic distribution yielding the logit
+% link.  For the logit link we approximate the multivariate logistic
+% distribution by a multivariate Student $t$ distribution with fixed
+% degrees of freedom \citep[following the approach
+% of][]{o2004bayesian}.  In addition, we allow for different error
+% structures as will be discussed in the following subsections.\\
+
+% The notation above corresponds to a cross-sectional setting, where repeated ordinal observations $Y_{ij}$ on the same subject~$i$ are observed at the same time. Similarly, in a panel setting we assume to have $T$ repeated measurements $Y_{it}$ at consecutive equi-spaced time points with index $t \in T$ of subject~$i$ . In principle, we can replace every $j$ by $t$, in order to obtain the panel model notation. In the following we resume with the cross-sectional notation und use $j \in J$ as an index for the repeated measurements.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% IDENTIFIABILTY
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Identifiability Issues}
+As the absolute scale and the absolute location are not identifiable
+in ordinal models further restrictions on the parameter set need to be
+imposed.  Assuming $\bm\Sigma_i$ is a covariance matrix with diagonal
+elements $[\sigma^2_{ij}]_{j \in J_i}$, only the quantities
+$\bm\beta_j/\sigma_{ij}$ and $(\theta_{j,r_{ij}}
+-\beta_{j0})/\sigma_{ij}$ are identifiable in the model in
+Equation~\ref{eqn:model}.
+The scale can be fixed either by restricting the full
+variance-covariance matrix $\bm\Sigma_i$ to be a correlation matrix
+$\bm R_i$, by fixing two threshold parameters, or the intercept and a
+threshold parameter. In order to fix the location either the
+intercept $\beta_{j0}$ or one threshold parameter has to be set to
+some value. Hence, in order to obtain an identifiable model the parameter set is typically
+constrained in one of the following ways:
+\begin{itemize}
+  \item Fixing the intercept $\beta_{j0}$ (e.g., to zero), using
+    flexible thresholds $\bm\theta_{j}$ and fixing $\sigma_{ij}$ (e.g.,
+    to unity)  $\forall j \in J_i$, $\forall i \in \{1,\dots, n\}$;
+  \item Leaving the intercept $\beta_{j0}$ unrestricted, fixing one
+    threshold parameter (e.g., $\theta_{j,1}=0$) and fixing
+    $\sigma_{ij}$ (e.g., to unity) $\forall j \in J_i$, $\forall i \in \{1,\dots, n\}$;
+   \item Fixing the intercept $\beta_{j0}$ (e.g., to zero), fixing one
+     threshold parameter (e.g., $\theta_{j,1}=0$) and leaving
+     $\sigma_{ij}$ unrestricted $\forall j \in J_i$, $\forall i \in \{1,\dots, n\}$;
+   \item Leaving the intercept $\beta_{j0}$ unrestricted, fixing two
+     threshold parameters (e.g., $\theta_{j,1}=0$ and
+     $\theta_{j,2}=1$) and leaving $\sigma_{ij}$ unrestricted $\forall
+     j \in J_i$, $\forall i \in \{1,\dots, n\}$ (note that this
+     parameterization cannot be applied to the binary case).
+\end{itemize}
+Note that the first two options are the most commonly used in the
+literature. All of these alternative parameterizations of the models
+are supported by the \pkg{mvord} package, allowing the user to
+choose the most convienient one for each specific
+application. Table~\ref{table:Identifiability} gives an overview on
+all identifiable model parameterizations.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% multord2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \subsection{multord2}
+% The cross-sectional multivariate ordinal regression model (multord2) is a special case, where we assume that the covariates do not change among repeated measurements $j \in J$ ($\bm x_{ij} = \bm x_i, \, \forall j \in J$)\footnote{Nevertheless, covariates $\bm{x}_{ij}$ depending on $j$ can be used with appropriate constraints on the regression coefficients \code{coef.constraints}.}, yielding the following relationship between
+% $\widetilde{Y}_{ij}$ and the vector of covariates
+% $\bm{x}_{i}$:
+% \begin{align}%\label{eq:model}
+% 	\widetilde{Y}_{ij} &= \bm{x}_{i}^\top
+%         \bm{\beta}_j +\epsilon_{ij}, \qquad  \bm{\epsilon_{i}}\sim F_{q},
+% \end{align}
+% where $\bm{\beta}_j$ is a vector of regression coefficients corresponding to outcome~$j$, $\epsilon_{ij}$ are $F_q$ distributed error terms that are independent across subjects.
+
+\subsection{Error Structures}
+We mainly distinguish between two different model types with different
+parameterizations, one with standardized error variances
+(\textit{correlation error structure}) and one with unrestricted error
+variances (\textit{covariance error structure}). For both model types
+we allow for a factor dependent error structure and in case of a
+correlation error structure we additionally allow for a covariate
+dependent equicorrelation and $AR(1)$ error structures. For the sake
+of notation we assume in the following that the number of repeated
+measurements is equal for all subjects and denoted by $q$. In the case
+of $q_i\neq q$, the matrices presented below will be subsetted by
+picking the rows and columns corresponding to $j \in J_i$.
+\subsubsection{Correlation error structure}
+\begin{itemize}
+  \item \textbf{General correlation structure}\\ In this parameterization we fix the scale by restricting the full
+    variance-covariance to be a correlation matrix and obtain the
+    following error distribution:
+%$\bm{\epsilon}_i = (\epsilon_{i1}, \epsilon_{i2}, \ldots, \epsilon_{iq}) \sim F_{q}(\bm{0},\bm{R})$\\
+\begin{align}\label{eqn:multord2cor}
+	\bm{\epsilon}_i = (\epsilon_{i1}, \epsilon_{i2}, \ldots, \epsilon_{iq})^\top \sim F_{q} \left(\bm{0}, \begin{pmatrix}
+		1 & \rho_{12} & \cdots & \rho_{1q}\\
+\rho_{12} & 1& \cdots & \rho_{2q}\\
+\vdots&\vdots& \ddots& \vdots\\
+\rho_{1q}&\rho_{2q}& \cdots&1\\
+	\end{pmatrix}
+	\right).
+\end{align}
+As absolute location is not identifiable in this model one of the following constraints need to be imposed for all $j \in J$:
+\begin{itemize}
+\item[-] the intercept $\beta_{j0}$ is fixed to some constant $c$ (e.g., the default value is zero), or
+\item[-] the first threshold $\theta_{j,1}$ is fixed to some value.
+\end{itemize}
+
+  \item \textbf{Factor dependent correlation structure}\\
+  In order to account for heterogeneity in the error terms, a first model extension allows for factor-varying correlation structures. To be more precise, we allow for different correlation matrices in the errors for each subject $i$, depending on some factor $f(i)$ which is assumed to be constant across repeated measurements~$j$. The factor dependent error structure for a correlation structure has the following form:
+\begin{align*}
+\bm{\epsilon}_i = (\epsilon_{i1}, \epsilon_{i2}, \ldots, \epsilon_{iq})^\top \sim F_{q}(\bm{0},\bm{R}_{f(i)}).
+\end{align*}
+
+  \item \textbf{Covariate dependent equicorrelation structure}\\
+We improve the complexity of the model by allowing a covariate dependent equicorrelation structure. In this setting, we assume that correlations are equal across all pairs, but differ across subjects $i$. The correlation parameter $\rho_i$ of each subject $i$ is assumed to depend on a vector of covariates $\bm{s}_i$. Fisher's $z$-transformation allows us to reparameterize the linear term $\alpha_{0} + \bm{s}_{i}^\top \bm{\alpha}$ in terms of a correlation parameter for each subject:
+\begin{align*}
+  \frac{1}{2} \log \left( \frac{1+ \rho_{i}}{1-\rho_{i}}\right) = \alpha_{0} + \bm{s}_{i}^\top \bm{\alpha}.
+\end{align*}
+Solving for $\rho_i$ gives us the following re-transformation:
+\begin{align*}
+  \rho_{i} = \frac{e^{2 (\alpha_{0} + \bm{s}_{i} \bm{\alpha})} - 1}{e^{2 (\alpha_{0} + \bm{s}_{i} \bm{\alpha})} + 1}.
+\end{align*}
+
+As a consequence, this transformation allows for subject-varying
+correlations which depend on subject-specific covariates that have to
+be constant across repeated measurements~$j$. We obtain an
+equicorrelation structure that is able to account for heterogeneity in
+the errors:
+
+%$\bm{\epsilon}_i = (\epsilon_{i1}, \epsilon_{i2}, \ldots, \epsilon_{iq}) \sim F_{q}(\bm{0},\bm{R}_i)$\\
+\begin{align*}
+	\bm{\epsilon}_i = (\epsilon_{i1}, \epsilon_{i2}, \ldots, \epsilon_{iq})^\top \sim F_{q} \left(\bm{0}, \begin{pmatrix}
+		1 & \rho_i & \cdots & \rho_i\\
+\rho_i & 1& \cdots & \rho_i\\
+\vdots&\vdots& \ddots& \vdots\\
+\rho_i&\rho_i& \cdots&1\\
+	\end{pmatrix}
+	\right).
+\end{align*}
+
+  \item \textbf{$AR(1)$ correlation structure}\\
+  For given consecutive equi-spaced time points $t_1, \ldots, t_T$ we assume an autoregressive error structure of order one with $corr(\epsilon_{it_k}, \epsilon_{it_l}) = \rho^{|t_l - t_k|}$ for each subject $i$. In this case the  correlation structure has the following form:
+%$\bm{\epsilon}_i = (\epsilon_{it_1}, \epsilon_{it_2}, \ldots, \epsilon_{it_T}) \sim F_{T}(\bm{0},\bm{R})$\\
+\begin{align*}
+	\bm{\epsilon}_i = (\epsilon_{it_1}, \epsilon_{it_2}, \ldots, \epsilon_{it_T})^\top \sim F_{T} \left(\bm{0}, \begin{pmatrix}
+		1 & \rho^{|t_2-t_1|} & \cdots & \rho^{|t_T-t_1|}\\
+\rho^{|t_2-t_1|} & 1& \cdots & \rho^{|t_T-t_2|}\\
+\vdots&\vdots& \ddots& \vdots\\
+\rho^{|t_T-t_1|}&\rho^{|t_T-t_2|}& \cdots&1\\
+	\end{pmatrix}
+	\right).
+\end{align*}
+This $AR(1)$ correlation structure can be extended to a covariate dependent setting in analogy to the equicorrelation structure.
+\end{itemize}
+
+\subsubsection{Covariance error structure}
+\begin{itemize}
+  \item \textbf{General covariance structure}\\
+  In a further parameterization we leave the variance-covariance matrix unrestricted and obtain the following error distribution:
+%$\bm{\epsilon}_i = (\epsilon_{i1}, \epsilon_{i2}, \ldots, \epsilon_{iq}) \sim F_{q}(\bm{0},\bm{\Sigma})$
+
+\begin{align}\label{eqn:multord2cov}
+	\bm{\epsilon}_i = (\epsilon_{i1}, \epsilon_{i2}, \ldots, \epsilon_{iq})^\top \sim F_{q} \left(\bm{0}, \begin{pmatrix}
+		\sigma_1^2 & \rho_{12} \sigma_1 \sigma_2 & \cdots & \rho_{1q} \sigma_1 \sigma_{q}\\
+		\rho_1 \sigma_1 \sigma_2 & \sigma_2^2 & \cdots &\rho_{2q} \sigma_2 \sigma_{q}\\
+		\vdots & \vdots & \ddots & \vdots\\
+		\rho_{1q} \sigma_1 \sigma_{q} & \rho_{2q} \sigma_2 \sigma_{q} & \cdots & \sigma_{q}^2\\
+	\end{pmatrix}
+	\right).
+\end{align}
+In this model we again need further restrictions on the parameter set in order to obtain an identifiable scale and location. We either fix
+\begin{itemize}
+\item[-] the first two thresholds $\theta_{j,1}$ and $\theta_{j,2}$ to some value (e.g., in the default case we set $\theta_{j,1} = 0$ and $\theta_{j,2} = 1$),
+\item[-] the first threshold $\theta_{j,1}$ and the last threshold $\theta_{j,K_j-1}$ to some value, or% (\code{model = multord2cov2})
+\item[-] the intercept $\beta_{j0}$ and the first threshold $\theta_{j,1}$ to some value
+\end{itemize}
+for all repeated measurements $j \in J$.
+
+  \item \textbf{Factor dependent covariance structure}\\
+    In order to account for some heterogeneity in the error terms, we allow for different covariance matrices in the errors for each subject $i$, depending on some factor $f(i)$. In this case the factor dependent covariance structure has the following form:
+\begin{align*}
+\bm{\epsilon}_i = (\epsilon_{i1}, \epsilon_{i2}, \ldots, \epsilon_{iq})^\top \sim F_{q}(\bm{0},\bm{\Sigma}_{f(i)}).
+\end{align*}
+\end{itemize}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PMOR
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \subsection{PMOR}
+% In the panel multivariate ordinal regression model (PMOR) repeated measurements $Y_{it}$ of the same subject $i$ are observed at different time points $t \in T$. In this setting we assume that the covariates $\bm{x}_{it}$ change over time yielding the following relationship:
+% \begin{align}\label{eqn:PMOR}
+% 	\widetilde{Y}_{it} &= \bm{x}_{it}^\top
+%         \bm{\beta}_t +\epsilon_{it}, \qquad  \bm{\epsilon_{i}}\sim F_{T},
+% \end{align}
+% where $\bm{\beta}_t$ is a vector of regression coefficients corresponding to outcome~$j$, $\epsilon_{it}$ are error terms that are independent across subjects and $F_T$ is a $T$-dimensional distribution function.
+%
+% \paragraph{Factor dependent correlation structure}
+% In order to account for some heterogeneity we allow for different correlation matrices in ther errors for each subject $i$, where each $\rho_i$ depends on some factor $f(i)$ which has to be constant over time. In this case the error structure is the following:
+% \begin{align*}
+% \bm{\epsilon}_i = (\epsilon_{it_1}, \epsilon_{it_2}, \ldots, \epsilon_{it_T}) \sim F_{T}(\bm{0},\bm{R}_{f(i)}).
+% \end{align*}
+
+% \begin{tabularx}{\textwidth}{|l|C|C|C|C|C|}
+% \hline
+% model & Covariance & Correlation & Intercept & one fixed threshold & two fixed thresholds\\
+% \hline
+% \code{multord} type 1-1 & & \checkmark &  &  &\\
+% \hline
+% \code{multord} type 1-2 & & \checkmark & \checkmark & \checkmark &\\
+% \hline
+% \code{multord} type 2 & \checkmark & & \checkmark &  &\checkmark\\
+% % % \hline
+% % % \code{multord2cov2} & \checkmark & &\checkmark & \checkmark &\\
+% % \hline
+% % \code{PMOR} type 1 & & \checkmark &  &  &\\
+% % \hline
+% % \code{PMOR} type 2 & & \checkmark & \checkmark & \checkmark &\\
+%  \hline
+% \end{tabularx}
+
+% \begin{table}[h!]
+% %\captionof{table}{...}
+% \label{table:Identifiability}
+% \begin{tabularx}{\textwidth}{|C|C|C|C|C|C|C|}
+% \hline
+% Correlation & Covariance &  Intercept & flexible thresholds & one fixed threshold & two fixed thresholds & all fixed thresholds \\
+% \hline
+% \checkmark& &  &\checkmark& & &\\
+% \hline
+% \checkmark& & \checkmark &  & \checkmark & &\\
+% \hline
+% \checkmark& & \checkmark &  &  & & \checkmark\\
+% \hline
+% & \checkmark& \checkmark &  &  & \checkmark& \\
+% \hline
+% & \checkmark& \checkmark &  &  & & \checkmark\\
+% \hline
+% \end{tabularx}
+% \caption{This table displays different model parameterizations.}
+% \end{table}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Composite Likelihood Estimation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Composite Likelihood Estimation} \label{sect:estimation}
+In order to estimate the model parameters we use a composite
+likelihood approach, where the full likelihood is approximated by a
+pseudo-likelihood which is constructed from lower dimensional
+marginal distributions, more specifically by ``aggregating'' the
+likelihoods corresponding to pairs of observations \citep{varin_overview}.
+
+For a given parameter vector $\bm\Gamma$, which contains the threshold
+parameters, the regression coefficients and the correlation (and
+variance) parameters, the likelihood is given by:
+\begin{align*}
+\mathscr{L} (\bm\Gamma|[X_i]_{i=1:n},Y) &= \prod_{i=1}^n \Prob(\cap_{j\in
+  J_{i}}Y_{ij} = r_{ij}|\bm\Gamma, X_i)^{w_{i}} =\prod_{i=1}^n \left(
+\int_{D_{i}} f_{q_{i}}(\bm{\widetilde{Y}}_{i}|\bm\Gamma,
+X_i)d^{q_{i}}\widetilde{\bm{Y}}_{i}\right)^{w_{i}},
+ \end{align*}
+where $X_i$ is a $q_i\times p$ matrix of covariates, $D_{i} =
+\prod_{j\in J_{i}} (\theta_{j,r_{ij}-1}, \theta_{j,r_{ij}}]$ is a
+  Cartesian product, $w_{i}$ are are subject specific non-negative
+  weights, which are set to one in the default case, and $f_{q_{i}}$
+  is the $q_{i}$-dimensional density of the error terms $\bm\epsilon_i$.
+% The likelihood of all implemented multivariate ordinal regression models (in case of the panel notation $j$ and $\bm{x}_{ij}$ have to be replaced by $t$ and $\bm{x}_{it}$) can be represented in the following form:
+%% \begin{align*}
+%%  L (\bm\Gamma) &= \prod_{i=1}^n \P(Y_{i1} = r_{i1}, Y_{i2} = r_{i2}, \ldots, Y_{iJ} = r_{iJ})^{w_i}\\
+%%  &= \prod_{i=1}^n \left(\int\limits_{\theta_{1,r_{i1}-1}- \beta_{j0} - \bm{x}_{ij}^\top \bm{\beta}_j}^{\theta_{1,r_{i1}}- \beta_{j0} - \bm{x}_{ij}^\top \bm{\beta}_j} \cdots \int\limits_{\theta_{J_i,r_{iJ_i}-1}- \beta_{j0} -\bm{x}_{ij}^\top \bm{\beta}_j}^{\theta_{J_i,r_{iJ_i}}- \beta_{j0} -\bm{x}_{ij}^\top \bm{\beta}_j} f_{J}(v_{i1}, \ldots, v_{iJ}; \bm{R}) dv_{i1} \ldots dv_{iJ}\right)^{w_i}
+  %% \end{align*}
+%% where $f_q$ denotes the density of a $q$-dimensional distribution $F_q$.
+%Taking the logarithm yields the log-likelihood function:
+%\begin{align*}
+% \ell(\bm\Gamma) = \sum_{i=1}^n \log \left( \int\limits_{\theta_{1,y_{i1}-1}-\bm{x}_{ij}^\top \tilde{\bm{\beta}}_j}^{\theta_{1,y_{i1}}- \bm{x}_{ij}^\top \tilde{\bm{\beta}}_j} \cdots \int\limits_{\theta_{J_i,y_{iJ_i}-1}-\bm{x}_{ij}^\top \tilde{\bm{\beta}}_j}^{\theta_{J_i,y_{iJ_i}}-\bm{x}_{ij}^\top \tilde{\bm{\beta}}_j} \phi_{J_i}(z_{i1}, \ldots, z_{iJ_i}; \bm{R}_i) dz_{i1} \ldots dz_{iJ_i}\right).
+%\end{align*}
+
+ We approximate the full likelihood by a pseudolikelihood which is
+ constructed from bivariate marginal distributions. If the number of
+ observed outcomes for subject~$i$ is less than two ($q_i<2$), then
+ the univariate marginal distribution enters the likelihood. For the
+ sake of notation we introduce an $n\times q$ binary index matrix $Z$,
+ where each element $z_{ij}$ takes a value of $1$ if $j \in J_{i}$ and
+ $0$ otherwise. The pairwise log-likelihood function is obtained by:
+\begin{align}\label{eqn:logpl}
+  p\ell(\bm\Gamma|Y)= \sum_{i=1}^n w_i &
+  \left[\sum_{k=1}^{q-1} \sum_{l = k +1}^{q} \mathbbm{1}_{\{z_{ik}
+      z_{il} = 1\}} \log\left(\Prob(Y_{ik} = r_{ik}, Y_{il} =
+    r_{il}|\bm\Gamma)\right)+\right.\nonumber \\ &
+    \mathbbm{1}_{\{q_i = 1\}} \left.\sum_{k=1}^{q}
+    \mathbbm{1}_{\{z_{ik}=1\}}\log\left(\Prob(Y_{ik} = r_{ik},|\bm\Gamma) \right)\right].
+\end{align}
+Denoting by $U_{ij} = ( \theta_{j,r_{ij}} - \beta_{j0} -\bm
+x_{ij}^\top\bm{\beta}_j)/\sigma_{ij}$ the upper and by $L_{ij} =
+(\theta_{j,r_{ij}-1} - \beta_{j0} -
+\bm{x}_{ij}^\top\bm{\beta}_j)/\sigma_{ij}$ the lower integration
+bounds, the uni- and bivariate probabilities are given by:
+\begin{align*}
+\Prob(Y_{ik} &= r_{ik}, Y_{il} = r_{il}|\cdot)
+=\displaystyle\int_{L_{ik}}^{U_{ik}}
+\displaystyle\int_{L_{il}}^{U_{il}} f_{2}(v_{ik},v_{il}|\cdot) dv_{ik}dv_{il},\\
+\Prob(Y_{ik} &= r_{ik}|\cdot) =\displaystyle \int_{L_{ik}}^{U_{ik}} f_{1}(v_{ik})
+dv_{ik}.
+\end{align*}
+
+The maximum pairwise likelihood estimates
+$\hat{\bm\Gamma}_{\text{PL}}$ are obtained by direct maximization of
+the composite likelihood given in Equation~\ref{eqn:logpl}. The parameters to be estimated are
+reparametrized (where needed) such that unconstrained optimization can
+be performed. First, we reparametrize the threshold parameters in
+order to achieve monotonicity.  Second, for all unrestricted
+correlation (and covariance) matrices we use the spherical
+parameterization of \cite{Pinheiro96}. This parameterization has the
+advantage that it can be easily applied to correlation
+matrices. Third, if we assume to have equicorrelated or $AR(1)$
+errors, we use the hyperbolic tangent transformation.
+
+Computation of the standard errors is needed in order to quantify the
+uncertainty of the maximum pairwise likelihood estimates. Under
+certain regularity conditions, the maximum pairwise likelihood
+estimates are consistent as the number of responses is fixed and
+$n\rightarrow \infty$. In addition, the maximum pairwise likelihood
+estimator is asymptotically normal with asymptotic mean $\bm\Gamma$
+and a covariance matrix which equals the inverse of the Godambe
+information matrix:
+\begin{align*}
+  G(\bm\Gamma)^{-1} = H^{-1}(\bm\Gamma)V(\bm\Gamma)
+H^{-1}(\bm\Gamma),
+\end{align*}
+where $G(\bm\Gamma)$ denotes the Godambe information matrix,
+$H(\bm\Gamma)$ the Hessian (sensitivity matrix) and $V(\bm\Gamma)$
+the variability matrix. The Hessian
+$H(\bm\Gamma)$ and variability matrix $V(\bm\Gamma)$ can be estimated
+as follows:
+\begin{equation*}
+\hat V(\bm\Gamma)= \frac{1}{n} \sum_{i=1}^n \frac{\partial
+  p\ell_i(\hat{\bm\Gamma}_{\text{PL}}|\bm Y_i)}{\partial \bm\Gamma}
+\left(\frac{\partial p\ell_i(\hat{\bm\Gamma}_{\text{PL}}|\bm Y_i)}{\partial
+  \bm\Gamma}\right)^{\top},\enspace \hat H(\bm\Gamma) = -\frac{1}{n}
+\sum_{i=1}^n \frac{\partial^2 p\ell_i(\hat{\bm\Gamma}_{\text{PL}}|\bm
+  Y_i)}{\partial \bm\Gamma\partial\bm\Gamma^\top},
+\end{equation*}
+where $p\ell_i(\bm\Gamma|\bm Y_i)$ is the component of the pairwise
+log-likelihood corresponding to subject~$i$.
+It is possible to avoid the computation of the second-order derivatives,
+as the Hessian can be computed as:
+$$\hat H(\bm\Gamma) = \frac{1}{n}
+\sum_{i=1}^n \sum_{k<l, k,l\in J_i}
+\left(\frac{\partial p\ell_i(\hat{\bm\Gamma}_{\text{PL}}|Y_{ik},Y_{il})}{\partial \bm\Gamma}\right)
+\left(\frac{\partial p\ell_i(\hat{\bm\Gamma}_{\text{PL}}|Y_{ik},Y_{il})}{\partial \bm\Gamma}\right)^\top.$$%
+
+In order to compare different models, the composite likelihood information criterion can
+be used: $\text{CLIC}(\bm\Gamma) =
+-2\ p\ell(\hat{\bm\Gamma}_{\text{PL}}|X, Y) + k\ \mathrm{tr}(\hat
+V(\bm\Gamma)\hat H(\bm\Gamma)^{-1})$ (where $k=2$ corresponds to
+CLAIC and $k=\text{log}(n)$ corresponds to CLBIC). A
+comprehensive overview and further details on the properties of the
+maximum composite likelihood estimates is provided in
+\cite{varin08}.
+
+% We use three reparameterizations in our implementation. First, in
+% order to achieve monotonicity we use an unconstrained parameterization
+% of the threshold parameters. Second, for all unrestricted correlation
+% and covariance matrices we use the spherical parameterization of
+% \cite{Pinheiro96}. This parameterization for covariance matrices has
+% the advantage that it can be easily applied to correlation
+% matrices. Third, if we assume to have equicorrelated or $AR(1)$
+% errors, we use Fisher's $z$-transformation to obtain an unconstrained
+% correlation parameter.
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % IMPLEMENTATION
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Implementation}
+Multivariate ordinal regression models in the \proglang{R} package
+\pkg{mvord} are fitted using the function \code{multord()}
+<<eval = FALSE>>=
+multord(formula,
+        error.structure = corGeneral(~1),
+        link = c("probit", "logit"),
+        data,
+        index = NULL,
+        response.names = NULL,
+        response.levels = NULL,
+        coef.constraints = NULL,
+        coef.values = NULL,
+        threshold.constraints = NULL,
+        threshold.values = NULL,
+        weights = NULL,
+        se = TRUE,
+        start.values = NULL,
+        solver = "BFGS",
+        control = list(maxit=200000, trace = 1, kkt = FALSE)
+)
+@
+Two link functions and different error structures are implemented in
+\code{multord()}. By default, threshold parameters and regression
+coefficients are allowed to be outcome specific. However, this can be
+restricted by the user, who can specify constraints on the threshold
+parameters and/or on the regression coefficients.
+
+All features are
+illustrated by means of a simulated data set which corresponds to an application in credit
+risk modeling.
+<<>>=
+head(data_cr_multord, n = 3)
+str(data_cr_multord, vec.len = 3)
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Data structure}
+We use the long format for the input of \code{data}, where each row
+contains a subject index~$i$ (\code{firm_id}), a repeated measurement
+index~$j$ (\code{rater_id}), an ordinal response (\code{rating}) and
+all the covariates (\code{ICR}, \code{LR}, \code{LEV1}, \code{LEV2},
+\code{PR}, \code{lRSIZE} and \code{lSYSR}). This long format data
+stucture is internally transformed to a matrix of responses $Y$ (which
+contains \code{NA} in the case of missing entries) and a list of
+covariate matrices $X_j$ for all $j \in J$\footnote{In order to avoid
+numerical instabilities we suggest to standardize the covariates
+$\bm{x}_{ij}$.}. In order to construct these objects, subject
+index~$i$ and the repeated measurement index~$j$ should be
+specified. This can be performed by an optional argument \code{index},
+a character vector of length two, specifying the column names of the
+subject index and the repeated measurement index in \code{data}. In the credit risk example we set:
+<<>>=
+index <- c("firm_id", "rater_id")
+index
+@
+The default value of \code{index} is \code{NULL} assuming that the
+first column of \code{data} contains the subject index~$i$ and the second
+column the repeated measurement index~$j$. If specific constraints are imposed on the threshold parameters and/or
+on the regression coefficients, it is important to know which level of
+the repeated measurement index~$j$ corresponds to the first dimension,
+second dimension and so on. Hence, a well defined index $j \in J$ for
+the repeated measurements is needed. Therefore, a vector
+\code{response.names} is used to define the index number of the
+repeated measurements:
+<<>>=
+response.names <- c("R1", "R2", "R3", "R4")
+response.names
+@
+
+The default value of \code{response.names} is \code{NULL} giving the
+natural ordering of the levels of the factor variable for all the
+repeated measurements. The ordering of \code{response.names} always
+specifies the index of the repeated measurement unit $j \in J$. This
+ordering is essential when putting constraints on the parameters and
+when setting \code{response.levels}:
+<<>>=
+response.levels <-  list(rev(LETTERS[1:6]),
+                         rev(LETTERS[1:6]),
+                         rev(LETTERS[7:13]),
+                         rev(LETTERS[14:15]))
+names(response.levels) <- response.names
+response.levels
+@
+
+If the categories differ across repeated measurements (either the
+number of categories and/or the category labels) one needs to specify
+the \code{response.levels} explicitly. This is performed by a list of
+length $J$ (number of repeated measurements), where each element
+contains the names of the levels of the ordered categories in
+ascending (or if desired descending) order.
+% In addition, a second function \code{multord2} is available for
+% cross-sectional models. For this function a cross-sectional specific
+% data structure is applied, where the repeated ordinal observations
+% as well as the covariates are stored as columns in a
+% \code{data.frame} with corresponding names as labels. In this case
+% each subject corresponds to one row of the data frame, where all
+% repeated observations ($Y_{i1}, \ldots, Y_{iJ}$) with all the
+% covariates ($x_{i1}, \ldots, x_{ip}$) are stored in different
+% columns.  \subsubsection{multord2} For the multord2 model the data can be
+% stored in two different ways. In the first alternative the repeated
+% ordinal observations as well as the covariates are stored as columns
+% in a \code{data.frame} with corresponding names as labels. In this
+% case each subject corresponds to one row of the data frame, where
+% all repeated observations with all the covariates are stored in
+% different columns. In the second alternative each single measurement
+% together with its covariates is stored in a seperate row of the data
+% frame, where one variable indexes the subject and one factor
+% variable indexes the response index of the multiple measurement. In
+% this case the data frame conatins several rows for each subject.
+\subsection{Formula}
+The ordinal responses $Y$ (\code{rating}) and the covariates are passed by a
+\code{formula} object. Intercepts can be included or excluded in the
+model depending on the model parameterization chosen in order to
+ensure identifiability:
+\paragraph{Model without intercept}
+If the intercept should be removed, the \code{formula} of a given
+response (\code{rating}) and covariates (\code{ICR}, \code{LR}, \code{LEV1}, \code{LEV2}, \code{PR}, \code{lRSIZE} and \code{lSYSR}) has
+the following form:
+<<>>=
+formula <- rating ~ 0 + ICR + LR + LEV1 + LEV2 + PR + lRSIZE + lSYSR
+@
+\paragraph{Model with intercept}
+If one wants to include an intercept in the model, there are two
+equivalent possibilities to set the model \code{formula}. Either the
+intercept is included explicitly by:
+<<>>=
+formula <- rating ~ 1 + ICR + LR + LEV1 + LEV2 + PR + lRSIZE + lSYSR
+@
+or by
+<<>>=
+formula <- rating ~ ICR + LR + LEV1 + LEV2 + PR + lRSIZE + lSYSR
+@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Link function}
+We allow for two different link functions, the probit link (\code{link   =
+"probit"}) and the logit link (\code{link = "logit"}). For the probit link a
+multivariate normal distribution for the errors is applied, while for the
+logit link an approximate multivariate logistic distribution is used. The
+ normal bivariate probabilities which enter the pairwise log-likelihood are
+computed with the \proglang{R} package \pkg{pbivnorm} \citep{pbivnorm}.
+The bivariate $t$ probabilities are computed using \proglang{Fortran} code from Alan Genz \citep{Genz09}.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Error structures}
+We allow for several different error structures depending on the model parameterization:
+\begin{itemize}
+  \item \textbf{Correlation}
+  \begin{itemize}
+   \item \code{corGeneral}\\
+    The most common parameterization is the general correlation matrix given in Equation~\ref{eqn:multord2cor}. This error structure is applied by:
+<<>>=
+error.structure <- corGeneral(~ 1)
+@
+This paramterization can be extended by allowing a factor dependent correlation structure, where the correlation of each subject~$i$ depends on a given factor \code{f}.
+<<>>=
+error.structure = corGeneral(~ f)
+@
+The factor \code{f} is not allowed to vary across repeated measurements~$j$ for the same subject~$i$ and due to numerical constraints only up to maximum 30 levels are allowed.
+
+    \item \code{corEqui}\\
+   A covariate dependent equicorrelation structure, where the correlations are equal across all $q$ dimensions and depend on some covariates \code{S1, ..., Sm}, is used by:
+<<>>=
+error.structure <- corEqui(~ S1 + ... + Sm)
+@
+   It has to be noted that these covariates \code{S1, ..., Sm} as well as the factor \code{f} are not allowed to vary across repeated measurements~$j$ for the same subject~$i$.
+
+    \item \code{corAR1}\\
+    An autoregressive error structure of order one $AR(1)$ is obtained by:
+<<>>=
+error.structure = corAR1(~ 1)
+@
+In order to account for some heterogeneity the $AR(1)$ error structure is allowed to depend on covariates \code{S1, ..., Sm} that are constant over time for each subject $i$
+<<>>=
+error.structure = corAR1(~ S1 + ... + Sm)
+@
+  \end{itemize}
+  \item \textbf{Covariance}
+  \begin{itemize}
+    \item \code{covGeneral}\\
+In case of a full variance-covariance parameterization given in Equation~\ref{eqn:multord2cov} the standard parameterization with a full variance-covariance is obtained by:
+<<>>=
+error.structure = covGeneral(~ 1)
+@
+This parameterization can be extended to the factor dependent covariance structure, where the covariance of each subject depends on a given factor \code{f}:
+<<>>=
+error.structure = covGeneral(~ f)
+@
+  \end{itemize}
+\end{itemize}
+
+\begin{table}[h!]
+\begin{tabularx}{\textwidth}{|l|C|C|C|C|}
+\hline
+\code{error.structure}  & Cov. structure ($\bm \Sigma$) & Corr. structure  ($\bm R$)& Factor dependent & Covariate dependent\\
+\hline
+\code{corGeneral(\~ \,1)}  & & \checkmark &&\\
+\hline
+\code{corGeneral(\~ \,f)}  & & \checkmark &\checkmark&\\
+\hline
+\code{covGeneral(\~ \,1)}  & \checkmark & &&\\
+\hline
+\code{covGeneral(\~ \,f)}  & \checkmark & &\checkmark&\\
+\hline
+\code{corEqui(\~ \,1)}  & & \checkmark &&\\
+\hline
+\code{corEqui(\~ \,S)}  & & \checkmark &&\checkmark\\
+\hline
+\code{corAR1(\~ \,1)} &  & \checkmark & &\\
+\hline
+\code{corAR1(\~ \,S)} &  & \checkmark &&\checkmark\\
+\hline
+\end{tabularx}
+\caption{This table gives an overview on the error structures in \pkg{mvord}.}
+\end{table}
+
+\subsection{Constraints on threshold coefficients}
+The package supports constraints on the threshold
+parameters. Firstly, the user can specify whether the threshold
+parameters should be equal across some or all response dimensions.
+Secondly, the values of some of the threshold parameters can be fixed.
+This feature is important for the users who wish to further restrict
+the parameter space of the thresholds or who wish to specify values
+for the threshold parameters other than the default values used in the
+package.  Note that fixing some of the thresholds is needed for some
+of the parameterizations presented in
+Table~\ref{table:Identifiability} in order to ensure identifiability
+of the model.
+%%%%%%%%%%%%%%%%%%
+\subsubsection{Threshold constraints across responses}
+Such constraints can be imposed by a vector of positive integers
+\code{threshold.constraints}, where dimensions with equal threshold
+parameters obtain the same integer. When restricting two outcome
+dimensions to be the same, one has to be careful that the number of
+categories in the two outcome dimensions must be the same. In our
+example with $q=4$ different outcomes, if one wishes to restrict the
+threshold parameters of \code{R1} and \code{R2} to be equal,
+i.e.:
+\begin{itemize}
+\item[-] $\bm\theta_{1} = \bm\theta_{2}$;
+\item[-] $\bm\theta_{3},\, \bm\theta_{4}$ arbitrary.
+\end{itemize}
+These constraints on the threshold parameters are specified by:
+<<>>=
+threshold.constraints <- c(1, 1, 2, 3)
+names(threshold.constraints) <- response.names
+threshold.constraints
+@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
+\subsubsection{Fixing threshold values}
+Values for the threshold parameters can be specified by the
+argument \code{threshold.values}. For this purpose the user can pass a \code{list} with $q$ elements, where each element
+is a \code{vector} of length $K_j - 1$ (where $K_j$ is number of
+ordered categories for ordinal outcome~$j$). A numeric value in this vector
+fixes the corresponding threshold parameter to the specified value
+while \code{NA} leaves the parameter flexible and indicates it should
+be estimated.
+
+After specifying the error structure (through the
+\code{error.structure} argument) and whether an intercept should be
+estimated or not (in the \code{formula} argument), the user can choose
+among five possible options for fixing the thresholds:
+\begin{itemize}
+  \item leaving all thresholds flexible;
+  \item fixing, for all $j\in J$, the first threshold $\theta_{j,1}$ to a constant $a_j$;
+  \item fixing, for all outcomes with $K_j > 2$, the first and second thresholds
+    $\theta_{j,1}=a_j$, $\theta_{j,2}=b_j$;
+  \item fixing,  for all outcomes with $K_j > 2$, the first and last thresholds
+     $\theta_{j,1}=a_j$, $\theta_{j,K_j-1}=b_j$;
+  \item an extra option is fixing all of the threshold parameters, for all $j\in J$.% TODO cite Gree p111 ugly format
+\end{itemize}
+Note that the option chosen needs to be consistent across the
+different outcomes (e.g., it is not allowed to fix first and last
+threshold for one outcome and first and second threshold for a
+different).  Table~\ref{table:Identifiability} provides information
+about the options available for each combination error structure and
+intercept, as well as about the default values in case the user does
+not specify any threshold values.
+
+% TODO:Rainer Note that if at least one of the responses is binary ($K_j = 2$), in the cov general case first threshold must be fixed for all outcome dimensions! Example corGeneral + intercept +  threshold.values <- list(c(-4,NA,NA,NA,NA,4.5),
+%                          c(-4,NA,NA,NA,NA,4),
+%                          c(-5,NA,NA,NA,NA,NA,4.5),
+%                          c(-2.5)) works as the minimal requirements are ok!
+
+\begin{table}[h!]
+\label{table:Identifiability}
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabularx}{\textwidth}{|C|C|C|C|C|C|C|}%{p{1.4cm}|p{1.4cm}|p{1.3cm}|X|X|X|X|}%{|C|C|C|C|C|C|C|C|}
+\hline
+\multirow{4}{=}{\centering Error Structure}&\multirow{4}{=}{\centering Intercept} & \multicolumn{5}{c|}{Thresholds}\\
+\cline{3-7}
+ & & all flexible & one fixed & two fixed & two fixed & all fixed \\
+&   & & $\theta_{j,1}=a_j$ & $\theta_{j,1}=a_j$  &$\theta_{j,1}=a_j$  & \\
+ &  &&& $\theta_{j,2}=b_j$ & $\theta_{j,K_j-1}=b_j$ & \\
+\hline
+\multirow{2}{*}{\code{cor}}  &no     &\textcolor{green}{\checkmark} &\checkmark&\checkmark&\checkmark&\checkmark\\
+ &yes    &   &\textcolor{green}{\checkmark} & \checkmark &\checkmark&\checkmark\\
+\hline
+\multirow{2}{*}{\code{cov}}  & no &   & \textcolor{green}{\checkmark } & \checkmark &  \checkmark &  \checkmark\\
+ &yes&  &  & \textcolor{green}{\checkmark }&\checkmark &\checkmark\\
+\hline
+\end{tabularx}
+\caption{This table displays different model parameterizations in the presence of truly ordinal observations ($K_j > 2 \; \forall j \in J$). The
+  row \code{cor} includes error structures \code{corGeneral},
+  \code{corEqui} and \code{corAR1}, while row \code{cov} includes the
+  error structure \code{covGeneral}. The minimal restrictions (default) to
+  ensure identifiability are given in green. The default threshold values (in
+  case \code{threshold.values = NULL}) are always $a_j = 0$ and $b_j = 1$.}
+\end{table}
+
+In the presence of binary observations ($K_j = 2$) in connection with a covariance error structure, the intercept has always to be fixed to some value due to identifiability constraints. In a correlation structure setting no further restrictions are required.
+
+For example, the following restrictions on the threshold parameters
+\begin{itemize}
+\item $\theta_{11} = -4 \leq \theta_{12} \leq \theta_{13}\leq
+  \theta_{14}\leq \theta_{15} \leq \theta_{16} $;
+\item $\theta_{21} = -4 \leq \theta_{22} \leq \theta_{23}\leq
+  \theta_{24}\leq \theta_{25} \leq \theta_{26} $;
+\item $\theta_{31} = -5 \leq \theta_{32} \leq \theta_{33}\leq
+  \theta_{34}\leq \theta_{35} \leq \theta_{36} \leq \theta_{37}$;
+\item $\theta_{41} = 0$.
+\end{itemize}
+are implemented as:
+<<>>=
+threshold.values <- list(c(-4, NA, NA, NA, NA, NA),
+                         c(-4, NA, NA, NA, NA, NA),
+                         c(-5, NA, NA, NA, NA, NA, NA),
+                         c(0))
+names(threshold.values) <- response.names
+threshold.values
+@
+%% ------------------------------------------------------------
+%% In the credit risk example we
+%% have (TODO THIS DOES NOT WORK for covGeneral with intercept!!!)
+%% <<>>=
+%% threshold.values <- list(c(-4,NA,NA,NA,NA,4.5),
+%%                          c(-4,NA,NA,NA,NA,4),
+%%                          c(-5,NA,NA,NA,NA,NA,4.5),
+%%                          c(-2.5))
+%% @
+%% which results in
+%% \begin{itemize}
+%% \item[-] $\theta_{11} = -4 \leq \theta_{12} \leq \theta_{13}\leq
+%%   \theta_{14}\leq \theta_{15} \leq \theta_{16} = 4.5$,
+%% \item[-] $\theta_{21} = -4 \leq \theta_{22} \leq \theta_{23}\leq
+%%   \theta_{24}\leq \theta_{25} \leq \theta_{26} = 4$,
+%% \item[-] $\theta_{31} = -5 \leq \theta_{32} \leq \theta_{33}\leq
+%%   \theta_{34}\leq \theta_{35} \leq \theta_{36} \leq \theta_{37} =
+%%   4.5$,
+%% \item[-] $\theta_{41} = -2.5$.
+%% \end{itemize}
+%% \subsubsection{Set specific threshold values} In addition,
+%% threshold parameter values can be specified by
+%% \code{threshold.values} in accordance with identifiability
+%% constraints. For this purpose we use a \code{list} with $J$
+%% elements, where each element specifies the constraints of the
+%% particular dimension by a vector of length of the number of
+%% threshold parameters (number of categories - 1).  A number
+%% specifies a threshold parameter to a specific value and \code{NA}
+%% leaves the parameter flexible.  All threshold parameters values
+%% need to be fixed according to the identifiablity constraints given
+%% in Table~\ref{table:Identifiability}. These constraints have to be
+%% consistent across all dimensions.  %TODO: What is allowed refer to
+%% table ..
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Constraints on Coefficients}
+Similar to the threshold parameters, the package supports
+constraints on the regression coefficients. Firstly, the
+user can specify whether the regression coefficients should be equal
+across some or all response dimensions. Secondly, the values of some
+of the regression coefficients can be fixed.
+
+\subsubsection{Coefficient constraints across responses}
+Such constraints can be specified by a vector or a matrix
+\code{coef.constraints}, which can be either a vector or a matrix of
+integer values.
+
+If vector constraints of the type $\bm \beta_{k} = \bm \beta_{l}$, are desired, which
+should hold for all $p$~regression coefficients corresponding to
+outcome $k$ and $l$, the easiest way to specify this is by means of a
+vector of integers of dimension~$q$, where outcomes with equal vectors
+of regression coefficients get the same integer.
+
+For example, for $q=4$, a model where the regression coefficients of
+the first and second outcomes are equal ($\bm\beta_{1} =
+\bm\beta_{2}$), while the coefficients of outcomes three and four are
+unrestricted, can be specified as:
+<<>>=
+coef.constraints <- c(1, 1, 2, 3)
+names(coef.constraints) <- response.names
+coef.constraints
+@
+
+A more flexible framework allows the user to specify such constraints
+for each of the regression coeffiecients of the $p$~covariates, not only for the whole
+vector. Such constraints will be specified by means of a matrix of
+dimension $q\times p$, where each column specifies constraints for one
+of the $p$~covariates in the same way presented above. Moreover, a
+value of \code{NA} indicates that the corresponding coefficient is
+fixed (as we will show below) and should not be estimated.
+
+The following constraints on the regression coefficients:
+\begin{itemize}
+\item[-] $\beta_{12} = \beta_{22} = \beta_{32}$;
+\item[-] $\beta_{13} = 0$, $\beta_{23} = 0$, $\beta_{33} = 0$;
+\item[-] $\beta_{14} = \beta_{24} = \beta_{34}$, $\beta_{44} = 0$;
+\item[-] $\beta_{15} = \beta_{25} = \beta_{35}=\beta_{45} = 2$;
+\end{itemize}
+give rise to the following model:
+\begin{alignat*}{8}
+\widetilde Y_{i1} &= \beta_{11} x_{i1} &&+ \beta_{12} x_{i2} &&+ \beta_{14} x_{i4} &+ 2 x_{i5} &&+ \beta_{16} x_{i6} &&+ \beta_{17} x_{i7} ,\\
+\widetilde Y_{i2} &= \beta_{21} x_{i1} &&+ \beta_{12} x_{i2} &&+  \beta_{14} x_{i4} &+ 2 x_{i5} &&+ \beta_{26} x_{i6} &&+ \beta_{27} x_{i7} ,\\
+\widetilde Y_{i3} &= \beta_{31} x_{i1} &&+ \beta_{12} x_{i2} &&+ \beta_{14}  x_{i4} &+ 2 x_{i5} &&+ \beta_{36} x_{i6} &&+ \beta_{37} x_{i7},\\
+\widetilde Y_{i4} &= \beta_{41} x_{i1} &&+ \beta_{42} x_{i2} &+ \beta_{43} x_{i3} &&+2 x_{i5} &&+ \beta_{46} x_{i6} &&+ \beta_{47} x_{i7}.
+\end{alignat*}
+
+These restrictions on the parameter set of the regression coefficients are imposed by:
+<<>>=
+coef.constraints = cbind(c(1, NA, 1, NA),
+                         c(NA, NA, NA, 1),
+                         c(1, 1, 1, NA),
+                         c(1, 2, 3, 4),
+                         c(1, 1, 1, 4),
+                         c(1, 2, 3, 4),
+                         c(NA, NA, NA, 1))
+rownames(coef.constraints) <- response.names
+colnames(coef.constraints) <- c("ICR", "LR", "LEV1", "LEV2", "PR",
+                                "lRSIZE", "lSYSR")
+coef.constraints
+@
+
+Specific values of coefficients can be fixed
+through the \code{coef.values} argument, as we will show in the
+following.
+\subsubsection{Fixing coefficient values}
+In addition, specific values on regression coefficients can be set in
+the $q\times p$ matrix \code{coef.values}. Again each column
+corresponds to the regression coefficients of one covariate. This
+feature is to be used if some of the covariates have known slopes, but
+also for excluding covariates from the mean model of some of the
+outcomes (by fixing the regression coefficient to zero).
+
+By default, if no \code{coef.values} are passed by the user, all the
+regression coefficients which receive an \code{NA} in
+\code{coef.constraints} will be set to zero. \code{NA} in the
+\code{coef.values} matrix indicates the regression coefficient ought
+to be estimated.
+%% Parameters are removed if the value is set to zero (default for
+%% \code{NA}'s in \code{coef.constraints}) or to some fixed value. If
+%% constraints on parameters are set, these dimensions need to have
+%% the same value in \code{coef.values}. Again each column corresponds
+%% to one regression coefficient.
+%%
+%%
+% For example, one particular column $j$ of the
+% \code{coef.constraints} matrix together with the corresponding
+% \code{coef.values} column <<>>= coef.constraints_j <- c(1,NA,1,2)
+% coef.constraints_j coef.values_j <- c(NA,0,NA,NA) coef.values_j @
+% results in the following constraints on the beta
+% coefficients: \begin{align*} \beta_{j1} = \beta_{j3},\, \beta_{j2} =
+% 0 \text{ and } \beta_{j4} \text{ arbitrary}.  \end{align*}
+%% In the credit risk example, the constraints given by \code{coef.constraints} and \code{coef.values}
+% \begin{verbatim}
+% coef.constraints <- cbind(c(1,2,3), c(1,1,1), c(1,NA,NA), c(NA,1,1))
+% \end{verbatim}
+% with the corresponding matrix \code{coef.values} (default values are 0; otherwise different values can be set)
+% \begin{verbatim}
+% coef.constraints <- cbind(c(NA,NA,NA), c(NA,NA,NA), c(NA,0,0), c(0,NA,NA))
+% \end{verbatim}
+For the example above, we have:
+<<>>=
+coef.values <- cbind(c(NA, NA, NA, NA),
+                     c(NA, NA, NA, NA),
+                     c(0, 0, 0, NA),
+                     c(NA, NA, NA, 0),
+                     c(2, 2, 2, 2),
+                     c(NA, NA, NA, NA),
+                     c(NA, NA, NA, NA))
+rownames(coef.values) <- response.names
+colnames(coef.values) <- c("ICR", "LR", "LEV1", "LEV2", "PR",
+                           "lRSIZE", "lSYSR")
+coef.values
+@
+\paragraph{Note on interaction terms and factor covariates}
+When constraints on the regression coefficients should be specified in
+models with interaction terms or factor covariates, the
+\code{coef.constraints} matrix has to be constructed appropriately. If
+the order of the terms in the covariate matrix is not clear to the
+user, it is helpful to call the function \code{model.matrix()}
+before constructing the \code{coef.constraints} and \code{coef.values}
+matrices. The command
+<<>>=
+formula <- rating ~ 0 + ICR : LR + LEV1 + LEV2 + PR + lRSIZE * lSYSR
+colnames(model.matrix(formula, data = data_cr_multord))
+@
+will give the names of each column in the covariate matrix and should be used when setting up the coefficient constraints.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
+\subsection{Additional arguments}
+% \subsubsection{Starting values} Starting values can be chosen
+% manually by: \begin{verbatim} start.values = c(start.values.theta,
+% start.values.beta, start.values.sigma).  \end{verbatim} This
+% parameter vector has the length of the number of parameters that
+% have to be optimized (e.g., fixed threshold parameters are not
+% included). The starting values are passed directly to the
+% optimizers and must therefore correspond to the transformed
+% parameters (see Section).  If no starting values are passed to the
+% function, they are set automatically.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Weights}
+\sloppy
+Weights on each subject~$i$ can be chosen in a way that they are
+constant across repeated measurements. Weights should be part of the
+\code{data}.  The column name of the weights in \code{data} should be
+passed to this argument. Negative weights are not allowed.
+\subsubsection{Solver}
+All general-purpose optimizers of the \proglang{R} package
+\pkg{optimx} can be used for maximization of the composite
+log-likelihood. These are \code{"Nelder-Mead", "BFGS", "CG",
+  "L-BFGS-B", "nlm", "nlminb", "spg", "ucminf", "newuoa", "bobyqa",
+  "nmkb", "hjkb", "Rcgmin"} and \code{"Rvmmin"} \citep{optimx1,
+  optimx2}. The default is the \code{"BFGS"} solver.
+  However, also the \code{"newuoa"} solver performed very well in terms of convergence in our experiments.
+  Moreover, if the user desires a specific solver which is not implemented in the \proglang{R} package \pkg{optimx}, other applicable solvers can be used by using a wrapper function with arguments \code{starting.values}, \code{objFun}, \code{control} of the following form:
+<<eval = FALSE>>=
+solver = function(starting.values, objFun, control){
+  optRes <- solver.function(...)
+  list(optpar = , optRes$optpar, # a vector of length equal to number of parameters to optimize
+       objvalue = optRes$objvalue) # value of objective function
+}
+@
+The output of the \code{solver.function} has to be a list of vector of length of the \code{starting.values} (threshold parameters, regression coefficients and error structure parameters) and value of the objective function.
+\subsubsection{Standard errors}
+If \code{se = TRUE} standard errors are computed using the Godambe
+information matrix (see Section~\ref{sect:estimation}).
+
+\subsubsection{Starting values}
+A list of starting values for threshold as well as regression coefficients can be passed by the argument \code{start.values}. This list contains a list (with a vector of starting values for each dimension) \code{theta} of all flexible threshold parameters and a list \code{beta} of all flexible regression parameters. All fixed values need to be excluded and in case of constraints on a whole dimension (e.g., \code{threshold.constraints = c(1,1,2,3)} or \code{coef.constraints = c(1,1,2,3)}), the element can be either skipped or a vector of length zero can be set. Starting values for Example 1 in Section~\ref{sect:examples} are for example:
+<<>>=
+start.values = list(theta = list(c(-3,-1,0,0.5,2.5),
+                                 c(-3,-1,0,0.5,2,3.5),
+                                 c(0)),
+                    beta = list(c(0.05,-0.05,-0.8,1,0.2),
+                                c(-0.5,0.2),
+                                c(-0.3,0.3),
+                                c(0.5,-1.1,0.7,0.3,-1.2)))
+@
+
+
+\subsection{Methods for class "multord"}
+Several methods are implemented for the class \code{"multord"}. These
+methods include a \code{summary()} and a \code{print()} function to
+represent the estimation results, a \code{coef()} function to extract
+the regression coefficients, a \code{thresholds()} function to extract
+the threshold coefficients and a function \code{get.error.struct()} to
+extract the estimated parameters of the correlation/covariance structure of the
+errors. In addition, the pairwise log-likelihood can be extracted by \code{logPL()} as well as information critera like CLAIC by \code{claic()} and CLBIC by \code{clbic()}.
+%TODO, a predict function with ... and a plot function (not
+%implemented yet) that plots threshold coefficients as well as
+%regression coefficients.
+
+
+\subsection{Output}
+The function \code{multord} returns an object of class
+\code{"multord"},
+%% The functions \code{summary} and \code{print} can be used to
+%% display the results.  The function \code{coef} extracts the
+%% regression coefficients, a function \code{threshold} the threshold
+%% coefficients and the function \code{get.error.struct} represents
+%% the estimation of the corresponding error structure.
+which is a list containing the following
+components:
+
+%\begin{tabular}{ll}
+%\begin{table}
+\begin{tabularx}{\textwidth}{lX}
+   \code{beta} & a named \code{matrix} of regression coefficients\\
+   \code{theta} & a named \code{list} of threshold parameters \\
+\code{error.struct} & a named \code{list} of correlation (covariance) matrices, or a vector of coefficients in the \code{corEqui} or \code{corAR1} setting\\
+   \code{sebeta} & a named \code{matrix} of the standard errors of the regression coefficients\\
+   \code{setheta} & a named \code{list} of the standard errors of the threshold parameters\\
+\code{seerror.struct} & a named \code{list} of the standard errors of the correlation (covariance) matrices, or a vector of the standard errors of the coefficients in the \code{corEqui} or \code{corAR1} setting\\
+   \code{rho} & a \code{list} of all objects that are used in \code{multord}
+   \end{tabularx}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Implementation multord2()}
+Additionally, a second function \code{multord2()} is implemented, for the
+setting where the covariates do not vary between the repeated
+measurements ($\bm x_{i1}=\dots= \bm x_{iq}$):
+<<eval = FALSE>>=
+multord2(formula,
+         error.structure = corGeneral(~1),
+         data,
+         link = c("probit", "logit"),
+         coef.constraints = NULL,
+         coef.values = NULL,
+         threshold.constraints = NULL,
+         threshold.values = NULL,
+         weights = NULL,
+         se = TRUE,
+         start.values = NULL,
+         solver = "BFGS",
+         control = list(maxit = 200000, trace = 1, kkt = FALSE))
+@
+
+% \begin{verbatim}
+% multord2(formula, data, link = c("probit", "logit"), error.structure =
+%      corGeneral(~1), weights = NULL, coef.constraints = NULL,
+%      coef.values = NULL, threshold.constraints = NULL,
+%      threshold.values = NULL, se = FALSE,
+%      solver = "newuoa")
+% \end{verbatim}
+This function uses a slightly simplified data structure, where the repeated ordinal observations as well as the covariates
+are stored as columns in a \code{data.frame}. Each subject~$i$ corresponds to one row of the data
+frame, where all outcomes $Y_{i1}, \ldots, Y_{iq}$ (with missing observations set to \code{NA}) and all the covariates $x_{i1}, \ldots, x_{ip}$ are stored in different columns.
+Each outcome must be of type \code{Ord.factor}.
+<<>>=
+head(data_cr_multord2, n = 3)
+@
+In order to specify the mean model we use a
+multivariate formula object of the form:
+<<>>=
+formula <- cbind(R1, R2, R3) ~ 0 + X1 + ... + Xp
+@
+The \code{error.structure} and the constraints on the regression and
+threshold parameters are set in analogy to \code{multord()}, however,
+the ordering of the responses is given by the ordering in the model
+\code{formula}. In addition, the \code{link}, subject \code{weights},
+\code{se} and the \code{solver} are chosen in the same way as in
+\code{multord()}.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Examples
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Examples}\label{sect:examples}
+The motivation of this package lies in a credit risk application,
+where multiple credit ratings are assigned by various credit rating
+agencies (CRAs) to firms over several years. CRAs have an important
+role in financial markets, as they deliver (subjective) assessments or
+opinions of an entity's (typically firm or sovereign) creditworthiness,
+which are then used by other players on the market, such as investors and regulators, in
+their decision making process.
+Entities are assigned to rating classes by CRAs on an ordinal scale by
+using both quantitative and qualitative criteria.
+%In the context of credit risk one may think of the underlying latent variable as the latent creditworthiness of a firm, which is measured on a continuous scale.
+This setting is an example of an application where correlated ordinal
+data arises naturally. On the one hand, multiple ratings for one firm at the
+same point in time can be assumed to be correlated
+and on the other hand, given the longitudinal dimension of the data, for
+each rater, there is serial dependence in the ratings assigned over
+several periods.
+
+The data set used in the original credit risk application cannot be
+made available due to proprietary reasons. We therefore resort to the
+simulation of data sets which have a similar structure to the original data.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Example 1 -- ratings assigned by multiple raters to a cross-section of firms}
+The first example presents a multivariate ordinal logit regression model with a general correlation error structure (\code{corGeneral(~ 1)}).
+The simulated data set contains the credit risk measure \code{rating} (ratings assigned by raters \code{R1}, \code{R2}, \code{R3} and \code{R4}) and 8 covariates for a cross-section of \Sexpr{length(unique(data_cr_multord[,"firm_id"]))} firms.
+The number of firm-ratings is \Sexpr{NROW(data_cr_multord)}.
+<<>>=
+head(data_cr_multord, n = 3)
+str(data_cr_multord, vec.len = 3)
+@
+The panel of ratings is unbalanced:
+<<>>=
+nfirms <- length(unique(data_cr_multord$firm_id))
+table(data_cr_multord$rater_id)/nfirms
+@
+<<echo=F>>=
+tab <- round(table(data_cr_multord$rater_id)/nfirms * 100)
+@
+We observe that rater~\code{R1} rates \Sexpr{tab[1]}\% of the firms, rater~\code{R2} rates only \Sexpr{tab[2]}\% of the firms,
+rater~\code{R3} rates \Sexpr{tab[3]}\% of the firms and rater~\code{R4} rates all the firms in the sample.
+
+The distribution of the ratings classes for the four raters is:
+<<>>=
+by(data_cr_multord,  data_cr_multord$rater_id,
+    function(x) table(x$rating))
+@
+
+We include 7 financial ratios as covariates in a model without intercept by the formula:
+<<>>=
+formula <- rating ~ 0 + ICR + LR + LEV1 + LEV2 + PR + lRSIZE + lSYSR
+formula
+@
+The subject index $i$ is stored in the column \code{firm_id} and the multiple measurement index $j$, which indicates the rater, is given by \code{rater_id}:
+<<>>=
+index <- c("firm_id", "rater_id")
+index
+@
+An optional vector \code{response.names} is used to specify all the raters to be included in the model. The ordering of this vector is essential when constraints on the parameter set want to be imposed:
+<<>>=
+response.names <- c("R1", "R2", "R3", "R4")
+response.names
+@
+Due to the fact that the categories differ across raters we specify the \code{response.levels} by:
+<<>>=
+response.levels <-  list(rev(LETTERS[1:6]),
+                         rev(LETTERS[1:6]),
+                         rev(LETTERS[7:13]),
+                         rev(LETTERS[14:15]))
+names(response.levels) <- response.names
+response.levels
+@
+If no \code{response.levels} are passed, the natural ordering is used and could lead to an incorrect labeling.
+The rating classes assigned by the raters are here in order from worst to best indicating that lower values of the latent variables indicate lower creditworthiness or increased credit risk.
+
+We fit a model to these data which:
+\begin{itemize}
+ \item assumes that \code{R1} and \code{R2} use the same rating scale by setting the following constraints on the threshold parameters:
+<<>>=
+ threshold.constraints <- c(1,1,2,3)
+ names(threshold.constraints) <- response.names
+ threshold.constraints
+@
+\item assumes that some covariates are equal for some raters. For example, we assume that the coefficient of \code{ICR} is equal for \code{R1} and \code{R3}, or that the coeffiecients of \code{LEV1} and \code{PR} are the same for the raters \code{R1}, \code{R2} and \code{R3}. In addition, some of the regression coefficients are set to zero like \code{ICR} for \code{R1} and \code{R3}, or \code{lSYSR} for the raters \code{R1}, \code{R2} and \code{R3}. All the constraints above and some additional constraints are performed by the following restrictions on the regression coefficients by using the advanced method:
+<<>>=
+coef.constraints = cbind(c(1,NA,1,NA),
+                         c(NA,NA,NA,1),
+                         c(1,1,1,NA),
+                         c(1,2,3,4),
+                         c(1,1,1,4),
+                         c(1,2,3,4),
+                         c(NA,NA,NA,1))
+rownames(coef.constraints) <- response.names
+colnames(coef.constraints) <- c("ICR", "LR", "LEV1", "LEV2",
+                           "PR", "lRSIZE", "lSYSR")
+coef.constraints
+@
+The \code{NA}s in \code{coef.constraints} have to be fixed to some value. If no matrix \code{coef.values} is provided, the coefficients are set by default to zero automatically. This automatically generated \code{coef.values} matrix, looks like:
+<<>>=
+coef.values <- cbind(c(NA, 0, NA, 0),
+                     c(0, 0, 0, NA),
+                     c(NA, NA, NA, NA),
+                     c(NA, NA, NA, 0),
+                     c(NA, NA, NA, NA),
+                     c(NA, NA, NA, NA),
+                     c(0, 0, 0, NA))
+rownames(coef.values) <- response.names
+colnames(coef.values) <- c("ICR", "LR", "LEV1", "LEV2",
+                           "PR", "lRSIZE", "lSYSR")
+coef.values
+@
+The specified \code{coef.constraints} together with \code{coef.values} give the following model:
+\begin{alignat*}{8}
+\widetilde Y_{1} &= \beta_{11} \text{\code{ICR}}+ && & \beta_{13}\text{\code{LEV1}}& + &\beta_{14} \text{\code{LEV2}} &+ \beta_{15}\text{\code{PR}}  &+ \beta_{16} \text{\code{lRSIZE}} ,\\
+\widetilde Y_{2} &=   && &\beta_{13} \text{\code{LEV1}}&+& \beta_{24} \text{\code{LEV2}}&+ \beta_{15} \text{\code{PR}} &+ \beta_{26} \text{\code{lRSIZE}}  ,\\
+ \widetilde Y_{3} &= \beta_{11}\text{\code{ICR}}+  &&& \beta_{13} \text{\code{LEV1}} &+ &\beta_{34}  \text{\code{LEV2}}&+ \beta_{15} \text{\code{PR}} &+ \beta_{36}\text{\code{lRSIZE}} ,\\
+ \widetilde Y_{4} &= & \beta_{42} \text{\code{LR}}+ && & &\beta_{44}\text{\code{LEV2}} &+ \beta_{45}\text{\code{PR}}  &+ \beta_{46} \text{\code{lRSIZE}} &+ \beta_{47} \text{\code{lSYSR}}.
+\end{alignat*}
+%\item allows for different correlation error structures depending on the business sector:
+\end{itemize}
+
+As a link function we choose the logit link:
+<<>>=
+link <- "logit"
+@
+For simplicity, we use a general correlation structure which is constant for all subjects:
+<<>>=
+error.structure <- corGeneral(~ 1)
+error.structure
+@
+
+
+%Alternatively, the data set \code{data_cr_multord2} can be converted
+%into the long format needed for the \code{multord()} function. First
+%we create a list where each element contains the \code{data.frame}
+%corresponding to each rater: # <<>>= # # df_list <- lapply(1:4,
+%function(i) { # # ind <- which(!is.na(data_cr_multord2[,
+%ind_rater[i]])) # # data.frame(firm_id = data_cr_multord2[ind,
+%"firm_id"], # # year = "year1", # # rater_id = ind_rater[i], # #
+%rating = data_cr_multord2[ind, ind_rater[i]], # #
+%data_cr_multord2[ind, 7:14]) # # }) # # # # df <-
+%do.call("rbind.data.frame", df_list) # # # # df$rating <-
+%as.character(df$rating) # # @
+
+In order to avoid numerical instabilities, we standardize our data for each rater:
+<<>>=
+covar_names <- c("ICR", "LR","LEV1","LEV2", "PR","lRSIZE","lSYSR")
+data_cr_multord_scaled <- do.call("rbind.data.frame",
+  by(data_cr_multord, data_cr_multord$rater_id,
+    function(x){x[, covar_names] <- scale(x[, covar_names]); x}))
+@
+
+
+The estimation can now be performed by the function \code{multord()}:
+<<eval = FALSE>>=
+res_cor_logit <- multord(
+  formula = rating ~ 0 + ICR + LR + LEV1 + LEV2 + PR + lRSIZE + lSYSR,
+  error.structure = corGeneral(~ 1),
+  link = "logit",
+  data = data_cr_multord_scaled,
+  index = c("firm_id", "rater_id"),
+  response.names = c("R1", "R2", "R3", "R4"),
+  response.levels = list(rev(LETTERS[1:6]),
+                         rev(LETTERS[1:6]),
+                         rev(LETTERS[7:13]),
+                         rev(LETTERS[14:15])),
+  coef.constraints = cbind(c(1,NA,1,NA),
+                           c(NA,NA,NA,1),
+                           c(1,1,1,NA),
+                           c(1,2,3,4),
+                           c(1,1,1,4),
+                           c(1,2,3,4),
+                           c(NA,NA,NA,1)),
+  threshold.constraints = c(1,1,2,3))
+@
+
+<<echo = FALSE, results = hide>>=
+FILE <- "res_cor_logit.rda"
+if (cache & file.exists(FILE)) {
+  load(FILE)
+} else {
+  if (cache) {
+    res_cor_logit <- multord(
+      formula = rating ~ 0 + ICR + LR + LEV1 + LEV2 + PR + lRSIZE + lSYSR,
+      error.structure = corGeneral(~ 1),
+      link = "logit",
+      data = data_cr_multord_scaled,
+      index = c("firm_id", "rater_id"),
+      response.names = c("R1", "R2", "R3", "R4"),
+      response.levels = list(rev(LETTERS[1:6]),
+                         rev(LETTERS[1:6]),
+                         rev(LETTERS[7:13]),
+                         rev(LETTERS[14:15])),
+      coef.constraints = cbind(c(1,NA,1,NA),
+                               c(NA,NA,NA,1),
+                               c(1,1,1,NA),
+                               c(1,2,3,4),
+                               c(1,1,1,4),
+                               c(1,2,3,4),
+                               c(NA,NA,NA,1)),
+      threshold.constraints = c(1,1,2,3))
+  save(res_cor_logit, file  = FILE)
+  } else {
+      if(file.exists(FILE)) file.remove(FILE)
+  }
+
+}
+@
+
+%% Then discuss output
+The results are displayed either by the function \code{summary()}:
+<<>>=
+summary(res_cor_logit, call = FALSE)
+@
+or by the function \code{print()}:
+<<>>=
+print(res_cor_logit, call = FALSE)
+@
+An extended summary, where all thresholds and regression coefficients are shown, even though they are duplicated, can be obtained by:
+<<>>=
+summary(res_cor_logit, short = FALSE, call = FALSE)
+@
+The threshold coefficients can be extracted by the function \code{thresholds()}:
+<<>>=
+thresholds(res_cor_logit)
+@
+The regression coefficients are obtained by the function \code{coef()}:
+<<>>=
+coef(res_cor_logit)
+@
+The error structure is displayed by the function \code{get.error.struct()}:
+<<>>=
+get.error.struct(res_cor_logit)
+@
+
+\subsubsection{Fitting the model with the function multord2()}
+Due to the fact that the covariates do not change across the repeated
+measurements (the covariates are firm specific and do not vary across
+raters), we can alternatively fit the model by the function
+\code{multord2()}. In \code{multord2()}, a slightly different format of \code{data} is used and the ordering of the responses is defined by a
+multivariate \code{formula} object. The repeated measurements are stored in
+different columns as ordered factors:
+
+<<>>=
+head(data_cr_multord2, n = 3)
+str(data_cr_multord2, vec.len = 2)
+@
+
+Again, we standardize the data to avoid numerical instabilities:
+<<>>=
+data_cr_multord2[, covar_names] <- scale(data_cr_multord2[, covar_names])
+@
+The estimation is performed by calling the function \code{multord2()}:
+<<eval = FALSE>>=
+res_cor_logit <- multord(
+  formula = cbind(R1, R2, R3, R4) ~ 0 + ICR + LR + LEV1 + LEV2 + PR +
+                                        lRSIZE + lSYSR,
+  error.structure = corGeneral(~ 1),
+  link = "logit",
+  data = data_cr_multord_scaled,
+  coef.constraints = cbind(c(1,NA,1,NA),
+                           c(NA,NA,NA,1),
+                           c(1,1,1,NA),
+                           c(1,2,3,4),
+                           c(1,1,1,4),
+                           c(1,2,3,4),
+                           c(NA,NA,NA,1)),
+  threshold.constraints = c(1,1,2,3))
+@
+yielding equivalent results to the fit of \code{multord()}.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Example 2 -- ratings assigned by one rater to a panel of firms}
+In a second example we present a longitudinal multivariate ordinal probit regression model with a covariate dependent $AR(1)$ error structure.
+The simulated data set contains the credit risk measure \code{rating} (ratings assigned by rater \code{R1}) and 8 covariates for a panel of \Sexpr{length(unique(data_cr_panel[, "firm_id"]))} firms over ten years. The number of firm-year observations is \Sexpr{NROW(data_cr_panel)}:
+<<>>=
+str(data_cr_panel, vec.len = 3)
+head(data_cr_panel, n = 3)
+@
+The panel is highly unbalanced. The distribution of the number of ratings per firm assigned by rater \code{R1} over the 10 years is given by:
+<<>>=
+summary(rowSums(with(data_cr_panel, table(firm_id, year))))
+@
+Per year the number of ratings decreases:
+<<>>=
+with(data_cr_panel, table(year))
+@
+%% first discuss input
+We include the 7 financial ratios as covariates in a model without intercept by the formula:
+<<>>=
+formula <- rating ~ 0 + ICR + LR + LEV1 + LEV2 + PR + lRSIZE + lSYSR
+formula
+@
+
+The subject index+$i$ is stored in the column \code{firm_id} while the repeated measurement index~$j$ is given in the column \code{year}:
+<<>>=
+index <- c("firm_id", "year")
+index
+@
+
+If we wish to estimate the model only for the last eight years of the sample, this can be done by
+specifing the names of each dimension ordered response which should enter the model:
+<<>>=
+response.names <- paste0("year", 3:10)
+response.names
+@
+
+The rating classes assigned by rater \code{R1} are:
+<<>>=
+levels(data_cr_panel$rating)
+@
+with the sixth rating class \code{F} being the worst class and the first rating class \code{A} being the best rating class. We specify the response levels, in the order from worst to best, for each of the 10 outcome dimensions through the \code{response.level} argument. Ordering the classes from worst to best indicates that lower values of the latent variables indicate lower creditworthiness or increased credit risk. The rating classes and labels do not change over the ten years:
+<<>>=
+response.levels <- rep(list(levels(data_cr_panel$rating)),
+                       length(response.names))
+names(response.levels) <- response.names
+response.levels
+@
+
+Additionally, the model has the following features:
+\begin{itemize}
+\item we assume the rating agencies do not change their methodology over the sample period. This means the threshold parameters are constant over the years. This can be specified through the argument \code{threshold.constraints}:
+<<>>=
+threshold.constraints <- rep(1, length(response.names))
+names(threshold.constraints) <- response.names
+threshold.constraints
+@
+\item we assume there is a breakpoint in the regression coefficients after \code{year5} in the sample (this could correspond to the beginning of a crisis in a real case application).
+Hence, we use one set of regression coefficients for years \code{year3}, \code{year4} and \code{year5} and a different set for \code{year6}, \code{year7}, \code{year8}, \code{year9}, \code{year10}.
+This can be specified through the argument \code{coef.constraints}:
+<<>>=
+coef.constraints = c(rep(1, 3),  rep(2, 5))
+names(coef.constraints) <- response.names
+coef.constraints
+@
+\item allows for different correlation parameters in the $AR(1)$ structure for the different business sectors.
+<<>>=
+error.structure = corAR1(~ BSEC)
+error.structure
+@
+\end{itemize}
+
+The estimation is performed by calling the function \code{multord()}:
+As before, we standardize our covariates on a yearly basis:
+<<>>=
+data_cr_panel_scaled <- do.call("rbind.data.frame",
+  by(data_cr_panel, data_cr_panel$year,
+    function(x){x[, covar_names] <- scale(x[, covar_names]); x}))
+@
+<<eval=F>>=
+res_AR1_probit <- multord(
+    formula = rating ~ 0 + ICR + LR + LEV1 + LEV2 + PR + lRSIZE + lSYSR,
+    index = c("firm_id", "year"),
+    data = data_cr_panel_scaled,
+    response.levels = rep(list(levels(data_cr_panel$rating)), 8),
+    response.names = paste0("year", 3:10),
+    link = "probit",
+    error.structure = corAR1(~ BSEC),
+    coef.constraints = c(rep(1, 3),  rep(2, 5)),
+    threshold.constraints = rep(1, 8),
+    solver = "BFGS")
+@
+<<echo = FALSE, results = hide>>=
+FILE <- "res_AR1_probit.rda"
+if (cache & file.exists(FILE)) {
+  load(FILE)
+} else {
+  if (cache) {
+    res_AR1_probit <- multord(
+      formula = rating ~ 0 + ICR + LR + LEV1 + LEV2 + PR + lRSIZE + lSYSR,
+      error.structure = corAR1(~ BSEC),
+      link = "probit",
+      data = data_cr_panel_scaled,
+      index = c("firm_id", "year"),
+      response.names = paste0("year", 3:10),
+      response.levels = rep(list(levels(data_cr_panel$rating)), 8),
+      coef.constraints =  c(rep(1, 3),  rep(2, 5)),
+      threshold.constraints = rep(1,8))
+  save(res_AR1_probit, file  = FILE)
+  } else {
+      if(file.exists(FILE)) file.remove(FILE)
+  }
+
+}
+@
+
+%% Then discuss output
+The results are displayed either by the function \code{summary()}:
+<<>>=
+summary(res_AR1_probit, short = TRUE, call = FALSE, digits = 6)
+@
+or by the function \code{print()}:
+<<>>=
+print(res_AR1_probit, call = FALSE, digits = 4)
+@
+An extended summary, where all thresholds and regression coefficients are shown, even though they are duplicated, can be obtained by:
+<<eval = F>>=
+summary(res_AR1_probit, short = FALSE, call = FALSE)
+@
+The threshold coefficients can be extracted by the function \code{thresholds()}:
+<<>>=
+thresholds(res_AR1_probit)
+@
+The regression coefficients are obtained by the function \code{coef()}:
+<<>>=
+coef(res_AR1_probit)
+@
+The error structure is displayed by the function \code{get.error.struct()}:
+<<>>=
+get.error.struct(res_AR1_probit)
+@
+In addition, the correlation parameters $\rho_i$ for each firm are obtained by:
+<<>>=
+head(get.error.struct(res_AR1_probit, type = "corr"), n = 3)
+@
+
+Moreover, the correlation matrices for each specific firm are obtained by:
+<<>>=
+head(get.error.struct(res_AR1_probit, type = "sigmas"), n = 1)
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%\bibliographystyle{plainnat}
+\bibliography{mvord}
+
+\end{document}
