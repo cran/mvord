@@ -10,8 +10,7 @@ data(data_cr_panel)
 }
 \description{
 A data set containing simulated credit ratings assigned by one rater and simulated perfomance measures for firms in different years.
-}
-\details{
+
 \itemize{
   \item \code{year} year index
   \item \code{rating} credit ratings

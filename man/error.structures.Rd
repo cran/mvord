@@ -44,6 +44,3 @@ Different \code{error.structures} are available in \pkg{mvord}:
 }
 See \code{\link{error.structures}} or vignette.
 }
-\details{
-see vignette %General (symmetric) correlation structure
-}

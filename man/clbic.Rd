@@ -2,17 +2,17 @@
 % Please edit documentation in R/mvord.R
 \name{clbic}
 \alias{clbic}
-\alias{clbic.multord}
+\alias{clbic.mvord}
 \title{CLBIC of Multivariate Ordinal Regression Models.}
 \usage{
 clbic(object)
 
-\method{clbic}{multord}(object)
+\method{clbic}{mvord}(object)
 }
 \arguments{
-\item{object}{object of class \code{"multord"}}
+\item{object}{object of class \code{"mvord"}}
 }
 \description{
 \code{clbic} is a generic function which extracts the composite likelihood BIC from objects of class \cr
-\code{"multord"}.
+\code{"mvord"}.
 }

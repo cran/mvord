@@ -9,7 +9,7 @@ coef.values[is.na(coef.constraints)] <- 0
 
 mvord:::check(identical(mvord:::getInd.coef(coef.constraints, coef.values), rbind(1:4,c(5,2,NA,4),c(6,2,3,4),c(7,2,NA,4),c(8,2,NA,9))))
 
-##getInd.thresholds.flexible
+##getInd.thresholds -- flexible
 threshold.constraints <- c(1,2,2,3,4)
 rho$threshold.values <- list(NA,
                              c(NA,NA,NA),
@@ -18,11 +18,16 @@ rho$threshold.values <- list(NA,
                              c(NA,NA))
 rho$ntheta <- sapply(rho$threshold.values, length)
 rho$npar.theta <- sapply(1:rho$ndim, function(j) sum(is.na(rho$threshold.values[[j]])))
-rho$ncat <- sapply(rho$threshold.values, length) + 1
+rho$npar.theta.opt <- rho$npar.theta
+rho$npar.theta.opt[duplicated(threshold.constraints)] <- 0
 
-mvord:::check(all.equal(mvord:::getInd.thresholds.flexible(threshold.constraints,rho), list(1,2:4,2:4,5:9,10:11)))
+mvord:::check(all.equal(mvord:::getInd.thresholds(threshold.constraints,rho), list(1,2:4,2:4,5:9,10:11)))
+
 threshold.constraints <- c(1,2,3,4,5)
-mvord:::check(all.equal(mvord:::getInd.thresholds.flexible(threshold.constraints,rho), list(1,2:4,5:7,8:12,13:14)))
+rho$npar.theta.opt <- rho$npar.theta
+rho$npar.theta.opt[duplicated(threshold.constraints)] <- 0
+
+mvord:::check(all.equal(mvord:::getInd.thresholds(threshold.constraints,rho), list(1,2:4,5:7,8:12,13:14)))
 
 threshold.constraints <- c(1,2,2,3,4)
 rho$threshold.values <- list(NA,
@@ -32,11 +37,12 @@ rho$threshold.values <- list(NA,
                              c(1,2))
 rho$ntheta <- sapply(rho$threshold.values, length)
 rho$npar.theta <- sapply(1:rho$ndim, function(j) sum(is.na(rho$threshold.values[[j]])))
-rho$ncat <- sapply(rho$threshold.values, length) + 1
+rho$npar.theta.opt <- rho$npar.theta
+rho$npar.theta.opt[duplicated(threshold.constraints)] <- 0
 
-mvord:::check(all.equal(mvord:::getInd.thresholds.flexible(threshold.constraints,rho), list(1,2:4,2:4,5:9,integer(0))))
+mvord:::check(all.equal(mvord:::getInd.thresholds(threshold.constraints,rho), list(1,2:4,2:4,5:9,integer(0))))
 
-##getInd.thresholds.fix2
+##getInd.thresholds -- fix2
 threshold.constraints <- c(1,2,2,3,4)
 rho$threshold.values <- list(1,
                              c(1,2,NA),
@@ -45,11 +51,12 @@ rho$threshold.values <- list(1,
                              c(1,2))
 rho$ntheta <- sapply(rho$threshold.values, length)
 rho$npar.theta <- sapply(1:rho$ndim, function(j) sum(is.na(rho$threshold.values[[j]])))
-rho$ncat <- sapply(rho$threshold.values, length) + 1
+rho$npar.theta.opt <- rho$npar.theta
+rho$npar.theta.opt[duplicated(threshold.constraints)] <- 0
 
-mvord:::check(all.equal(mvord:::getInd.thresholds.fix2(threshold.constraints,rho), list(integer(0),1,1,2:4, integer(0))))
+mvord:::check(all.equal(mvord:::getInd.thresholds(threshold.constraints,rho), list(integer(0),1,1,2:4, integer(0))))
 threshold.constraints <- c(1,2,3,4,5)
-mvord:::check(all.equal(mvord:::getInd.thresholds.fix2(threshold.constraints,rho), list(integer(0),1,2,3:5, integer(0))))
+mvord:::check(all.equal(mvord:::getInd.thresholds(threshold.constraints,rho), list(integer(0),1,2,3:5, integer(0))))
 
 threshold.constraints <- c(1,2,2,3,4)
 rho$threshold.values <- list(1,
@@ -60,16 +67,16 @@ rho$threshold.values <- list(1,
 rho$ntheta <- sapply(rho$threshold.values, length)
 rho$npar.theta <- sapply(1:rho$ndim, function(j) sum(is.na(rho$threshold.values[[j]])))
 rho$ncat <- sapply(rho$threshold.values, length) + 1
+rho$npar.theta.opt <- rho$npar.theta
+rho$npar.theta.opt[duplicated(threshold.constraints)] <- 0
 
-mvord:::check(all.equal(mvord:::getInd.thresholds.fix2(threshold.constraints,rho), list(integer(0),1,1,2:4, integer(0))))
+mvord:::check(all.equal(mvord:::getInd.thresholds(threshold.constraints,rho), list(integer(0),1,1,2:4, integer(0))))
 threshold.constraints <- c(1,2,3,4,5)
-mvord:::check(all.equal(mvord:::getInd.thresholds.fix2(threshold.constraints,rho), list(integer(0),1,2,3:5, integer(0))))
+mvord:::check(all.equal(mvord:::getInd.thresholds(threshold.constraints,rho), list(integer(0),1,2,3:5, integer(0))))
 threshold.constraints <- c(1,2,2,4,5)
-mvord:::check(all.equal(mvord:::getInd.thresholds.fix2(threshold.constraints,rho), list(integer(0),1,1,2:4, integer(0))))
+mvord:::check(all.equal(mvord:::getInd.thresholds(threshold.constraints,rho), list(integer(0),1,1,2:4, integer(0))))
 
-
-
-##getInd.thresholds.fix1
+##getInd.thresholds -- fix1
 threshold.constraints <- c(1,2,2,3,4)
 rho$threshold.values <- list(1,
                              c(1,NA,NA),
@@ -78,11 +85,16 @@ rho$threshold.values <- list(1,
                              c(1,NA))
 rho$ntheta <- sapply(rho$threshold.values, length)
 rho$npar.theta <- sapply(1:rho$ndim, function(j) sum(is.na(rho$threshold.values[[j]])))
-rho$ncat <- sapply(rho$threshold.values, length) + 1
+rho$npar.theta.opt <- rho$npar.theta
+rho$npar.theta.opt[duplicated(threshold.constraints)] <- 0
 
-mvord:::check(all.equal(mvord:::getInd.thresholds.fix1(threshold.constraints,rho), list(integer(0),1:2,1:2,3:6, 7)))
+mvord:::check(all.equal(mvord:::getInd.thresholds(threshold.constraints,rho), list(integer(0),1:2,1:2,3:6, 7)))
+
 threshold.constraints <- c(1,2,3,4,5)
-mvord:::check(all.equal(mvord:::getInd.thresholds.fix1(threshold.constraints,rho), list(integer(0),1:2,3:4,5:8,9)))
+rho$npar.theta.opt <- rho$npar.theta
+rho$npar.theta.opt[duplicated(threshold.constraints)] <- 0
+
+mvord:::check(all.equal(mvord:::getInd.thresholds(threshold.constraints,rho), list(integer(0),1:2,3:4,5:8,9)))
 
 threshold.constraints <- c(1,2,2,3,5)
 rho$threshold.values <- list(1,
@@ -92,7 +104,8 @@ rho$threshold.values <- list(1,
                              c(1,NA))
 rho$ntheta <- sapply(rho$threshold.values, length)
 rho$npar.theta <- sapply(1:rho$ndim, function(j) sum(is.na(rho$threshold.values[[j]])))
-rho$ncat <- sapply(rho$threshold.values, length) + 1
+rho$npar.theta.opt <- rho$npar.theta
+rho$npar.theta.opt[duplicated(threshold.constraints)] <- 0
 
-mvord:::check(all.equal(mvord:::getInd.thresholds.fix1(threshold.constraints,rho), list(integer(0),1:2,1:2,3:6, 7)))
+mvord:::check(all.equal(mvord:::getInd.thresholds(threshold.constraints,rho), list(integer(0),1:2,1:2,3:6, 7)))
 

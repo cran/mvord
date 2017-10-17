@@ -2,17 +2,17 @@
 % Please edit documentation in R/mvord.R
 \name{claic}
 \alias{claic}
-\alias{claic.multord}
+\alias{claic.mvord}
 \title{CLAIC of Multivariate Ordinal Regression Models.}
 \usage{
 claic(object)
 
-\method{claic}{multord}(object)
+\method{claic}{mvord}(object)
 }
 \arguments{
-\item{object}{object of class \code{"multord"}}
+\item{object}{object of class \code{"mvord"}}
 }
 \description{
 \code{claic} is a generic function which extracts the composite likelihood AIC from objects of class \cr
-\code{"multord"}.
+\code{"mvord"}.
 }

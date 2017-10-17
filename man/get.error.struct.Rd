@@ -2,27 +2,27 @@
 % Please edit documentation in R/mvord.R
 \name{get.error.struct}
 \alias{get.error.struct}
-\alias{get.error.struct.multord}
+\alias{get.error.struct.mvord}
 \title{Extracts Error Structure of Multivariate Ordinal Regression Models.}
 \usage{
 get.error.struct(object, type, ...)
 
-\method{get.error.struct}{multord}(object, type = NULL, ...)
+\method{get.error.struct}{mvord}(object, type = NULL, ...)
 }
 \arguments{
-\item{object}{object of class \code{"multord"}}
+\item{object}{object of class \code{"mvord"}}
 
 \item{type}{choose type \code{c("sigmas", "alpha", "corr", "z")}}
 
 \item{...}{further arguments passed to or from other methods.}
 }
 \description{
-\code{get.error.struct} is a generic function which extracts the estimated error structure parameters from objects of class \code{"multord"}.
+\code{get.error.struct} is a generic function which extracts the estimated error structure parameters from objects of class \code{"mvord"}.
 }
 \details{
 \itemize{
 \item{\code{sigmas}} {extracts the correlation/covariance matrices corresponding to each subject.
-            Applicable in line with\cr \code{corGeneral, covGeneral, corEqui, corAR1}}
+            Applicable in line with \code{corGeneral, covGeneral, corEqui, corAR1}}
 \item{\code{alpha}} {extracts the parameters of covariate dependent error structure. Applicable in line with \code{corEqui, corAR1}}
 \item{\code{corr}} {extracts the subject-specific correlation parameters. Applicable in line with \code{corEqui, corAR1}}
 \item{\code{z}} {extracts the subject-specific Fisher-z score. Applicable in line with \code{corEqui, corAR1}}}

@@ -2,17 +2,17 @@
 % Please edit documentation in R/mvord.R
 \name{logPL}
 \alias{logPL}
-\alias{logPL.multord}
+\alias{logPL.mvord}
 \title{logPL of Multivariate Ordinal Regression Models.}
 \usage{
 logPL(object)
 
-\method{logPL}{multord}(object)
+\method{logPL}{mvord}(object)
 }
 \arguments{
-\item{object}{object of class \code{"multord"}}
+\item{object}{object of class \code{"mvord"}}
 }
 \description{
 \code{logPL} is a generic function which extracts the log pairwise likelihood from objects of class \cr
-\code{"multord"}.
+\code{"mvord"}.
 }

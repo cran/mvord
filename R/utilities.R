@@ -5,32 +5,47 @@ set.threshold.type <- function(rho){
       type <- "fixall"
 #fix2first
   } else if (all(sapply(1:rho$ndim, function(j){
-      (all(length(which(!is.na(rho$threshold.values[[j]])))==length(c(1,2))) && all(which(!is.na(rho$threshold.values[[j]])) == c(1,2)) #all first two thresholds are not NA
+    #all first two thresholds are not NA
+      (all(length(which(!is.na(rho$threshold.values[[j]])))==length(c(1,2))) && all(which(!is.na(rho$threshold.values[[j]])) == c(1,2))
       ) || ((length(rho$threshold.values[[j]]) == 1) &&  (which(!is.na(rho$threshold.values[[j]])) == 1))
       }))){
-      if (rho$error.structure$type %in% c("corGeneral", "corAR1", "corEqui")) cat("We suggest to fix only one threshold or the intercept in a correlation model.\n")
-      if ((rho$error.structure$type %in% c("covGeneral"))&& (rho$intercept.type == "fixed")) cat("We suggest to fix either two thresholds or one threshold and the intercept in a covGeneral model.\n")
+      if (rho$error.structure$type %in% c("corGeneral", "corAR1", "corEqui")){
+        cat("We suggest to fix only one threshold or the intercept in a correlation model.\n")
+      }
+      if ((rho$error.structure$type %in% c("covGeneral"))&& (rho$intercept.type == "fixed")){
+        cat("We suggest to fix either two thresholds or one threshold and the intercept in a covGeneral model.\n")
+      }
       type <- "fix2first"
 #fix2firstlast
   } else if (all(sapply(1:rho$ndim, function(j){
-      (all(length(which(!is.na(rho$threshold.values[[j]])))==length(c(1,rho$ntheta[j]))) && all(which(!is.na(rho$threshold.values[[j]])) == c(1,rho$ntheta[j]))#all first and last two thresholds are not NA
+      (all(length(which(!is.na(rho$threshold.values[[j]])))==length(c(1,rho$ntheta[j]))) &&
+       all(which(!is.na(rho$threshold.values[[j]])) == c(1,rho$ntheta[j]))#all first and last two thresholds are not NA
       ) || ((length(rho$threshold.values[[j]]) == 1) &&  (which(!is.na(rho$threshold.values[[j]])) == 1))
       }))){
-      if (rho$error.structure$type %in% c("corGeneral", "corAR1", "corEqui")) cat("We suggest to fix only one threshold or the intercept in a correlation model.\n")
-      if ((rho$error.structure$type %in% c("covGeneral"))&& (rho$intercept.type == "fixed")) cat("We suggest to fix either two thresholds or one threshold and the intercept in a covGeneral model.\n")
+      if (rho$error.structure$type %in% c("corGeneral", "corAR1", "corEqui")){
+        cat("We suggest to fix only one threshold or the intercept in a correlation model.\n")
+      }
+      if ((rho$error.structure$type %in% c("covGeneral"))&& (rho$intercept.type == "fixed")){
+        cat("We suggest to fix either two thresholds or one threshold and the intercept in a covGeneral model.\n")
+      }
       type <- "fix2firstlast"
 #fix1first
-  } else if (all(sapply(1:rho$ndim, function(j) (length(which(!is.na(rho$threshold.values[[j]])) >= 1) && all(which(!is.na(rho$threshold.values[[j]])) == 1))))){ #all first thresholds are not NA (and no additional)
+      #all first thresholds are not NA (and no additional)
+  } else if (all(sapply(1:rho$ndim, function(j) (length(which(!is.na(rho$threshold.values[[j]])) >= 1) &&
+                                                 all(which(!is.na(rho$threshold.values[[j]])) == 1))))){
       if ((rho$error.structure$type == "covGeneral") && (rho$intercept.type == "flexible")) stop("Model with covGeneral is not identifiable.
                           Please either fix two thresholds or one threshold and the intercept.\n", call. = FALSE)
-      if ((rho$error.structure$type %in% c("corGeneral", "corAR1", "corEqui"))&& (rho$intercept.type == "fixed")) cat("We suggest to fix only one threshold or the intercept in a correlation model.\n")
+      if ((rho$error.structure$type %in% c("corGeneral", "corAR1", "corEqui"))&& (rho$intercept.type == "fixed")){
+        cat("We suggest to fix only one threshold or the intercept in a correlation model.\n")
+      }
       type <- "fix1first"
 #flexible
   } else if (all(sapply(1:rho$ndim, function(j) all(is.na(rho$threshold.values[[j]]))))){#all thresholds NA
       if (rho$error.structure$type == "covGeneral") stop("Model with covGeneral is not identifiable.
                                                         Please either fix two thresholds or one threshold and the intercept.\n", call. = FALSE)
-      if ((rho$error.structure$type %in% c("corGeneral", "corAR1", "corEqui")) && (rho$intercept.type == "flexible")) stop("Model is not identifiable.
-                                                                                                                                  Please either fix one threshold or the intercept.", call. = FALSE)
+      if ((rho$error.structure$type %in% c("corGeneral", "corAR1", "corEqui")) && (rho$intercept.type == "flexible")){
+          stop("Model is not identifiable. Please either fix one threshold or the intercept.", call. = FALSE)
+      }
       type <- "flexible"
 #ERRORS
   } else stop("Either fix all thresholds in one or more outcome dimensions,
@@ -75,10 +90,14 @@ set.error.structure <- function(error.structure, data.x, ndim){
   } else if (error.structure$type %in%  c("corGeneral", "covGeneral")){
     #depends on one factor
     if (length(all.vars(error.structure$formula[[2]])) > 1) stop("only one factor is allowed in covGeneral and corGeneral", call. = FALSE)
-    if (!is.factor(data.x[[1]][,all.vars(error.structure$formula)])) stop("variable must be of type factor in covGeneral and corGeneral", call. = FALSE)
+    if (!is.factor(data.x[[1]][,all.vars(error.structure$formula)])){
+      stop("variable must be of type factor in covGeneral and corGeneral", call. = FALSE)
+    }
     tmp <- lapply(1:ndim,function(j) data.x[[j]][,all.vars(error.structure$formula)])
 
-    if (!all(sapply(1:ndim, function(j) all(tmp[[1]]==tmp[[j]], na.rm=T)))) stop("Covariate dependent variables need to be constant across multiple observations", call. = FALSE)
+    if (!all(sapply(1:ndim, function(j) all(tmp[[1]]==tmp[[j]], na.rm=T)))){
+      stop("Covariate dependent variables need to be constant across multiple observations", call. = FALSE)
+    }
     error.structure$x <- as.factor(apply(do.call("cbind.data.frame", tmp), 1, function(x) unique(x[!is.na(x)])))
      } else {
     #depends on one factor
@@ -90,11 +109,11 @@ set.error.structure <- function(error.structure, data.x, ndim){
 }
 
 
-set.error.structure.multord2 <- function(error.structure, data){
-  if (error.structure$type == "corEqui"){
+set.error.structure.mvord2 <- function(error.structure, data){
+  if (error.structure$type  %in%  c("corEqui", "corAR1")){
     error.structure$x <- model.matrix(error.structure$formula, data)
-  } else if (error.structure$type == "corAR1"){
-    stop("corAR1 is not applicable in multord2", call. = FALSE)
+ # } else if (error.structure$type == "corAR1"){
+  #  stop("corAR1 is not applicable in mvord2", call. = FALSE)
   } else if (error.structure$type %in%  c("corGeneral", "covGeneral")){
     if (error.structure$formula == ~ 1){
       error.structure$x <- as.factor(model.matrix(error.structure$formula, data))
@@ -114,8 +133,10 @@ checkArgs <- function(rho){
       stop("dimensions of threshold.values and number of thresholds do not match", call. = FALSE)
   for (j in unique(rho$threshold.constraints)){
     ind <- which(rho$threshold.constraints == j)
-    if (length(unique(rho$threshold.values[ind]))!=1) stop("If constraints are set on thresholds (by threshold.constraints), threshold.values need to be specified accordingly for these outcome dimensions.
-                                                           Maybe dimension do not have the same number of threshold parameters.", call. = FALSE)
+    if (length(unique(rho$threshold.values[ind]))!=1){
+        stop("If constraints are set on thresholds (by threshold.constraints), threshold.values need to be specified accordingly
+              for these outcome dimensions. Maybe dimensions do not have the same number of threshold parameters.", call. = FALSE)
+    }
   }
   if (nrow(rho$coef.constraints) != rho$ndim) stop("row dimension of coef.constraints and outcome dimension do not match (?factor)", call. = FALSE)
 
@@ -170,7 +191,7 @@ casesNA <- function(y) {
 
 split.NA.pattern <- function(y) {
   # y should be a data.frame
-  # return a list, whose elements are groups of the matrix y according to each unique combination of response variables
+  # returns a list, whose elements are groups of the matrix y according to each unique combination of response variables
   if (!is.data.frame(y)) y <- as.data.frame(y)
   yg <- split(y, casesNA(y)) # grouped y by cases of NA pattern
   lapply(yg, function(x)  which(rownames(y) %in% rownames(x)))
@@ -181,8 +202,8 @@ split.NA.pattern <- function(y) {
 getStart.values <- function(rho){
  gammas <- sapply(1:rho$ndim, function(j) {
    if (rho$npar.theta.opt[j] != 0){
-    theta <- if (rho$ntheta[j] >= 2) polr(rho$y[, j] ~1)$zeta else 0#qlogis((1:rho$ntheta[j])/(rho$ntheta[j] + 1))
-    if (!grepl("logit", rho$link)) theta <- theta/1.7
+    theta <- if (rho$ntheta[j] >= 2) polr(rho$y[, j] ~1)$zeta else 0
+    if (!grepl("mvlogit", rho$link$name)) theta <- theta/1.7
     c(theta[1L], log(diff(theta)))[1:rho$npar.theta.opt[j]]
   } else NULL
 })
@@ -200,8 +221,8 @@ transf.par.cor <- function(par, rho) {
   pred.fixed <- sapply(1:rho$ndim, function(j) rho$x[[j]] %*% beta[j, ])
   theta.lower <- sapply(1:rho$ndim, function(j) c(-rho$inf.value, theta[[j]])[rho$y[, j]])
   theta.upper <- sapply(1:rho$ndim, function(j) c(theta[[j]], rho$inf.value)[rho$y[, j]])
-  pred.lower <- (theta.lower - pred.fixed)/rho$sd.y
-  pred.upper <- (theta.upper - pred.fixed)/rho$sd.y
+  pred.lower <- (theta.lower - pred.fixed)
+  pred.upper <- (theta.upper - pred.fixed)
   list(U = pred.upper,
        L = pred.lower,
        sigmas = sigmas)
@@ -228,8 +249,8 @@ transf.par.cov <- function(par, rho) {
   pred.lower <- theta.lower - pred.fixed
   pred.upper <- theta.upper - pred.fixed
   for (l in 1:rho$ncor.levels){
-  pred.lower[lev==l,] <-t(t(pred.lower[lev==l,]/rho$sd.y)/exp.par.sd[[l]])
-  pred.upper[lev==l,] <-t(t((pred.upper[lev==l,])/rho$sd.y)/exp.par.sd[[l]])
+  pred.lower[lev==l,] <-t(t(pred.lower[lev==l,])/exp.par.sd[[l]])
+  pred.upper[lev==l,] <-t(t(pred.upper[lev==l,])/exp.par.sd[[l]])
   }
   sigmas <- lapply(sigmas, cov2cor)
   list(U = pred.upper,
@@ -244,58 +265,50 @@ transf.thresholds.fixall <- function(gamma, rho){
   rho$threshold.values
 }
 
+transf.thresholds.fix1.first <- function(gamma, rho){
+  ## \theta_j = a + exp(gamma_1) + .. + exp(gamma_j)
+  lapply(seq_len(rho$ndim), function(j) {
+    cumsum(c(rho$threshold.values.fixed[[j]][1], exp(gamma[rho$ind.thresholds[[j]]])))
+  })
+}
+
+transf.thresholds.fix2.first <- function(gamma, rho){
+  ## \theta_j = a + b + exp(gamma_1) + .. + exp(gamma_j)
+     lapply(seq_len(rho$ndim), function(j) {
+       a <- rho$threshold.values.fixed[[j]][1] ## a bounds
+       b <- rho$threshold.values.fixed[[j]][2] ## b bounds
+       if (is.na(b)) b <- NULL ## it implies one can have binary with fix2first
+       c(a, cumsum(c(b, exp(gamma[rho$ind.thresholds[[j]]]))))
+     })
+}
+
+transf.thresholds.fix2.firstlast <- function(gamma, rho){
+  ## (theta_j - theta_{j-1})/(1 - theta_j) = exp(gamma_j)/(1 + exp(gamma_j))
+  lapply(seq_len(rho$ndim), function(j){
+    gamma1  <- gamma[rho$ind.thresholds[[j]]]
+    a <- rho$threshold.values.fixed[[j]][1]
+    b <- rho$threshold.values.fixed[[j]][2]
+    if (!is.na(b)) {
+    recursive.theta <- function(i) {
+      if (i == 0) 0
+      else return ((exp(gamma1[i]) + recursive.theta(i - 1))/(1 + exp(gamma1[i])))
+    }
+    theta <- unlist(sapply(seq_len(length(gamma1)), function(i) recursive.theta(i)))
+    c(0, theta, 1) * (b - a) + a
+    } else a
+    })
+}
 
 transf.thresholds.flexible <- function(gamma, rho){
   lapply(1:rho$ndim, function(j)
     if (anyNA(rho$threshold.values[[j]])){
-    if (rho$ntheta[j] > 1) {
-      cumsum(c(gamma[rho$ind.thresholds[[j]][1]],
-               exp(gamma[rho$ind.thresholds[[j]][2:rho$ntheta[j]]])))
-    } else if (rho$ntheta[j] == 1) gamma[rho$ind.thresholds[[j]]] else NULL
+      if (rho$ntheta[j] > 1) {
+        cumsum(c(gamma[rho$ind.thresholds[[j]][1]],
+                 exp(gamma[rho$ind.thresholds[[j]][2:rho$ntheta[j]]])))
+      } else if (rho$ntheta[j] == 1) gamma[rho$ind.thresholds[[j]]] else NULL
     } else rho$threshold.values[[j]]
   )
 }
-
-transf.thresholds.fix1.first <- function(gamma, rho){
-  lapply(1:rho$ndim, function(j)
-    if (length(rho$ind.thresholds[[j]]) >= 1) {
-      cumsum(c(rho$threshold.values.fixed[[j]][1],
-        exp(gamma[rho$ind.thresholds[[j]][seq_len(length(rho$ind.thresholds[[j]]))]])))
-    } else if (length(rho$ind.thresholds[[j]]) == 0) rho$threshold.values.fixed[[j]] else NULL)
-}
-
-transf.thresholds.fix2.first <- function(gamma, rho){
-   lapply(1:rho$ndim, function(j)
-     if (rho$npar.theta[j] >= 1) {
-       c(rho$threshold.values.fixed[[j]][1],
-        cumsum(c(rho$threshold.values.fixed[[j]][2] ,exp(gamma[rho$first.ind.theta[j] - 1 +
-                                                     seq_len(rho$npar.theta[j])]))))
-     } else {
-       if (rho$npar.theta[j] == 0) rho$threshold.values.fixed[[j]]
-     }
-     )
-}
-
-
-transf.thresholds.fix2.firstlast <- function(gamma, rho){
-  lapply(1:rho$ndim, function(j){
-    gamma1 <- gamma[rho$first.ind.theta[j] - 1 + seq_len(rho$npar.theta[j])]
-    recursive.theta <- function(i) {
-      if (i == 0) 0
-      else return ((exp(gamma1[i]) +
-                      recursive.theta(i - 1))/(1 + exp(gamma1[i])))
-    }
-    if (rho$npar.theta[j] >= 1) {
-      theta <- sapply(1:rho$npar.theta[j], function(i)
-        recursive.theta(i))
-      c(0, theta, 1) * (rho$threshold.values.fixed[[j]][2] - rho$threshold.values.fixed[[j]][1]) +
-        rho$threshold.values.fixed[[j]][1]
-    } else {
-      rho$threshold.values.fixed[[j]]
-    }
-  })
-}
-
 
 ##############################################################################
 ## transformation of the parameters of the correlation/covariance structure ##
@@ -322,7 +335,6 @@ transf.sigmas.spheric <- function(par.nu, rho, exp.par.sd = NULL) {
   })
 }
 
-
 transf.sigmas.corAR1 <- function(par.sigma, rho, exp.par.sd = NULL) {
   w <- par.sigma[seq_len(rho$npar.cor)]
   z <- rho$error.structure$x %*% w
@@ -330,7 +342,6 @@ transf.sigmas.corAR1 <- function(par.sigma, rho, exp.par.sd = NULL) {
   lapply(seq_len(length(r)), function(i){
     sigma <- diag(rho$ndim)
     sigma[lower.tri(sigma)]  <- r[i]^sequence((rho$ndim-1):1)
-    ### CHECK: easier way?
     sigma <- sigma + t(sigma) - diag(diag(sigma))
     sigma
   })
@@ -345,7 +356,6 @@ transf.sigmas.corEqui <- function(par.sigma, rho, exp.par.sd = NULL) {
 z2r <- function (z) {
   ifelse(z > 354, 1, (exp(2 * z) - 1)/(1 + exp(2 * z)))
 }
-
 
 getInd.coef <- function(coef.constraints, coef.values) {
   ind <- matrix(NA,ncol = ncol(coef.constraints), nrow = nrow(coef.constraints))
@@ -371,74 +381,21 @@ getInd.coef <- function(coef.constraints, coef.values) {
   ind
 }
 
-getInd.thresholds.flexible <- function(threshold.constraints,rho){
-  pointer <- lapply(1:rho$ndim, function(j) rep(0,rho$npar.theta[j]))
-  pointer[[1]] <- seq_len(rho$npar.theta[1])
-  k <- length(pointer[[1]])
-  for(i in 2:rho$ndim){
-    if (rho$npar.theta[i] == 0){
-      pointer[[i]] <- integer(0)
+getInd.thresholds <- function(threshold.constraints,rho){
+  rho$npar.theta.opt <- rho$npar.theta
+  rho$npar.theta.opt[duplicated(threshold.constraints)] <- 0
+  cs <- c(0, cumsum(rho$npar.theta.opt)[-length(rho$npar.theta.opt)])
+  lapply(seq_len(rho$ndim), function(j){
+    if (!duplicated(threshold.constraints)[j]) {
+        seq_len(rho$npar.theta[j]) + cs[j]
     } else {
-      if (threshold.constraints[i] %in% threshold.constraints[1:(i-1)]){
-        min.ind <- min(which(threshold.constraints[i] == threshold.constraints[1:(i-1)]))
-        if (rho$ntheta[i] != rho$ntheta[min.ind])
-          stop("Constraints on threshold parameters are not valid (different number of categories)", call. = FALSE)
-        pointer[[i]] <- pointer[[min.ind]]
-      } else{
-        pointer[[i]] <- (k+1):(k+rho$ntheta[i])
-        k <- k + rho$ntheta[i]
-      }
+        indj <- which(threshold.constraints == threshold.constraints[j])
+        if(length(unique(rho$npar.theta[indj])) != 1)
+            stop("Constraints on threshold parameters are not valid
+                (different number of categories)", call. = FALSE)
+        seq_len(rho$npar.theta[indj[1]]) + cs[indj[1]]
     }
-    }
-  pointer
-}
-
-getInd.thresholds.fix2 <- function(threshold.constraints,rho) {
-  pointer <- lapply((1:rho$ndim), function(j) seq_len(rho$npar.theta[j]))
-
-  k <- length(pointer[[1]])
-  for(i in (1:rho$ndim)){
-    if (rho$npar.theta[i] == 0){
-      pointer[[i]] <- integer(0)
-    } else {
-    if (threshold.constraints[i] %in% threshold.constraints[1:(i - 1)]){
-      min.ind <- min(which(threshold.constraints[i] == threshold.constraints[1:(i-1)]))
-      if (rho$ntheta[i] != rho$ntheta[min.ind])
-        stop("Constraints on threshold parameters are not valid (different number of categories)", call. = FALSE)
-      pointer[[i]] <- pointer[[min.ind]]
-    } else{
-      pointer[[i]] <- (k+1):(k+rho$ntheta[i]-2)
-      k <- k + rho$ntheta[i]-2
-    }
-    }
-  }
-  pointer
-}
-
-getInd.thresholds.fix1 <- function(threshold.constraints,rho) {
-  pointer <- lapply(1:rho$ndim, function(j) rep(0,rho$npar.theta[j]))
-  pointer[[1]] <- seq_len(rho$npar.theta[1])
-  k <- length(pointer[[1]])
-  for(i in 2:rho$ndim){
-    if (rho$npar.theta[i] == 0){
-      pointer[[i]] <- integer(0)
-    } else {
-    if (threshold.constraints[i] %in% threshold.constraints[1:(i - 1)]){
-      min.ind <- min(which(threshold.constraints[i] == threshold.constraints[1:(i - 1)]))
-      if (rho$ntheta[i] != rho$ntheta[min.ind])
-        stop("Constraints on threshold parameters are not valid (different number of categories)", call. = FALSE)
-      pointer[[i]] <- pointer[[min.ind]]
-    } else{
-      pointer[[i]] <- (k+1):(k+rho$ntheta[i]-1)
-      k <- k + rho$ntheta[i]-1
-    }
-    }
-  }
-  pointer
-}
-
-getInd.thresholds.fixall <- function(threshold.constraints,rho) {
-  lapply(1:rho$ndim, function(j) integer())
+  })
 }
 
 get.labels.theta <- function(rho,j) {
@@ -460,7 +417,6 @@ get.labels.theta <- function(rho,j) {
 #' \item covariate dependent AR(1) correlation structure \code{corAR1(~S)}.
 #' }
 #' See \code{\link{error.structures}} or vignette.
-#' @details see vignette %General (symmetric) correlation structure
 #' @param formula \code{\link{formula}} object
 #' @export
 #' @name error.structures
@@ -504,7 +460,6 @@ corAR1.formula <- function(formula){
   return(list(type = "corAR1", formula = formula))
 }
 
-
 backtransf.sigmas <- function(R){
   J <- nrow(R)
   l <- t(chol(R))
@@ -531,7 +486,7 @@ get.sigma.i <- function(object) {
   }
 }
 
-# #' @title Data preparation for multord
+# #' @title Data preparation for mvord
 # #'
 # #' @description
 # #' This function is an (internally) used to transforms the \code{data}, into a "multivariate setting",
@@ -550,7 +505,8 @@ get.sigma.i <- function(object) {
 # #' @param response.names (optional) vector of names of the repeated measurements in \code{data}
 # #' which specifies the ordering of the repeated measurements.
 # #' @export
-multord.data <- function(data, index, y.names, x.names,
+
+mvord.data <- function(data, index, y.names, x.names,
                          y.levels = NULL, response.names = NULL) {
   df <- list()
   if (any(duplicated(data[,index]))) stop("duplicated observation(s) for one index", call. = FALSE)
@@ -559,7 +515,8 @@ multord.data <- function(data, index, y.names, x.names,
   data.split.y <- lapply(seq_len(length(data.split)), function(j) {
     colnames(data.split[[j]]) <- c(index.levels[j],index[1])
     data.split[[j]]})
-  df$y <- Reduce(function(...) merge(..., by = index[1], all = TRUE), data.split.y )[, -1]
+  df$y <- Reduce(function(...) merge(..., by = index[1], all = TRUE), data.split.y )
+  df$y <- df$y[, - match(index[1], colnames(df$y)), drop = FALSE]
   response.names.NA <- c()
   if (!is.null(response.names)) {
     response.names.NA <- response.names[!response.names %in% colnames(df$y)]
@@ -585,7 +542,10 @@ multord.data <- function(data, index, y.names, x.names,
     data.split.x[[j]]})
 
 
-  xdatadf <- Reduce(function(...) merge(...,by = index[1], all = TRUE), data.split.x)[, -1]
+  xdatadf <- Reduce(function(...) merge(...,by = index[1], all = TRUE), data.split.x)#[, -1]
+  subject_id_names <- xdatadf[,index[1]]
+  rownames(xdatadf) <- subject_id_names
+  xdatadf <- xdatadf[, -match(index[1], colnames(xdatadf)), drop = FALSE]
   xdatadf <- cbind(xdatadf, matrix(NA, ncol = length(response.names.NA) * length(x.names),
                                    nrow = nrow(xdatadf)))
   df$x <- lapply(1:(length(index.levels) + length(response.names.NA)), function(i) {
@@ -597,6 +557,7 @@ multord.data <- function(data, index, y.names, x.names,
   names(df$x) <- c(names.x, response.names.NA)
   if (!is.null(response.names)) df$x <- df$x[as.character(response.names)]
 
+  rownames(df$y) <- subject_id_names
   indallNA <- which(rowSums(is.na(df$y)) == NCOL(df$y))
   if (length(indallNA) != 0) {
     df$y <- df$y[-indallNA, ]
@@ -619,4 +580,52 @@ theta2gamma <- function(theta){
     }
   }
   gamma
+}
+
+r2sigma <- function(r, object){
+  if(object$rho$error.structure$type == "corAR1"){
+    sigma <- lapply(seq_len(length(r)), function(i){
+      tmp <- diag(object$rho$ndim)
+      tmp[lower.tri(tmp)]  <- r[i]^sequence((object$rho$ndim-1):1)
+      tmp <- tmp + t(tmp) - diag(diag(tmp))
+      rownames(tmp) <- colnames(tmp) <- colnames(object$rho$y)
+      tmp
+    })
+  } else if (object$rho$error.structure$type == "corEqui") {
+    sigma <- lapply(seq_len(length(r)), function(i) {
+      tmp <- matrix(r[i], nrow = object$rho$ndim, ncol = object$rho$ndim)
+      diag(tmp) <- 1
+      rownames(tmp) <- colnames(tmp) <- colnames(object$rho$y)
+      tmp
+    })
+  }
+  sigma
+}
+
+
+#' @title Multivariate link functions in mvord
+#' @description Different \code{link} functions are available in \pkg{mvord}:
+#' @details We allow for two different link functions, the multivariate probit
+#' link and the multivariate logit link.
+#' For the multivariate probit
+#' link a multivariate normal distribution for the errors is applied. The
+#' normal bivariate probabilities which enter the pairwise log-likelihood
+#' are computed with the package \pkg{pbivnorm}.
+#'
+#' For the multivariate logit link a \eqn{t} copula based multivariate
+#' distribution with logistic margins is used.
+#'   The \code{mvlogit()} function has an optional integer valued argument
+#' \code{df} which specifies the degrees of freedom to be used for the
+#' \eqn{t} copula.  The default value of the degrees of freedom parameter is
+#' 8. We restrict the degrees of freedom to be integer valued because the
+#' most efficient routines for computing bivariate \eqn{t}~probabilities do
+#' not support non-integer degrees of freedom. For further details see vignette.
+#' @param df integer specifying the degrees of freedom of the t copula
+#' @export
+#' @name mvlinks
+mvprobit <- function() return(list(name = "mvprobit"))
+#' @export
+#' @rdname mvlinks
+mvlogit <- function(df = 8L){
+  return(list(name = "mvlogit", df = df))
 }

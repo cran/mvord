@@ -1,8 +1,8 @@
-# #' @rdname mvord-package
+#' @rdname mvord-package
 #' @title Multivariate Ordinal Regression Models in R.
 #' @description  The R package mvord implements composite likelihood
 #' estimation in the class of multivariate ordinal regression models with probit and logit link.
-#' A flexible modeling framework for ordinal repeated measurements on
+#' A flexible modeling framework for multiple ordinal measurements on
 #' the same subject is set up, which takes into consideration the
 #' dependence among the multiple observations by employing different
 #' error structures.
@@ -13,15 +13,14 @@
 #' varying across the multiple response dimensions in the default
 #' implementation. However, constraints can be defined by the user if a
 #' reduction of the parameter space is desired.
-#' @details see \code{\link{multord}}, \code{\link{multord2}}
-"_PACKAGE"
-#> [1] "_PACKAGE"
-#NULL
+#' @details see \code{\link{mvord}}, \code{\link{mvord2}}
+#' @name mvord-package
+#' @aliases mvord-package
+NULL
 
-
-#' Simulated panel of credit ratings
+#' @title Simulated panel of credit ratings
 #'
-#' A data set containing simulated credit ratings assigned by one rater and simulated perfomance measures for firms in different years.
+#' @description A data set containing simulated credit ratings assigned by one rater and simulated perfomance measures for firms in different years.
 #'
 #' \itemize{
 #'   \item \code{year} year index
@@ -64,10 +63,10 @@ NULL
 #'   \item \code{BSEC} business sector of a firm (factor with 8 levels)
 #' }
 #'
-#' @name data_cr_multord
+#' @name data_cr_mvord
 #' @docType data
 # #' @keywords datasets
-#' @usage data(data_cr_multord)
+#' @usage data(data_cr_mvord)
 #' @format A data frame with 4566 rows and 11 variables
 NULL
 
@@ -90,10 +89,10 @@ NULL
 #'   \item \code{BSEC} business sector of a firm (factor with 8 levels)
 #' }
 #'
-#' @name data_cr_multord2
+#' @name data_cr_mvord2
 #' @docType data
 # #' @keywords datasets
-#' @usage data(data_cr_multord2)
+#' @usage data(data_cr_mvord2)
 #' @format A data frame with 1665 rows and 13 variables
 NULL
 
@@ -106,9 +105,9 @@ NULL
 #'
 #' \itemize{
 #'   \item \code{firm_id} firm index
-#'   \item \code{rater1}  ordinal rating observations of rater 1
-#'   \item \code{rater2}  ordinal rating observations of rater 2
-#'   \item \code{rater3}  ordinal rating observations of rater 3
+#'   \item \code{rater1}  ordinal rating outcome of rater 1
+#'   \item \code{rater2}  ordinal rating outcome of rater 2
+#'   \item \code{rater3}  ordinal rating outcome of rater 3
 #'   \item \code{X1} covariate X1
 #'   \item \code{X2} covariate X2
 #'   \item \code{X3} covariate X3
@@ -116,10 +115,10 @@ NULL
 #'   \item \code{X5} covariate X5
 #'   \item \code{X6} covariate X6 (factor)
 #' }
-#' @name data_multord2
+#' @name data_mvord2
 #' @docType data
 # #' @keywords datasets
-#' @usage data(data_multord2)
+#' @usage data(data_mvord2)
 #' @format A data frame with 1000 rows and 10 variables
 NULL
 
@@ -133,7 +132,7 @@ NULL
 #' \itemize{
 #'   \item \code{firm_id} firm index
 #'   \item \code{year}  year index (2001 - 2010)
-#'   \item \code{rating} ordinal credit rating observation
+#'   \item \code{rating} ordinal credit ratings
 #'   \item \code{X1} covariate X1
 #'   \item \code{X2} covariate X2
 #'   \item \code{X3} covariate X3
@@ -141,10 +140,10 @@ NULL
 #'   \item \code{X5} covariate X5
 #'   \item \code{X6} covariate X6 (factor)
 #' }
-#' @name data_multord_panel
+#' @name data_mvord_panel
 #' @docType data
 # #' @keywords datasets
-#' @usage data(data_multord_panel)
+#' @usage data(data_mvord_panel)
 #' @format A data frame with 10000 rows and 9 variables
 NULL
 
@@ -168,7 +167,7 @@ NULL
 #' \itemize{
 #'   \item \code{firm_id} firm index
 #'   \item \code{rater_id}  rater index
-#'   \item \code{rating} ordinal credit rating observation
+#'   \item \code{rating} ordinal credit ratings
 #'   \item \code{X1} covariate X1
 #'   \item \code{X2} covariate X2
 #'   \item \code{X3} covariate X3
@@ -177,20 +176,20 @@ NULL
 #'   \item \code{X6} covariate X6 (factor)
 #' }
 #'
-#' @name data_multord
+#' @name data_mvord
 #' @docType data
 # #' @keywords datasets
-#' @usage data(data_multord)
+#' @usage data(data_mvord)
 #' @format A data frame with 3000 rows and 9 variables
 NULL
 
 #' Data set toy example
 #'
-#' A data set containing two simulated ordinal observations with three categories and two covariates \code{X1} and \code{X2}.
+#' A data set containing two simulated ordinal responses with three categories and two covariates \code{X1} and \code{X2}.
 #'
 #' \itemize{
-#'   \item \code{Y1} ordinal observation one \code{Y1} (three categories)
-#'   \item \code{Y2} ordinal observation one \code{Y2} (three categories)
+#'   \item \code{Y1} ordinal outcome \code{Y1} (three categories)
+#'   \item \code{Y2} ordinal outcome \code{Y2} (three categories)
 #'   \item \code{X1} covariate \code{X1}
 #'   \item \code{X2} covariate \code{X2}
 #' }
@@ -204,90 +203,59 @@ NULL
 
 ##IMPORTS
 #' @importFrom optimx optimx
-#' @importFrom stats model.frame model.matrix coef as.formula cov2cor dnorm dt pnorm pt terms.formula
+#' @importFrom stats model.frame model.matrix coef as.formula cov2cor dnorm dt pnorm pt terms.formula plogis dlogis qt
 #' @importFrom pbivnorm pbivnorm
 #' @importFrom MASS polr
 #' @importFrom utils combn data write.table
+#' @importFrom mnormt sadmvn sadmvt
 
 
 #############################################################################################
 #' @title Multivariate Ordinal Regression Models.
 #'
 #' @description
-#' \code{multord} is used to estimate multivariate ordinal regression models. Different model types are implemented and can be chosen by
+#' \code{mvord} is used to estimate multivariate ordinal regression models. Different model types are implemented and can be chosen by
 #' the use of different \code{\link{error.structures}}. Constraints on the threshold as well as on the regression parameters can be imposed.
 #'
 #' @details
-# #' Suppose we have \eqn{J} repeated measurements on \eqn{n} different subjects \eqn{i},
-# #' where each repeated ordinal observation, indexed by \eqn{j \in J}, is denoted by \eqn{Y_{ij}}.
-# #'  Each observable categorical outcome \eqn{Y_{ij}} and the unobservable latent variable
-# #'  \eqn{\widetilde Y_{ij}} are connected by:
-# #' \deqn{
-# #' Y_{ij} = r_{ij} \quad \Leftrightarrow \quad \theta_{j,r_{ij}-1} <
-# #'   \widetilde{Y}_{ij} \leq \theta_{j, r_{ij}}, \qquad r_{ij} \in
-# #' \{1, \dots, K_j\},
-# #' }
-# #' where \eqn{r_{ij}} is a category out of \eqn{K_j} ordered categories and \eqn{\bm \theta_{j}} is a vector of suitable threshold
-# #' parameters for outcome \eqn{j} with the following restrictions:
-# #' \deqn{-\infty \equiv \theta_{j,0} < \theta_{j,1} < \dots < \theta_{j,K_j}\equiv\infty.}
-# #' The number of threshold categories \eqn{K_j} as well as the thresholds parameters themselves are allowed to vary across
-# #' outcome dimensions \eqn{j \in J} in order to account for differences in the repeated measurements. Given an \eqn{n \times p}
-# #'  matrix \eqn{X_j} of covariates for each \eqn{j \in J},
-# #' where each row vector \eqn{\bm{x}_{ij}} is a \eqn{p}-dimensional vector of covariates
-# #' for subject \eqn{i} and observation \eqn{j}, the following linear model for the relationship between \eqn{\widetilde{Y}_{ij}}
-# #'  and the vector
-# #' of covariates \eqn{\bm{x}_{ij}} is assumed:
-# #'  \deqn{
-# #' \widetilde{Y}_{ij} = \beta_{0j} + \bm{x}_{ij}^\top \bm{\beta}_j + \epsilon_{ij}, \qquad
-# #' \bm{\epsilon}_i = (\epsilon_{i1}, \epsilon_{i2}, \ldots, \epsilon_{iJ}) \sim F_{J}(\bm{0},\bm{\Sigma}),
-# #' }
-# #' where
-# #' \itemize{
-# #' \item {\eqn{\beta_{0j}} is an intercept term corresponding to outcome \eqn{j},}
-# #' \item {\eqn{\bm{\beta}_j} is a vector of regression coefficients corresponding to outcome \eqn{j},}
-# #' \item {\eqn{\epsilon_{ij}} is an error term with mean zero and distributed according to a \eqn{J}-dimensional
-# #'  distribution function \eqn{F_J}.}
-# #' }
-#'
 #' \describe{
 #'   \item{\code{data}}{
 #' We use the long format for the input of \code{data}, where each row contains a subject
-#' index \eqn{i} (\code{firm_id}), a repeated measurement index \eqn{j} (\code{rater_id}), an ordinal response
+#' index \eqn{i} (\code{firm_id}), a multiple measurement index \eqn{j} (\code{rater_id}), an ordinal response
 #' (\code{rating}) and all the covariates (\code{X1, ..., Xp}). This long format data stucture
 #' is internally transformed to matrix of covariates \eqn{Y} and a list of covariate matrices
-#' \eqn{X_j} for all \eqn{j \in J} by a matching according to the subject index \eqn{i} and the repeated
+#' \eqn{X_j} for all \eqn{j \in J} by a matching according to the subject index \eqn{i} and the multiple
 #' measurement index \eqn{j}, which are passed by an optional argument \code{index}. This is
 #' usually performed by a character vector of length two specifying the column names
-#' of the subject index and the repeated measurement index in \code{data}. For the data set in \code{\link{data_multord}} we have:
+#' of the subject index and the multiple measurement index in \code{data}. For the data set in \code{\link{data_mvord}} we have:
 #'
 #'    \code{index = c("firm_id", "rater_id")}
 #'
 #' The default value of \code{index} is \code{NULL} assuming that the first column of \code{data}
-#' contains the subject index and the second column the repeated measurement index.
+#' contains the subject index and the second column the multiple measurement index.
 #' (Note that if the covariates have different scale, the estimation is prone to numerical instabilities.
 #' In such a case one could standardize the covariates \eqn{x_{ij}}.)
 #'
 #' If specific constraints are imposed on the parameter set, a well defined index \eqn{j \in J}
-#' for the repeated measurements is needed. Therefore, a vector \code{response.names}
-#' is used to define the index number of the repeated measurement.
+#' for the multiple measurements is needed. Therefore, a vector \code{response.names}
+#' is used to define the index number of the multiple measurement.
 #'
 #'     \code{response.names = c("rater1", "rater2", "rater3")}
 #'
 #' The default value of \code{response.names} is \code{NULL} giving the natural ordering
-#' of the levels of the factor variable for all the repeated measurements.
+#' of the levels of the factor variable for all the multiple measurements.
 #' The ordering of \code{response.names} always specifies the index of the
-#' repeated measurement unit \eqn{j \in J}. This ordering is essential when
+#' multiple measurement unit \eqn{j \in J}. This ordering is essential when
 #' putting constraints on the parameters and when setting \code{response.levels}.
 #'
 #' \preformatted{response.levels = list(c("G","F","E", "D", "C", "B", "A"),
 #'                        c("G","F","E", "D", "C", "B", "A"),
 #'                        c("O","N","M","L", "K", "J", "I", "H"))}
 #'
-#' If the categories differ across repeated measurements (either the number of categories or the category labels)
+#' If the categories differ across multiple measurements (either the number of categories or the category labels)
 #' one needs to specify the \code{response.levels} explicitly. This is performed by a list
-#' of length \eqn{J} (number of repeated measurements), where each element contains
+#' of length \eqn{J} (number of multiple measurements), where each element contains
 #' the names of the levels of the ordered categories in ascending or descending order.}
-
 #'
 #' \item{\code{formula}}{
 #' The ordinal responses \eqn{Y} (\code{rating}) are passed by a \code{formula} object.
@@ -325,7 +293,7 @@ NULL
 #' This parameterization can be extended by allowing a factor dependent
 #' correlation structure, where the correlation of each subject \eqn{i} depends
 #' on a given subject-specific factor \code{f}. This factor \code{f} is not allowed to vary
-#' across repeated measurements \eqn{j} for the same subject \eqn{i} and due to numerical
+#' across multiple measurements \eqn{j} for the same subject \eqn{i} and due to numerical
 #' constraints only up to maximum 30 levels are allowed.
 #'
 #'       \code{error.structure = corGeneral(~ f)}
@@ -334,7 +302,7 @@ NULL
 #' A covariate dependent equicorrelation structure, where the correlations
 #' are equal across all \eqn{J} dimensions and depend on subject-specific covariates \code{S1, ..., Sm}.
 #' It has to be noted that these covariates \code{S1, ..., Sm} are not allowed to vary across
-#'  repeated measurements \eqn{j} for the same subject \eqn{i}.
+#'  multiple measurements \eqn{j} for the same subject \eqn{i}.
 #'
 #'          \code{error.structure = corEqui(~ S1 + ... + Sm)}
 #'
@@ -375,11 +343,11 @@ NULL
 #'      of dimension \eqn{J}. The ordering \eqn{j \in J} of the responses is given by \code{response.names}.
 #'      This vector is allocated in the following way:
 #' The first element of the vector \code{coef.constraints} gets a value of 1. If the coefficients
-#'  of the repeated measurement \eqn{j = 2} should be equal to the coefficients of the first dimension (\eqn{j=1}) again
+#'  of the multiple measurement \eqn{j = 2} should be equal to the coefficients of the first dimension (\eqn{j=1}) again
 #'   a value of 1 is set. If the coefficients should be different to the coefficients of the first dimension
 #'   a value of 2 is set. In analogy, if the coefficients of dimensions two and three
 #'    should be the same one sets both values to 2 and if they should be different,
-#'     a value of 3 is set. Constraints on the regression coefficients of the remaining repeated measurements are set analogously.
+#'     a value of 3 is set. Constraints on the regression coefficients of the remaining multiple measurements are set analogously.
 #'
 #'  \code{coef.constraints <- c(1,1,2,3)}
 #'
@@ -452,7 +420,7 @@ NULL
 #'     with \eqn{J} elements, where each element specifies the constraints of the particular
 #'      dimension by a vector of length of the number of threshold parameters (number of categories - 1).
 #'      A number specifies a threshold parameter to a specific value and \code{NA} leaves the parameter flexible.
-#'       For \code{\link{data_multord}} we have
+#'       For \code{\link{data_mvord}} we have
 
 #' \preformatted{threshold.constraints <- NULL}
 #'
@@ -462,13 +430,14 @@ NULL
 #' }
 #' }
 #'
-#' @return The function \code{multord} returns an object of \code{\link{class}} \code{"multord"}.
+#' @return The function \code{mvord} returns an object of \code{\link{class}} \code{"mvord"}.
 #'
 #' The functions \code{summary} and \code{print} are used to display the results.
 #' The function \code{coef} extracts the regression coefficients, a function \code{thresholds} the threshold coefficients
-#' and the function \code{get.error.struct} returns the estimated parameters of the corresponding error structure.
+#' and the function \cr
+#' \code{get.error.struct} returns the estimated parameters of the corresponding error structure.
 #'
-#' An object of \code{\link{class}} \code{"multord"} is a list containing the following components:
+#' An object of \code{\link{class}} \code{"mvord"} is a list containing the following components:
 #'
 #' \itemize{
 #'  \item{\code{beta}}{
@@ -488,42 +457,39 @@ NULL
 #'   \item{\code{setheta}}{
 #'
 #'     a named \code{\link{list}} of the standard errors of the threshold parameters}
-#'   \item{\code{sesigmas}}{
+#'   \item{\code{seerror.struct}}{
 #'
 #'     a named \code{\link{list}} of the standard errors of the correlation (covariance) matrices,
-#'   or a ?vector of coefficients in the \code{error.structure = corEqui} setting}
+#'   or a vector of coefficients in the \code{error.structure = corEqui} setting}
 #'   \item{\code{rho}}{
 #'
-#'     a \code{\link{list}} of all objects that are used in \code{multord}}
-#'  % \item{\code{rho$optRes}}{
-#'  %
-#'  %   a \code{\link{vector}} of the optimizer output}
+#'     a \code{\link{list}} of all objects that are used in \code{mvord()}}
 #' }
 #'
-#' @seealso %\code{\link{predict.multord}},
-#' \code{\link{print.multord}}, \code{\link{summary.multord}}, \code{\link{coef.multord}},
-#'  \code{\link{thresholds.multord}}, \code{\link{get.error.struct.multord}}, \code{\link{logPL}},
+#' @seealso %\code{\link{predict.mvord}},
+#' \code{\link{print.mvord}}, \code{\link{summary.mvord}}, \code{\link{coef.mvord}},
+#'  \code{\link{thresholds.mvord}}, \code{\link{get.error.struct.mvord}}, \code{\link{logPL}},
 #'  \code{\link{claic}}, \code{\link{clbic}},
-#'  \code{\link{data_cr_panel}},\code{\link{data_cr_multord}}, \code{\link{data_cr_multord2}},
-#'  \code{\link{data_multord_panel}},\code{\link{data_multord}}, \code{\link{data_multord2}}
+#'  \code{\link{data_cr_panel}},\code{\link{data_cr_mvord}}, \code{\link{data_cr_mvord2}},
+#'  \code{\link{data_mvord_panel}},\code{\link{data_mvord}}, \code{\link{data_mvord2}}
 #'
 #'
 #' @param formula an object of class \code{\link{formula}} of the form \code{y ~ X1 + ... + Xp}.
-#' @param data \code{\link{data.frame}} containing a subject index, an index for the repeated measurements,
+#' @param data \code{\link{data.frame}} containing a subject index, an index for the multiple measurements,
 #' an ordinal response \code{y} and covariates \code{X1, ..., Xp}.
-#' @param index (optional) argument to specify the column names of the subject index and the repeated measurement index
+#' @param index (optional) argument to specify the column names of the subject index and the multiple measurement index
 #' by a vector \cr
-#' \code{c("subject", "repeated_measurement")} in \code{data}.
+#' \code{c("subject", "multiple_measurement")} in \code{data}.
 #' The default value of \code{index} is \code{NULL} assuming that the first column of \code{data} contains
-#' the subject index and the second column the repeated measurement index.
-#' @param response.levels (optional) \code{\link{list}} of length equal to the number of repeated measurements to specify the category labels
-#' in case of varying categories across repeated measurements
-#' @param response.names (optional) \code{\link{vector}} of the labels of the repeated measurement index in order to
+#' the subject index and the second column the multiple measurement index.
+#' @param response.levels (optional) \code{\link{list}} of length equal to the number of multiple measurements to specify the category labels
+#' in case of varying categories across multiple measurements
+#' @param response.names (optional) \code{\link{vector}} of the labels of the multiple measurement index in order to
 #' specify the ordering of the responses which is essential when setting constraints on the model parameters.
 #'  The default value of \code{response.names} is \code{NULL} giving the natural ordering of the levels of the factor variable
-#'  of repeated measurements.
-#' @param link specifies the link function by \code{"probit"} (multivariate normally distributed errors)
-#' or \code{"logit"} (multivariate logistically distributed errors).
+#'  of multiple measurements.
+#' @param link specifies the link function by \code{mvprobit()} (multivariate normally distributed errors)
+#' or \code{mvlogit(df = 8)} (multivariate logistically distributed errors), where \code{df} specifies the degrees of freedom of the t copula.
 #' @param error.structure different \code{\link{error.structures}}: general correlation structure (default)\cr
 #' \code{corGeneral(~1)},
 #' general covariance structure \code{covGeneral(~1)}, factor dependent correlation structure \code{covGeneral(~f)},
@@ -533,15 +499,16 @@ NULL
 #' AR(1) correlation structure \code{corAR1(~S)}.
 #' See \code{\link{error.structures}} or 'Details'.
 #' @param weights (optional) column name of subject-specific weights in \code{data} which need to be
-#' constant across repeated measurements. Negative weights are not allowed.
+#' constant across multiple measurements. Negative weights are not allowed.
 #' @param coef.constraints \code{\link{vector}} or \code{\link{matrix}} of constraints on the regression coefficients. See 'Details'.
 #' @param coef.values \code{\link{matrix}} setting fixed values on the regression coefficients. See 'Details'.
 #' @param threshold.constraints \code{\link{vector}} of constraints on the threshold parameters. See 'Details'.
 #' @param threshold.values \code{\link{list}} of (optional) fixed values for the threshold parameters. See 'Details'.
 #' @param se logical, if \code{TRUE} standard errors are computed.
 #' @param start.values vector of (optional) starting values.
-#' @param solver character string containing the name of the applicable solver of \code{\link{optimx}} (default is \code{"BFGS"}) or wrapper function for user defined solver.
-# #' @param PL.lag specifies the time lag of the pairs in the pairwise likelihood approach to be optimized.
+#' @param solver character string containing the name of the applicable solver of \code{\link{optimx}} (default is \code{"BFGS"})
+#'  or wrapper function for user defined solver.
+#' @param PL.lag specifies the time lag of the pairs in the pairwise likelihood approach to be optimized.
 #' @param control a list of control arguments. See \code{\link{optimx}}.
 # #' Only applicable with \code{error.structure = corAR1}.
 #'
@@ -558,10 +525,10 @@ NULL
 #'                        "X1" = rep(data_toy_example$X1,2),
 #'                        "X2" = rep(data_toy_example$X2,2))
 #'
-#' res <- multord(formula = Y ~ 0 + X1 + X2,
+#' res <- mvord(formula = Y ~ 0 + X1 + X2,
 #'                data = df,
 #'                index = c("i", "j"),
-#'                link = "probit",
+#'                link = mvprobit(),
 #'                solver = "BFGS",
 #'                se = TRUE,
 #'                error.structure = corGeneral(~1),
@@ -575,19 +542,19 @@ NULL
 #'
 #' ## examples
 #' #load data
-#' data(data_multord)
-#' head(data_multord)
+#' data(data_mvord)
+#' head(data_mvord)
 #'
 #' #-------------
 #' # corGeneral
 #' #-------------
 #' \donttest{
 #' # approx 1 min
-#' res_cor <- multord(formula = rating ~ 0 + X1 + X2 + X3 + X4 + X5,
+#' res_cor <- mvord(formula = rating ~ 0 + X1 + X2 + X3 + X4 + X5,
 #' #formula ~ 0 ... without intercept
 #'                index = c("firm_id", "rater_id"),
 #' #not necessary if firm_id is first column and rater is second column in data
-#'                data = data_multord, #choose data
+#'                data = data_mvord, #choose data
 #'                response.levels = list(c("G","F","E", "D", "C", "B", "A"),
 #'                                       c("G","F","E", "D", "C", "B", "A"),
 #'                                       c("O","N","M","L", "K", "J", "I", "H")),
@@ -595,7 +562,7 @@ NULL
 #' #need to be set if specific levels/labels are desired (not in natural ordering)
 #'                response.names = c("rater1", "rater2", "rater3"),
 #' # set if not all raters are used and specifies ordering
-#'                link = "probit", #probit or logit
+#'                link = mvprobit(), #mvprobit() or mvlogit()
 #'                error.structure = corGeneral(~1), #different error structures
 #'                coef.constraints = cbind(c(1,2,2),
 #'                                         c(1,1,2),
@@ -620,11 +587,11 @@ NULL
 #' # covGeneral
 #' #-------------
 #' #approx 4 min
-#' res_cov <- multord(formula = rating ~ 1 + X1 + X2 + X3 + X4 + X5,
+#' res_cov <- mvord(formula = rating ~ 1 + X1 + X2 + X3 + X4 + X5,
 #' #formula ~ 0 ... without intercept
 #'             index = c("firm_id", "rater_id"),
 #' #not necessary if firm_id is first column and rater is second column in data
-#'             data = data_multord, #choose data
+#'             data = data_mvord, #choose data
 #'             response.levels = list(c("G","F","E", "D", "C", "B", "A"),
 #'                                    c("G","F","E", "D", "C", "B", "A"),
 #'                                    c("O","N","M","L", "K", "J", "I", "H")),
@@ -632,7 +599,7 @@ NULL
 #' #need to be set if specific levels/labels are desired
 #'             response.names = c("rater1", "rater2", "rater3"),
 #' # set if not all raters are used and specifies ordering
-#'             link = "probit", #probit or logit
+#'             link = mvprobit(), #mvprobit() or mvlogit()
 #'             error.structure = covGeneral(~1), #different error structures
 #'             threshold.constraints = NULL, #vector
 #'             threshold.values = list(c(-4,NA,NA,NA,NA,4.5),
@@ -652,20 +619,20 @@ NULL
 #' # corAR1
 #' #-------------
 #' #approx 4min
-#' data(data_multord_panel)
-#' head(data_multord_panel)
+#' data(data_mvord_panel)
+#' head(data_mvord_panel)
 #' mult.obs <- 5
-#' res_AR1 <- multord(formula = rating ~ 0 + X1 + X2 + X3 + X4 + X5,
+#' res_AR1 <- mvord(formula = rating ~ 0 + X1 + X2 + X3 + X4 + X5,
 #' #formula ~ 0 ... without intercept
 #'            index = c("firm_id", "year"),
 #' #not necessary if firm_id is first column and rater is second column in data
-#'            data = data_multord_panel, #choose data
+#'            data = data_mvord_panel, #choose data
 #'            response.levels = rep(list(c("G","F","E", "D", "C", "B", "A")), mult.obs),
 #' #list for each rater;
 #' #need to be set if specific levels/labels are desired (not in natural ordering)
 #'            response.names = c("year3", "year4", "year5", "year6", "year7"),
 #' # set if not all raters are used and specifies ordering
-#'            link = "probit", #probit or logit
+#'            link = mvprobit(), #mvprobit() or mvlogit()
 #'            error.structure = corAR1(~1), #different error structures
 #'            threshold.constraints = c(1,1,1,2,2),
 #'            coef.constraints = c(1,1,1,2,2),
@@ -678,39 +645,46 @@ NULL
 #' get.error.struct(res_AR1, type = "corr")
 #' }
 #'
-#' @name multord
+#' @name mvord
 #' @export
-multord <- function(formula,
-                    error.structure = corGeneral(~1),
-                    link = c("probit", "logit"),
-                    data,
-                    index = NULL,
-                    response.names = NULL,
-                    response.levels = NULL,
-                    coef.constraints = NULL,
-                    coef.values = NULL,
-                    threshold.constraints = NULL,
-                    threshold.values = NULL,
-                    weights = NULL, #TODO
-                    se = TRUE,
-                    start.values = NULL,
-                    solver = "BFGS",
-                    #PL.lag = NULL,
-                    control = list(maxit=200000, trace = 1, kkt = FALSE)
-                    ){
+mvord <- function(formula,
+                  error.structure = corGeneral(~1),
+                  link = mvprobit(),
+                  data,
+                  index = NULL,
+                  response.names = NULL,
+                  response.levels = NULL,
+                  coef.constraints = NULL,
+                  coef.values = NULL,
+                  threshold.constraints = NULL,
+                  threshold.values = NULL,
+                  weights = NULL, #TODO
+                  se = TRUE,
+                  start.values = NULL,
+                  solver = "BFGS",
+                  PL.lag = NULL,
+                  control = list(maxit=200000, trace = 1, kkt = FALSE)
+){
   #check arguments
   rho <- list()
+  rho$function.name <- "mvord"
   rho$link <- link
   rho$se <- se
   rho$start.values <- start.values
-  #rho$weights <- weights
   rho$solver <- solver
   rho$threshold.constraints <- threshold.constraints
   rho$threshold.values <- threshold.values
+  rho$coef.constraints <- coef.constraints
+  rho$coef.values <- coef.values
   rho$formula <- formula
-  rho$PL.lag <- NULL
+  rho$PL.lag <- PL.lag
   rho$control <- control
   rho$mc <- match.call(expand.dots = FALSE)
+  rho$index <- index
+  rho$weights.name <- weights
+  rho$response.levels <- response.levels
+  rho$response.names <- response.names
+  rho$error.structure.input <- error.structure
   nm <- names(as.list(rho$mc))
 
   if(!"data" %in% nm) stop("Model needs formula, data and link.", call.=FALSE)
@@ -718,71 +692,73 @@ multord <- function(formula,
   if(!"formula" %in% nm) stop("Model needs formula, data and link.", call.=FALSE)
 
   rho$response.name <- all.vars(rho$formula[[2]])
-  if(!is.null(response.names)){
-    if(is.null(index)) index[1:2] <- c(1,2)
-    if(!all(response.names %in% unique(data[,index[2]]))){
+  if(!is.null(rho$response.names)){
+    if(is.null(rho$index)) rho$index[1:2] <- c(1,2)
+    if(!all(rho$response.names %in% unique(data[,rho$index[2]]))){
     warning("response.names do not all exist in data.", call.=FALSE)
     }}
   if(length(rho$response.name) > 1) stop("only one response needed", call.=FALSE)
-  rho$x.names <- c(all.vars(formula[[3]]),
-                   all.vars(error.structure$formula[[2]]))
-  if(is.null(index)) index <- colnames(data)[1:2]
-  if(!all(index %in% colnames(data))) stop("index names do not match with column names of data", call.=FALSE)
-  data.multord <- multord.data(data, index, rho$response.name, unique(c(rho$x.names,weights)),
-                               y.levels = response.levels, response.names = response.names)
+  rho$x.names <- c(all.vars(rho$formula[[3]]),
+                   all.vars(rho$error.structure.input$formula[[2]]))
+  if(is.null(rho$index)) index <- colnames(data)[1:2]
+  if(!all(rho$index %in% colnames(data))) stop("index names do not match with column names of data", call.=FALSE)
+  data.mvord <- mvord.data(data, rho$index, rho$response.name, unique(c(rho$x.names, rho$weights.name)),
+                               y.levels = rho$response.levels, response.names = rho$response.names)
 
-  rho$y <- data.multord$y
+  rho$y <- data.mvord$y
   rho$y.names <- colnames(rho$y)
   rho$ndim <- ncol(rho$y)
   rho$x <- lapply(1:rho$ndim, function(j) {
-    tmp <- model.matrix(as.formula(paste0("~",deparse(rho$formula[[3]]))), data.multord$x[[j]])
+    tmp <- model.matrix(as.formula(paste0("~",deparse(rho$formula[[3]]))), data.mvord$x[[j]])
     attribute <- attr(tmp, "assign")
-    tmp <- tmp[match(rownames(data.multord$x[[j]]),rownames(tmp)),]
-    rownames(tmp) <- rownames(data.multord$x[[j]])
+    tmp <- tmp[match(rownames(data.mvord$x[[j]]),rownames(tmp)),]
+    rownames(tmp) <- rownames(data.mvord$x[[j]])
     attr(tmp, "assign") <- attribute
     tmp
   })
-  if (is.null(weights)) {
+  if (is.null(rho$weights.name)) {
     rho$weights <- rep(1, nrow(rho$y))#matrix(1, nrow = rho$n, ncol = rho$ndim)
   } else {
-    tmp <- sapply(data.multord$x, function(j) as.numeric(j[,weights]))
+    tmp <- sapply(data.mvord$x, function(j) as.numeric(j[,rho$weights.name]))
     rho$weights <- apply(tmp,1,function(x) unique(x[!is.na(x)]))
-    if(is.list(rho$weights)) stop("Weights need to be constant across repeated measurements", call.=FALSE)
+    if(is.list(rho$weights)) stop("Weights need to be constant across multiple measurements", call.=FALSE)
     if(any(rho$weights < 0)) stop("Weights must be non-negative", call.=FALSE)
   }
 
-  rho$error.structure <- set.error.structure(error.structure, data.multord$x, rho$ndim)
+  rho$error.structure <- set.error.structure(rho$error.structure.input, data.mvord$x, rho$ndim)
   if(!is.null(rho$PL.lag) && rho$error.structure$type != "corAR1") stop("Use PL.lag only with corAR1 error.structure", call.=FALSE)
   if(!is.null(rho$PL.lag) && rho$PL.lag <= 0) stop("PL.lag must be greater than 0", call.=FALSE)
 
   rho$intercept <- ifelse(attr(terms.formula(rho$formula), "intercept") == 1, TRUE, FALSE)
 
-  if(is.null(coef.constraints)) coef.constraints <- matrix(1:rho$ndim, ncol = ncol(rho$x[[1]]), nrow = rho$ndim)# + rho$intercept
-  if(is.vector(coef.constraints)) coef.constraints <- matrix(coef.constraints, ncol = length(rho$x.names) + (rho$intercept), nrow = rho$ndim)
+  if(is.null(rho$coef.constraints)) rho$coef.constraints <- matrix(1:rho$ndim, ncol = ncol(rho$x[[1]]), nrow = rho$ndim)
+  if(is.vector(rho$coef.constraints)) rho$coef.constraints <- matrix(rho$coef.constraints,
+                                                                     ncol = length(rho$x.names) + (rho$intercept),
+                                                                     nrow = rho$ndim)
 
   if(rho$intercept){
-    rho$coef.constraints <- coef.constraints[,attr(rho$x[[1]], "assign") + 1]
-  } else rho$coef.constraints <- coef.constraints[,attr(rho$x[[1]], "assign")]
+    rho$coef.constraints <- rho$coef.constraints[,attr(rho$x[[1]], "assign") + 1]
+  } else rho$coef.constraints <- rho$coef.constraints[,attr(rho$x[[1]], "assign")]
 
-  if(is.null(coef.values)){
-    rho$coef.values <- matrix(NA, ncol = ncol(rho$coef.constraints), nrow = nrow(rho$coef.constraints)) ## TODO:What is this????
+  if(is.null(rho$coef.values)){
+    rho$coef.values <- matrix(NA, ncol = ncol(rho$coef.constraints), nrow = nrow(rho$coef.constraints))
     rho$coef.values[is.na(rho$coef.constraints)] <- 0 #default 0
   } else {
     if(rho$intercept){
-      rho$coef.values <- coef.values[,attr(rho$x[[1]], "assign") + 1]
-    } else rho$coef.values <- coef.values[,attr(rho$x[[1]], "assign")]# TODO: check:?ordering
+      rho$coef.values <- rho$coef.values[,attr(rho$x[[1]], "assign") + 1]
+    } else rho$coef.values <- rho$coef.values[,attr(rho$x[[1]], "assign")]
   }
   rho$intercept.type <- ifelse(rho$intercept == FALSE, "fixed", ifelse(any(is.na(rho$coef.values[,1])), "flexible", "fixed"))
 
-  multord.fit(rho)
+  mvord.fit(rho)
 }
 #-----------------------------------------------------------------------------------------------------------------
-# multord2
+# mvord2
 #-----------------------------------------------------------------------------------------------------------------
 #' @title Multivariate Ordinal Regression Models with Subject Specific Covariates
 #'
 #' @description
-#' \code{multord2} fits a ordinal regression model for the case where the covariates do not vary\cr over the responses dimensions.
+#' \code{mvord2} fits a ordinal regression model for the case where the covariates do not vary\cr over the responses dimensions.
 #'
 #' @param formula a \code{\link{formula}} object for multivariate responses in the form of\cr
 #' \code{cbind(Y1, ..., Yj) ~ X1 + ... + Xp}.
@@ -796,27 +772,30 @@ multord <- function(formula,
 #' AR(1) correlation structure \code{corAR1(~S)}.
 #' See \code{\link{error.structures}} or 'Details'.
 #' @param data \code{\link{data.frame}} containing the ordinal observations and the covariates to be used in the model
-#' @param link \code{"probit"} or \code{"logit"} link function
+#' @param link specifies the link function by \code{mvprobit()} (multivariate normally distributed errors)
+#' or \code{mvlogit(df = 8)} (multivariate logistically distributed errors), where \code{df} specifies the degrees of freedom of the t copula.
 #' @param coef.constraints \code{\link{vector}} or \code{\link{matrix}} of constraints on coefficients. See 'Details'.
 #' @param coef.values \code{\link{matrix}} setting fixed values on the regression coefficients. See 'Details'.
 #' @param threshold.constraints \code{\link{vector}} of constraints on thresholds. See 'Details'.
 #' @param threshold.values (optional) \code{\link{list}} of fixed values for threshold parameters. See 'Details'.
 #' @param weights (optional) column name of subject-specific weights in \code{data} which need to be
-#' constant across repeated measurements. Negative weights are not allowed.
+#' constant across multiple measurements. Negative weights are not allowed.
 #' @param se logical, if \code{TRUE} standard errors are computed.
 #' @param start.values vector of (optional) starting values.
-#' @param solver character string containing the name of the applicable solver of \code{\link{optimx}} (default is \code{"BFGS"}) or wrapper function for user defined solver.
+#' @param solver character string containing the name of the applicable solver of \code{\link{optimx}} (default is \code{"BFGS"})
+#' or wrapper function for user defined solver.
+#' @param PL.lag specifies the time lag of the pairs in the pairwise likelihood approach to be optimized.
 #' @param control a list of control arguments. See \code{\link{optimx}}.
-#' @details see vignette or \code{\link{multord}}
+#' @details see vignette or \code{\link{mvord}}
 #' @examples
 #' library(mvord)
 #'
 #' ## toy example
 #' data(data_toy_example)
 #'
-#' res <- multord2(formula = cbind(Y1,Y2) ~ 0 + X1 + X2,
+#' res <- mvord2(formula = cbind(Y1,Y2) ~ 0 + X1 + X2,
 #'                 data = data_toy_example,
-#'                 link = "probit",
+#'                 link = mvprobit(),
 #'                 solver = "BFGS",
 #'                 se = TRUE,
 #'                 error.structure = corGeneral(~1),
@@ -829,18 +808,18 @@ multord <- function(formula,
 #' get.error.struct(res)
 #'
 #' #load data
-#' data(data_multord2)
-#' head(data_multord2)
+#' data(data_mvord2)
+#' head(data_mvord2)
 #'
 #' #-------------
 #' # corGeneral
 #' #-------------
 #' \donttest{
 #' #approx 1 min
-#' res_cor <- multord2(formula = cbind(rater1, rater2, rater3) ~ 0 + X1 + X2 + X3 + X4 + X5,
+#' res_cor <- mvord2(formula = cbind(rater1, rater2, rater3) ~ 0 + X1 + X2 + X3 + X4 + X5,
 #' #formula ~ 0 ... without intercept
-#'                data = data_multord2, #choose data
-#'                link = "probit", #probit or logit
+#'                data = data_mvord2, #choose data
+#'                link = mvprobit(), #mvprobit() or mvlogit()
 #'                error.structure = corGeneral(~1), #different error structures
 #'                coef.constraints = cbind(c(1,2,2),
 #'                                         c(1,1,2),
@@ -862,84 +841,90 @@ multord <- function(formula,
 #' get.error.struct(res_cor)
 #' }
 #'
-#' @name multord2
+#' @name mvord2
 #' @export
-multord2 <- function(formula,
-	               error.structure = corGeneral(~1),
-	               data,
-                 link = c("probit", "logit"),
-                 coef.constraints = NULL,
-                 coef.values = NULL,
-                 threshold.constraints = NULL,
-                 threshold.values = NULL,
-                 weights = NULL,
-                 se = TRUE,
-                 start.values = NULL,
-                 solver = "BFGS",
-                 control = list(maxit = 200000, trace = 1, kkt = FALSE)){
-
+mvord2 <- function(formula,
+                   data,
+                   error.structure = corGeneral(~1),
+                   link = mvprobit(),
+                   coef.constraints = NULL,
+                   coef.values = NULL,
+                   threshold.constraints = NULL,
+                   threshold.values = NULL,
+                   weights = NULL,
+                   se = TRUE,
+                   start.values = NULL,
+                   solver = "BFGS",
+                   PL.lag = NULL,
+                   control = list(maxit = 200000, trace = 1, kkt = FALSE)){
   #check arguments
   rho <- list()
+  rho$function.name <- "mvord2"
   rho$link <- link
   rho$se <- se
   rho$start.values <- start.values
-  #rho$weights <- weights
   rho$solver <- solver
   rho$threshold.constraints <- threshold.constraints
   rho$threshold.values <- threshold.values
+  rho$coef.constraints <- coef.constraints
+  rho$coef.values <- coef.values
   rho$formula <- formula
   rho$mc <- match.call(expand.dots = FALSE)
   nm <- names(as.list(rho$mc))
   rho$control <- control
-  rho$PL.lag <- NULL
+  rho$PL.lag <- PL.lag
+  rho$error.structure.input <- error.structure
+  rho$weights.name <- weights
   if(!"data" %in% nm) stop("Model needs formula, data and link.", call.=FALSE)
   if(!"link" %in% nm) stop("Model needs formula, data and link.", call.=FALSE)
   if(!"formula" %in% nm) stop("Model needs formula, data and link.", call.=FALSE)
 
-  #CALL multord2
+  #CALL mvord2
   rho$y.names <- all.vars(rho$formula[[2]])
   rho$y <- data[,rho$y.names]
   rho$ndim <- ncol(rho$y)
   rho$x <- lapply(1:rho$ndim, function(j) model.matrix(rho$formula,
 	model.frame(rho$formula, data, na.action=function(x)x)))
 
-  rho$x.names <- c(all.vars(formula[[3]]), all.vars(error.structure$formula[[2]]))
+  rho$x.names <- c(all.vars(rho$formula[[3]]), all.vars(rho$error.structure.input$formula[[2]]))
   rho$y.names <- colnames(rho$y)
   rho$ndim <- ncol(rho$y)
 
-  if (is.null(weights)) {
+  if (is.null(rho$weights.name)) {
     rho$weights <- rep(1, nrow(rho$y))
   } else {
-    rho$weights <- data[,weights]
+    rho$weights <- data[,rho$weights.name]
     if(any(rho$weights < 0)) stop("Weights must be non-negative", call.=FALSE)
   }
 
-  rho$error.structure <- set.error.structure.multord2(error.structure, data)
+  rho$error.structure <- set.error.structure.mvord2(rho$error.structure.input, data)
   rho$intercept <- ifelse(attr(terms.formula(rho$formula), "intercept") == 1, TRUE, FALSE)
 
-  if(is.null(coef.constraints)) coef.constraints <- matrix(1:rho$ndim, ncol = length(rho$x.names) + (rho$intercept), nrow = rho$ndim)
-  if(is.vector(coef.constraints)) coef.constraints <- matrix(coef.constraints, ncol = length(rho$x.names) + (rho$intercept), nrow = rho$ndim)
+  if(is.null(rho$coef.constraints)) rho$coef.constraints <- matrix(1:rho$ndim, ncol = length(rho$x.names) + (rho$intercept), nrow = rho$ndim)
+  if(is.vector(rho$coef.constraints)) rho$coef.constraints <- matrix(rho$coef.constraints,
+                                                                     ncol = length(rho$x.names) + (rho$intercept),
+                                                                     nrow = rho$ndim)
 
   if(rho$intercept){
-    rho$coef.constraints <- coef.constraints[,attr(rho$x[[1]], "assign") + 1]
-  } else rho$coef.constraints <- coef.constraints[,attr(rho$x[[1]], "assign"), drop = F]
+    rho$coef.constraints <- rho$coef.constraints[,attr(rho$x[[1]], "assign") + 1]
+  } else rho$coef.constraints <- rho$coef.constraints[,attr(rho$x[[1]], "assign"), drop = F]
 
-  if(is.null(coef.values)){
-    rho$coef.values <- matrix(NA, ncol = ncol(rho$coef.constraints), nrow = nrow(rho$coef.constraints)) ## TODO:What is this????
+  if(is.null(rho$coef.values)){
+    rho$coef.values <- matrix(NA, ncol = ncol(rho$coef.constraints), nrow = nrow(rho$coef.constraints))
     rho$coef.values[is.na(rho$coef.constraints)] <- 0 #default 0
   } else {
     if(rho$intercept){
-      rho$coef.values <- coef.values[,attr(rho$x[[1]], "assign") + 1]
-    } else rho$coef.values <- coef.values[,attr(rho$x[[1]], "assign"), drop = F]# TODO: check:?ordering
+      rho$coef.values <- rho$coef.values[,attr(rho$x[[1]], "assign") + 1]
+    } else rho$coef.values <- rho$coef.values[,attr(rho$x[[1]], "assign"), drop = F]
   }
   rho$intercept.type <- ifelse(rho$intercept == FALSE, "fixed", ifelse(any(is.na(rho$coef.values[,1])), "flexible", "fixed"))
 
-  multord.fit(rho)
+  mvord.fit(rho)
 }
 #-----------------------------------------------------------------------------------------------------------------
 #
 #-----------------------------------------------------------------------------------------------------------------
-multord.finalize <- function(rho){
+mvord.finalize <- function(rho){
   est <- list()
   est$theta <- rho$transf.thresholds(rho$optpar[seq_len(rho$npar.thetas)], rho)
   names(est$theta) <- rho$y.names
@@ -963,35 +948,24 @@ multord.finalize <- function(rho){
     for(j in 1:rho$ndim){
       names(est$setheta[[j]]) <- get.labels.theta(rho,j)
     }
-    ###
   }
   #if corEqui else...
   if(rho$error.structure$type %in% c("corAR1")){
     est$alpha <- rho$optpar[rho$npar.thetas + rho$npar.betas + seq_len(rho$npar.sigmas)]
     names(est$alpha) <- colnames(rho$error.structure$x)
-    est$z <- rho$error.structure$x %*% rho$optpar[rho$npar.thetas + rho$npar.betas + seq_len(rho$npar.sigmas)]
+    est$z <- rho$error.structure$x %*% est$alpha
     colnames(est$z) <- "Fisher-z Score"
-    est$error.struct <- rho$transf.sigmas(rho$optpar[rho$npar.thetas + rho$npar.betas + seq_len(rho$npar.sigmas)],rho)
-    est$error.struct <- lapply(1:length(est$error.struct), function(j){
-      rownames(est$error.struct[[j]]) <- colnames(est$error.struct[[j]]) <- rho$y.names
-      est$error.struct[[j]]
-    })
-    names(est$error.struct) <- rownames(rho$y)
+    est$error.struct <- est$alpha
     est$r <- z2r(est$z)
     colnames(est$r) <- "Correlation"
     } else if(rho$error.structure$type %in% c("corEqui")){
       est$alpha <- rho$optpar[rho$npar.thetas + rho$npar.betas + seq_len(rho$npar.sigmas)]
       names(est$alpha) <- colnames(rho$error.structure$x)
-      est$z <- rho$error.structure$x %*% rho$optpar[rho$npar.thetas + rho$npar.betas + seq_len(rho$npar.sigmas)]
+      est$z <- rho$error.structure$x %*% est$alpha
       colnames(est$z) <- "Fisher-z Score"
-      est$r <- rho$transf.sigmas(rho$optpar[rho$npar.thetas + rho$npar.betas + seq_len(rho$npar.sigmas)],rho)
+      est$r <- z2r(est$z)#TODO ???rho$transf.sigmas(est$alpha,rho)
       colnames(est$r) <- "Correlation"
-      est$error.struct <- lapply(1:rho$n, function(i) {
-        tmp <- matrix(est$r[i],nrow = rho$ndim,ncol = rho$ndim)
-        diag(tmp) <- 1
-        rownames(tmp) <- colnames(tmp) <- rho$y.names
-        tmp})
-      names(est$error.struct) <- rownames(rho$y)
+      est$error.struct <- est$alpha
   } else {
     #spherical parametrization of correlation matrix
     if (rho$error.structure$type == "covGeneral"){
@@ -1029,21 +1003,21 @@ multord.finalize <- function(rho){
 
 #' @title Print Method for Multivariate Ordinal Regression Models.
 #' @description Prints thresholds, regression coefficients
-#'  and parameters of the error structure of class \code{"multord"}.
-#' @param x object of class \code{"multord"}
+#'  and parameters of the error structure of class \code{"mvord"}.
+#' @param x object of class \code{"mvord"}
 #' @param call displays function call if \code{TRUE}
 #' @param ... further arguments passed to or from other methods.
 # #' @noRd
-# #' @rdname multord
-#' @method print multord
+# #' @rdname mvord
+#' @method print mvord
 #' @export
-# #' @exportMethod  print multord
-print.multord <- function(x, call = TRUE, ...){
+# #' @exportMethod  print mvord
+print.mvord <- function(x, call = TRUE, ...){
   if(call){
   cat("\nCall:\n",
       paste(deparse(x$rho$mc), sep = "\n", collapse = "\n"), "\n\n", sep = "")
   }
-  cat("Threshold parameters:\n")
+  cat("Thresholds:\n")
   print(x$theta, ...)
 
   cat("Coefficients:\n")
@@ -1060,7 +1034,7 @@ print.multord <- function(x, call = TRUE, ...){
   } else{
     if (x$rho$error.structure$formula == ~1) {
       cat("correlation parameter:\n")
-      print(x$r[1], names = FALSE, ...)
+      cat(x$r[1], ...)
     } else {
       cat("alpha parameters error.structure:\n")
       print(x$alpha, names = FALSE, ...)
@@ -1072,18 +1046,18 @@ print.multord <- function(x, call = TRUE, ...){
 
 #' @title Summary method for Multivariate Ordinal Regression Models.
 #' @description Summary of thresholds, regression coefficients
-#' and parameters of the error structure of class \code{"multord"}.
-#' @param object object of class \code{"multord"}
+#' and parameters of the error structure of class \code{"mvord"}.
+#' @param object object of class \code{"mvord"}
 #' @param short if \code{TRUE} short summary, otherwise extended summary
 #' @param call displays function call if \code{TRUE}
 #' @param ... further arguments passed to or from other methods.
-# #' @rdname multord
-#' @method summary multord
-# #' @exportMethod  summary multord
+# #' @rdname mvord
+#' @method summary mvord
+# #' @exportMethod  summary mvord
 #' @export
-summary.multord <- function(object, short = TRUE, call = TRUE, ...){
-  ntotal <- sum(object$rho$ntheta) + length(object$beta) + object$rho$npar.sigmas #object$rho$npar.cor * object$rho$ncor.levels
-  ## only for multord2cor
+summary.mvord <- function(object, short = TRUE, call = TRUE, ...){
+  ntotal <- sum(object$rho$ntheta) + length(object$beta) + object$rho$npar.sigmas
+  ## only for mvord2cor
   names.theta <- unlist(lapply(1:object$rho$ndim, function(j) paste(names(object$theta)[j], names(object$theta[[j]]), sep = " ")))
   names.beta <- unlist(lapply(1:ncol(object$beta), function(p){
     lapply(1:object$rho$ndim, function(j) paste(colnames(object$beta)[p], row.names(object$beta)[j], sep = " "))}))
@@ -1142,7 +1116,7 @@ summary.multord <- function(object, short = TRUE, call = TRUE, ...){
                   dimnames = list(c(names.theta, names.beta, as.vector(names.sigma)),
                                   c("Estimate", "Std. Error", "z value", "Pr(>|z|)")))
     tmp[, 1] <- coef
-    tmp[, 2] <- c(unlist(object$setheta), as.vector(object$sebeta), object$seerror.struct) #check: order of sesigmas in covGeneral
+    tmp[, 2] <- c(unlist(object$setheta), as.vector(object$sebeta), object$seerror.struct)
     tmp[, 3] <- tmp[, 1]/tmp[, 2]
     tmp[, 4] <- 2 * pnorm(abs(tmp[, 3]), lower.tail=FALSE)
     signif <- ifelse(tmp[,4] >=  0.1," ",
@@ -1154,19 +1128,22 @@ summary.multord <- function(object, short = TRUE, call = TRUE, ...){
     coef[tmp[, 2] == 0, 4] <- NA
     coef[tmp[, 2] == 0, 5] <- NA
   }
-  mat <- cbind.data.frame(c("link",object$rho$link), c("threshold",object$rho$threshold),
+  mat <- cbind.data.frame(c("link",object$rho$link$name), c("threshold",object$rho$threshold),
                           c("nsubjects", object$rho$n), c("ndim", object$rho$ndim),
                           c("logPL", round(-object$rho$objective,2)),c("CLAIC", ifelse(object$rho$se,round(object$rho$claic,2),NA)),
                           c("CLBIC", ifelse(object$rho$se,round(object$rho$clbic,2),NA)),
                           c("fevals", if(is.null(object$rho$optRes$fevals)) NA else object$rho$optRes$fevals))
+  summary.output <- list()
   if(call){
-  cat("\nCall: ",
-      paste(deparse(object$rho$mc), sep = "\n", collapse = "\n"), "\n\n", sep = "")
+    summary.output$call <-  paste(deparse(object$rho$mc), sep = "\n", collapse = "\n")
+    cat("\nCall: ",
+        summary.output$call, "\n\n", sep = "")
   }
   cat("Formula: ")
-  print(object$rho$formula)
+  summary.output$formula <- print(object$rho$formula)
   cat("\n")
-  write.table(format(mat, justify="right"), row.names = FALSE, col.names = FALSE, quote = FALSE)
+  summary.output$info <- format(mat, justify="right")
+  write.table(summary.output$info, row.names = FALSE, col.names = FALSE, quote = FALSE)
   cat("\n")
   if(short){
     tmp.duplicated <- duplicated(lapply(object$theta, unname))
@@ -1174,68 +1151,85 @@ summary.multord <- function(object, short = TRUE, call = TRUE, ...){
     lower.ind <- cumsum(c(1, len.thresh[-length(len.thresh)]))
     upper.ind <- cumsum(len.thresh)
     tmp.ind <- lapply(seq_len(length(len.thresh)), function(j) if(tmp.duplicated[j] == FALSE) seq(lower.ind[j], upper.ind[j]) else c())
-    cat("Threshold parameters:\n")
-    print(coef[unlist(tmp.ind),], ...)
+    cat("Thresholds:\n")
+    summary.output$thresholds <- print(coef[unlist(tmp.ind),], ...)
 
     cat("\nCoefficients:\n")
     tmp.duplicated <- duplicated(object$rho$ind.coef)
     ind.beta <- matrix(seq_len(length(names.beta)), ncol = ncol(object$rho$ind.coef), nrow = nrow(object$rho$ind.coef))
     tmp.ind <- length(names.theta) + as.vector(ind.beta[!tmp.duplicated,])
-    print(coef[tmp.ind,], ...)
+    summary.output$coefficients <- print(coef[tmp.ind,], ...)
   } else{
-    cat("Threshold parameters:\n")
-    print(coef[seq_len(length(names.theta)),], ...)
+    cat("Thresholds:\n")
+    summary.output$thresholds <- print(coef[seq_len(length(names.theta)),], ...)
     cat("\nCoefficients:\n")
-    print(coef[length(names.theta) + seq_len(length(names.beta)),], ...)
+    summary.output$coefficients <- print(coef[length(names.theta) + seq_len(length(names.beta)),], ...)
   }
   cat("\nError Structure:\n")
-  print(coef[length(names.theta) + length(names.beta) + seq_len(length(names.sigma)),], ...)
-
+  summary.output$error.structure <- print(coef[length(names.theta) + length(names.beta) + seq_len(length(names.sigma)),], ...)
   cat("---\n")
   cat("Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n")
-  class(coef) <- "summary.multord"
-  invisible(coef)
+  class(summary.output) <- "summary.mvord"
+  invisible(summary.output)
 }
 
-
+print.summary.mvord <- function(summary.output, ...){
+  if(!is.null(summary.output)){
+    cat("\nCall: ",
+        summary.output$call, "\n\n", sep = "")
+  }
+  cat("Formula: ")
+  print(summary.output$formula, ...)
+  cat("\n")
+  write.table(summary.output$info, row.names = FALSE, col.names = FALSE, quote = FALSE)
+  cat("\n")
+    cat("Thresholds:\n")
+    print(summary.output$thresholds, ...)
+    cat("\nCoefficients:\n")
+    print(summary.output$coefficients, ...)
+  cat("\nError Structure:\n")
+  print(summary.output$error.structure, ...)
+  cat("---\n")
+  cat("Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n")
+}
 
 #' @title Coefficients of Multivariate Ordinal Regression Models.
 #' @description \code{coef} is a generic function which extracts
-#'  regression coefficients from objects of class \code{"multord"}.
-#' @param object object of class \code{"multord"}
+#'  regression coefficients from objects of class \code{"mvord"}.
+#' @param object object of class \code{"mvord"}
 #' @param ... further arguments passed to or from other methods.
 # #' @noRd
 # #' @export
 # coef <- function(object, ...) UseMethod("coef")
-# #' @rdname multord
-#' @method coef multord
-# ' @exportMethod coef multord
+# #' @rdname mvord
+#' @method coef mvord
+# ' @exportMethod coef mvord
 #' @export
-# #' @exportMethod  coef multord
-coef.multord <- function(object, ...) object$beta
+# #' @exportMethod  coef mvord
+coef.mvord <- function(object, ...) object$beta
 
 #' @title Thresholds of Multivariate Ordinal Regression Models.
 #' @description
 #' \code{thresholds} is a generic function which extracts threshold coefficients from objects of class \cr
-#' \code{"multord"}.
-#' @param object object of class \code{"multord"}
+#' \code{"mvord"}.
+#' @param object object of class \code{"mvord"}
 #' @param ... further arguments passed to or from other methods.
-# #' @rdname multord
+# #' @rdname mvord
 #' @export
 thresholds <- function(object, ...) UseMethod("thresholds")
 #' @rdname thresholds
 #' @export
-thresholds.multord <- function(object, ...) object$theta
+thresholds.mvord <- function(object, ...) object$theta
 
 #' @title Extracts Error Structure of Multivariate Ordinal Regression Models.
 #' @description
-#' \code{get.error.struct} is a generic function which extracts the estimated error structure parameters from objects of class \code{"multord"}.
-#' @param object object of class \code{"multord"}
+#' \code{get.error.struct} is a generic function which extracts the estimated error structure parameters from objects of class \code{"mvord"}.
+#' @param object object of class \code{"mvord"}
 #' @param type choose type \code{c("sigmas", "alpha", "corr", "z")}
 #' @param ... further arguments passed to or from other methods.
 #' @details \itemize{
 #' \item{\code{sigmas}} {extracts the correlation/covariance matrices corresponding to each subject.
-#'             Applicable in line with\cr \code{corGeneral, covGeneral, corEqui, corAR1}}
+#'             Applicable in line with \code{corGeneral, covGeneral, corEqui, corAR1}}
 #' \item{\code{alpha}} {extracts the parameters of covariate dependent error structure. Applicable in line with \code{corEqui, corAR1}}
 #' \item{\code{corr}} {extracts the subject-specific correlation parameters. Applicable in line with \code{corEqui, corAR1}}
 #' \item{\code{z}} {extracts the subject-specific Fisher-z score. Applicable in line with \code{corEqui, corAR1}}}
@@ -1243,7 +1237,7 @@ thresholds.multord <- function(object, ...) object$theta
 get.error.struct <- function(object, type, ...) UseMethod("get.error.struct")
 #' @rdname get.error.struct
 #' @export
-get.error.struct.multord <- function(object, type = NULL, ...){
+get.error.struct.mvord <- function(object, type = NULL, ...){
   if(is.null(type)){
   if(object$rho$error.structure$type %in% c("corGeneral", "covGeneral")){
     if(length(object$error.struct) == 1){
@@ -1252,9 +1246,18 @@ get.error.struct.multord <- function(object, type = NULL, ...){
       object$error.struct
     }
   } else object$alpha
-  } else{
+  } else{ #here for each i
     if(type == "sigmas"){
-      object$error.struct
+      #object$error.struct
+      if(object$rho$error.structure$type %in% c("corGeneral", "covGeneral")){
+      lev <- match(object$rho$error.structure$x, object$rho$error.structure$levels)
+      sigmas <- lapply(seq_len(object$rho$n), function(i) object$error.struct[[lev[i]]])
+      names(sigmas) <- rownames(object$rho$y)
+      sigmas
+      } else {sigmas <- r2sigma(object$r, object)
+      names(sigmas) <- rownames(object$rho$y)
+      sigmas
+        }
     } else if(type == "corr"){
       object$r
     } else object[[type]]
@@ -1265,129 +1268,34 @@ get.error.struct.multord <- function(object, type = NULL, ...){
 #' @title CLAIC of Multivariate Ordinal Regression Models.
 #' @description
 #' \code{claic} is a generic function which extracts the composite likelihood AIC from objects of class \cr
-#' \code{"multord"}.
-#' @param object object of class \code{"multord"}
+#' \code{"mvord"}.
+#' @param object object of class \code{"mvord"}
 #' @export
 claic <- function(object) UseMethod("claic")
 #' @rdname claic
 #' @export
-claic.multord <- function(object) ifelse(object$rho$se, object$rho$claic, NA)
+claic.mvord <- function(object) ifelse(object$rho$se, object$rho$claic, NA)
 
 
 #' @title CLBIC of Multivariate Ordinal Regression Models.
 #' @description
 #' \code{clbic} is a generic function which extracts the composite likelihood BIC from objects of class \cr
-#' \code{"multord"}.
-#' @param object object of class \code{"multord"}
+#' \code{"mvord"}.
+#' @param object object of class \code{"mvord"}
 #' @export
 clbic <- function(object) UseMethod("clbic")
 #' @rdname clbic
 #' @export
-clbic.multord <- function(object) ifelse(object$rho$se, object$rho$clbic, NA)
+clbic.mvord <- function(object) ifelse(object$rho$se, object$rho$clbic, NA)
 
 
 #' @title logPL of Multivariate Ordinal Regression Models.
 #' @description
 #' \code{logPL} is a generic function which extracts the log pairwise likelihood from objects of class \cr
-#' \code{"multord"}.
-#' @param object object of class \code{"multord"}
+#' \code{"mvord"}.
+#' @param object object of class \code{"mvord"}
 #' @export
 logPL <- function(object) UseMethod("logPL")
 #' @rdname logPL
 #' @export
-logPL.multord <- function(object) -object$rho$objective
-
-
-#TODO
-#' #' @title Predict method for Multivariate Ordinal Regression Models.
-#' #'
-#' #' @description
-#' #' Obtains predicted values for objects of class \code{"multord"}.
-#' #' @param object of class \code{multord} or \code{PMOR}
-#' #' @param type \code{c("class.max", "class", "prob.max", "prob", "pred","cum.prob")}
-#' #' @param newdata (optional) data frame of new covariates.
-#' #' The names of the variables should correspond to the names of the
-#' #'  variables used to fit the model.
-#' #' @param ... further arguments passed to or from other methods.
-#' #' @details
-#' #' \tabular{ll}{
-#' #'   \code{type} \tab description\cr
-#' #'   \code{"class.max"} \tab (default)\cr
-#' #'   \code{"class"} \tab \cr
-#' #'   \code{"prob.max"} \tab \cr
-#' #'   \code{"prob"} \tab \cr
-#' #'   \code{"pred"} \tab \cr
-#' #'   \code{"cum.prob"} \tab (not applicable with newdata)
-#' #'   }
-#' #'
-#' # #' @export
-#' #object <- res.formula
-#' predict.multord <- function(object, type = "class.max", newdata = NULL, ...){
-#'   if(!is.null(newdata)){
-#'     # stop if varnames are different if()
-#'     if(object$rho$error.structure$type == "corAR1"){
-#'       ### CHECK: input Y's
-#'       y <- newdata[[1]][,object$rho$y.names]
-#'       x <- lapply(1:object$rho$ndim, function(j) model.matrix(object$rho$formula, newdata[[j]]))
-#'
-#'     } else{
-#'       y <- newdata[,object$rho$y.names]
-#'       x <- model.matrix(object$rho$formula, newdata)
-#'     }
-#'   } else{
-#'     x <- object$rho$x
-#'     y <- object$rho$y
-#'   }
-#'
-#'   if(object$rho$error.structure$type == "corAR1"){
-#'     pred.fixed <- sapply(1:object$rho$ndim, function(j) x[[j]] %*% object$beta[j,])
-#'   } else{
-#'     pred.fixed <- sapply(1:object$rho$ndim, function(j) x %*% object$beta[j,])
-#'   }
-#'
-#'   if(type == "pred"){
-#'     return(pred.fixed)
-#'   } else if(type == "class"){
-#'     y.ord <- sapply(1:object$rho$ndim, function(j)
-#'       cut(pred.fixed[,j],c(min(pred.fixed[,j])-1,object$theta[[j]],max(pred.fixed[,j])+1),
-#'           labels=FALSE), simplify = "array")
-#'     return(y.ord)
-#'   } else if(type == "prob"){
-#'     theta.lower <- sapply(1:object$rho$ndim, function(j) c(-object$rho$inf.value, object$theta[[j]])[object$rho$y[, j]])
-#'     theta.upper <- sapply(1:object$rho$ndim, function(j) c(object$theta[[j]], object$rho$inf.value)[object$rho$y[, j]])
-#'     pred.lower <- (theta.lower - pred.fixed)/object$rho$sd.y
-#'     pred.upper <- (theta.upper - pred.fixed)/object$rho$sd.y
-#'
-#'     sigma <- get.sigma.i(object)
-#'     sapply(1:object$rho$nobs, function(i) sadmvn(lower = pred.lower[i,], upper = pred.upper[i,],
-#'                                                  mean = rep(0,object$rho$ndim), varcov = sigma[[i]]))
-#'   } else if(type == "cum.prob"){
-#'     theta.lower <- sapply(1:object$rho$ndim, function(j) c(-object$rho$inf.value, object$theta[[j]])[object$rho$y[, j]])
-#'     theta.upper <- sapply(1:object$rho$ndim, function(j) c(object$theta[[j]], object$rho$inf.value)[object$rho$y[, j]])
-#'     pred.lower <- matrix(-10000, ncol = object$rho$ndim, nrow = object$rho$nobs)
-#'     pred.upper <- (theta.upper - pred.fixed)/object$rho$sd.y
-#'
-#'     sigma <- get.sigma.i(object)
-#'     sapply(1:object$rho$nobs, function(i) sadmvn(lower = pred.lower[i,], upper = pred.upper[i,],
-#'                                                  mean = rep(0,object$rho$ndim), varcov = sigma[[i]]))
-#'   } else if(type == "class.max"){
-#'     theta.lower.all <- sapply(1:object$rho$ndim, function(j) c(-object$rho$inf.value, object$theta[[j]]))
-#'     theta.upper.all <- sapply(1:object$rho$ndim, function(j) c(object$theta[[j]], object$rho$inf.value))
-#'
-#'     sigma <- get.sigma.i(object)
-#'     #all combinations
-#'     cats <- sapply(1:object$rho$ndim,function(j) 1:(object$rho$ntheta[j] + 1))
-#'     cmbn <- expand.grid(cats)
-#'
-#'     probs <- sapply(seq_len(nrow(cmbn)), function(i){
-#'       theta.lower <- sapply(1:object$rho$ndim, function(j) theta.lower.all[[j]][cmbn[i,j]])
-#'       theta.upper <- sapply(1:object$rho$ndim, function(j) theta.upper.all[[j]][cmbn[i,j]])
-#'       pred.lower <- (theta.lower - pred.fixed)/object$rho$sd.y
-#'       pred.upper <- (theta.upper - pred.fixed)/object$rho$sd.y
-#'       sapply(1:object$rho$nobs, function(i) sadmvn(lower = pred.lower[i,], upper = pred.upper[i,],
-#'                                                    mean = rep(0,object$rho$ndim), varcov = sigma[[i]]))
-#'     })
-#'     ind.max <- apply(probs,1,which.max)
-#'     cmbn[ind.max,]
-#'   }
-#' }
+logPL.mvord <- function(object) as.numeric(-object$rho$objective)

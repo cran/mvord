@@ -2,19 +2,19 @@
 % Please edit documentation in R/mvord.R
 \name{thresholds}
 \alias{thresholds}
-\alias{thresholds.multord}
+\alias{thresholds.mvord}
 \title{Thresholds of Multivariate Ordinal Regression Models.}
 \usage{
 thresholds(object, ...)
 
-\method{thresholds}{multord}(object, ...)
+\method{thresholds}{mvord}(object, ...)
 }
 \arguments{
-\item{object}{object of class \code{"multord"}}
+\item{object}{object of class \code{"mvord"}}
 
 \item{...}{further arguments passed to or from other methods.}
 }
 \description{
 \code{thresholds} is a generic function which extracts threshold coefficients from objects of class \cr
-\code{"multord"}.
+\code{"mvord"}.
 }

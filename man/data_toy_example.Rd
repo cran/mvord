@@ -9,12 +9,12 @@
 data(data_toy_example)
 }
 \description{
-A data set containing two simulated ordinal observations with three categories and two covariates \code{X1} and \code{X2}.
+A data set containing two simulated ordinal responses with three categories and two covariates \code{X1} and \code{X2}.
 }
 \details{
 \itemize{
-  \item \code{Y1} ordinal observation one \code{Y1} (three categories)
-  \item \code{Y2} ordinal observation one \code{Y2} (three categories)
+  \item \code{Y1} ordinal outcome \code{Y1} (three categories)
+  \item \code{Y2} ordinal outcome \code{Y2} (three categories)
   \item \code{X1} covariate \code{X1}
   \item \code{X2} covariate \code{X2}
 }

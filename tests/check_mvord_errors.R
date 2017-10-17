@@ -80,22 +80,22 @@ formula <- yy ~ 0 + X1 + X2 + X3 + X4
 
 #Model needs data
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula,
-        link = "probit",
+  mvord:::mvord(formula,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"))
 , silent = TRUE), "condition")))
 #Model needs formula
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(data = data,
-        link = "probit",
+  mvord:::mvord(data = data,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"))
 , silent = TRUE), "condition")))
 #Model needs link
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data,
-        #link = "probit",
+  mvord:::mvord(formula = formula, data = data,
+        #link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"))
 , silent = TRUE), "condition")))
@@ -103,16 +103,16 @@ mvord:::check(!is.null(attr(try(
 #only one response needed
 formula <- yy + X4 ~ 0 + X1 + X2 + X3 + X4
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data,
-        link = "probit",
+  mvord:::mvord(formula = formula, data = data,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"))
 , silent = TRUE), "condition")))
 
 formula <- cbind(yy + X4) ~ 0 + X1 + X2 + X3 + X4
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data,
-        link = "probit",
+  mvord:::mvord(formula = formula, data = data,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"))
 , silent = TRUE), "condition")))
@@ -122,16 +122,16 @@ formula <- yy ~ 0 + X1 + X2 + X3 + X4
 data2 <- data
 data2$firm[2] <- 1
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data2,
-        link = "probit",
+  mvord:::mvord(formula = formula, data = data2,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"))
 , silent = TRUE), "condition")))
 
 #levels of response do not match with y.levels
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data,
-        link = "probit",
+  mvord:::mvord(formula = formula, data = data,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
         response.levels = list(c(1),c(3,4)))
@@ -143,8 +143,8 @@ formula <- yy ~ 0 + X1 + X2 + X3
 data3 <- data
 data3$X4[101] <- 2
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data3,
-        link = "probit",
+  mvord:::mvord(formula = formula, data = data3,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
         weights = "X4")
@@ -154,8 +154,8 @@ mvord:::check(!is.null(attr(try(
 data3 <- data
 data3$X4 <- rep(sample(-1:3,100, replace = TRUE),4)
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data3,
-        link = "probit",
+  mvord:::mvord(formula = formula, data = data3,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
         weights = "X4")
@@ -170,36 +170,36 @@ data4 <- data
 data4$X5 <- data4$X4
 #only one factor is allowed in covGeneral and corGeneral
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula,
+  mvord:::mvord(formula = formula,
                     data = data4,
-        link = "probit",
+        link = mvprobit(),
         solver = "newuoa",
         error.structure = corGeneral(~ X4 + X5),
         index = c("firm", "rater"))
 , silent = TRUE), "condition")))
 
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula,
+  mvord:::mvord(formula = formula,
                     data = data,
-        link = "probit",
+        link = mvprobit(),
         solver = "newuoa",
         error.structure = corGeneral(~X1),
         index = c("firm", "rater"))
 , silent = TRUE), "condition")))
 
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula,
+  mvord:::mvord(formula = formula,
                     data = data,
-        link = "probit",
+        link = mvprobit(),
         solver = "newuoa",
         error.structure = covGeneral(~X1 + X2),
         index = c("firm", "rater"))
 , silent = TRUE), "condition")))
 
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula,
+  mvord:::mvord(formula = formula,
                     data = data,
-        link = "probit",
+        link = mvprobit(),
         solver = "newuoa",
         error.structure = corGeneral(~X1 *X3),
         index = c("firm", "rater"))
@@ -211,8 +211,8 @@ mvord:::check(!is.null(attr(try(
 
 #Use PL.lag only with corAR1 error.structure
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data,
-        link = "probit",
+  mvord:::mvord(formula = formula, data = data,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
         error.structure = corGeneral(~1),
@@ -220,8 +220,8 @@ mvord:::check(!is.null(attr(try(
 , silent = TRUE), "condition")))
 
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data,
-        link = "probit",
+  mvord:::mvord(formula = formula, data = data,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
         error.structure = covGeneral(~1),
@@ -229,8 +229,8 @@ mvord:::check(!is.null(attr(try(
 , silent = TRUE), "condition")))
 
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data,
-        link = "probit",
+  mvord:::mvord(formula = formula, data = data,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
         error.structure = corEqui(~1),
@@ -238,8 +238,8 @@ mvord:::check(!is.null(attr(try(
 , silent = TRUE), "condition")))
 #PL.lag must be greater than 0
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data,
-        link = "probit",
+  mvord:::mvord(formula = formula, data = data,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
         error.structure = corAR1(~1),
@@ -249,8 +249,8 @@ mvord:::check(!is.null(attr(try(
 # #Responses need to be ordered factors
 # data4 <- data
 # data4$yy <- as.numeric(data4$yy)
-# multord(formula, data4,
-#         link = "probit",
+# mvord(formula, data4,
+#         link = mvprobit(),
 #         solver = "newuoa",
 #         index = c("firm", "rater"))
 
@@ -259,16 +259,16 @@ mvord:::check(!is.null(attr(try(
 #set.threshold
 formula <- yy ~ 1 + X1 + X2 + X3 + X4
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data,
-        link = "probit",
+  mvord:::mvord(formula = formula, data = data,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
         error.structure = covGeneral(~1),
         threshold.values = list(c(0), c(-1,NA,NA),c(-2,NA,NA),c(-1.5, NA, NA, NA, NA)))
 , silent = TRUE), "condition")))
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data,
-        link = "probit",
+  mvord:::mvord(formula = formula, data = data,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
         error.structure = covGeneral(~1),
@@ -278,8 +278,8 @@ mvord:::check(!is.null(attr(try(
 
 formula <- yy ~ 1 + X1 + X2 + X3 + X4
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data,
-        link = "probit",
+  mvord:::mvord(formula = formula, data = data,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
         error.structure = covGeneral(~1),
@@ -287,8 +287,8 @@ mvord:::check(!is.null(attr(try(
 , silent = TRUE), "condition")))
 
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data,
-        link = "probit",
+  mvord:::mvord(formula = formula, data = data,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
         error.structure = covGeneral(~1),
@@ -298,53 +298,53 @@ mvord:::check(!is.null(attr(try(
 #checkArgs
 formula <- yy ~ 0 + X1 + X2 + X3 + X4
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data,
-        link = "probit",
+  mvord:::mvord(formula = formula, data = data,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
         threshold.constraints = c(1,1))
 , silent = TRUE), "condition")))
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data,
-        link = "probit",
+  mvord:::mvord(formula = formula, data = data,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
         threshold.constraints = c(1,1,1,1,1,1))
 , silent = TRUE), "condition")))
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data,
-        link = "probit",
+  mvord:::mvord(formula = formula, data = data,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
         threshold.constraints = 1:6)
 , silent = TRUE), "condition")))
 #dimensions of threshold.values and number of thresholds do not match
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data,
-        link = "probit",
+  mvord:::mvord(formula = formula, data = data,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
         threshold.values = list(c(-1,NA,NA),c(NA,NA,NA),c(-1.5, NA, NA, NA, NA)))
 , silent = TRUE), "condition")))
 
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data,
-                link = "probit",
+  mvord:::mvord(formula = formula, data = data,
+                link = mvprobit(),
                 solver = "newuoa",
                 index = c("firm", "rater"),
                 threshold.values = list(c(0,1),c(-1,NA,NA),c(NA,NA,NA),c(-1.5, NA, NA, NA, NA)))
 , silent = TRUE), "condition")))
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data,
-        link = "probit",
+  mvord:::mvord(formula = formula, data = data,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
         threshold.values = list(c(0),c(-1,NA,NA,NA),c(NA,NA,NA),c(-1.5, NA, NA, NA, NA)))
 , silent = TRUE), "condition")))
 #If constraints are set on thresholds (by threshold.constraints), threshold.values must be specified accordingly for these outcome dimensions.
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data,
-        link = "probit",
+  mvord:::mvord(formula = formula, data = data,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
         threshold.constraints = c(1,2,2,3),
@@ -352,15 +352,15 @@ mvord:::check(!is.null(attr(try(
 , silent = TRUE), "condition")))
 #row dimension of coef.constraints and outcome dimension do not match (?factor)
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data,
-        link = "probit",
+  mvord:::mvord(formula = formula, data = data,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
         coef.constraints = matrix(1,ncol = 4, nrow = 3))
 , silent = TRUE), "condition")))
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data,
-        link = "probit",
+  mvord:::mvord(formula = formula, data = data,
+        link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
         coef.constraints = matrix(1,ncol = 4, nrow = 5))
@@ -369,8 +369,8 @@ mvord:::check(!is.null(attr(try(
 
 
 mvord:::check(!is.null(attr(try(
-  mvord:::multord(formula = formula, data = data,
-                    link = "probit",
+  mvord:::mvord(formula = formula, data = data,
+                    link = mvprobit(),
                     solver = "newuoa",
                     index = c("firm", "rater"),
                     coef.constraints = matrix(1,ncol = 3, nrow = 5))

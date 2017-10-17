@@ -1,11 +1,11 @@
-multord.fit <- function(rho){
+mvord.fit <- function(rho){
   if(!all(sapply(rho$y, is.ordered))) stop("Responses need to be ordered factors", call.=FALSE)
   # split y according to missingness pattern
   rho$y.NA.ind <- split.NA.pattern(rho$y)
   if(is.null(rho$PL.lag)) rho$PL.lag <- rho$ndim
 
   ## number of thresholds per outcome
-  rho$ntheta <- sapply(1:rho$ndim,function(j) nlevels(rho$y[, j]) -1) #rho$ncat - 1
+  rho$ntheta <- sapply(1:rho$ndim, function(j) nlevels(rho$y[, j]) - 1) # no of categories - 1
 
   rho$threshold.values <- if (is.null(rho$threshold.values)) {
                               if ((rho$error.structure$type %in% c("corGeneral", "corAR1", "corEqui")) && (rho$intercept.type == "fixed")) {
@@ -22,56 +22,49 @@ multord.fit <- function(rho){
                           else rho$threshold.values
                         }
   #values of fixed (non-NA) threshold parameters
-  rho$threshold.values.fixed <- lapply(1:rho$ndim, function(j){ind <- !is.na(rho$threshold.values[[j]])
-                                                                  rho$threshold.values[[j]][ind]})
+  rho$threshold.values.fixed <- lapply(rho$threshold.values, function(x) x[!is.na(x)])
   ## number of non-fixed thresholds per rater
   rho$npar.theta <- sapply(1:rho$ndim, function(j) sum(is.na(rho$threshold.values[[j]])))
 
   #checks if binary outcome is present
   rho$binary <- any(sapply(1:rho$ndim, function(j) length(rho$threshold.values[[j]]) == 1))
 
+  #roh$threshold.type
   rho$threshold <- set.threshold.type(rho)
 
   #number of columns in the covariate matrix
   rho$p <- ncol(rho$x[[1]])
 
+
   rho$ind.coef <- getInd.coef(rho$coef.constraints, rho$coef.values)
 
   if(is.null(rho$threshold.constraints)) rho$threshold.constraints <- 1:rho$ndim
+  #number of flexible threshold parameters (in optimizer)
+  rho$npar.theta.opt <- rho$npar.theta
+  rho$npar.theta.opt[duplicated(rho$threshold.constraints)] <- 0
+
 
   rho$n <- nrow(rho$y)
 
   #number of total coefficients
-  rho$npar.betas <- max(rho$ind.coef, na.rm = TRUE)#sum(unique(c(rho$ind.coef)) != 0)#sum(rho$p)
+  rho$npar.betas <- max(c(rho$ind.coef,0), na.rm = TRUE)
 
   ##INCLUDE CHECKS here
   checkArgs(rho)
 ##############################################################################################
-  rho$getInd.thresholds <- switch(rho$threshold,
-                                  flexible = getInd.thresholds.flexible,
-                                  fix1first = getInd.thresholds.fix1,
-                                  fix2first = getInd.thresholds.fix2,
-                                  fix2firstlast = getInd.thresholds.fix2,
-                                  fixall = getInd.thresholds.fixall)
-  rho$ind.thresholds <- rho$getInd.thresholds(rho$threshold.constraints,rho)
-  rho$npar.theta.opt <- rho$npar.theta
-  rho$npar.theta.opt[duplicated(rho$threshold.constraints)] <- 0
-  #number of flexible threshold parameters (in optimizer)
+
+  rho$ind.thresholds <- getInd.thresholds(rho$threshold.constraints,rho)
+
   rho$npar.thetas <- sum(rho$npar.theta.opt)
 
-  #first indices of coefficients in parameter vector for each rater
-  rho$first.ind.beta <- rho$npar.thetas + apply(getInd.coef(rho$coef.constraints, rho$coef.values), 1, min, na.rm  =T)
-  rho$first.ind.theta <- sapply(rho$ind.thresholds, "[", 1)
-
-  # degrees of freedom for the t-distribution.
-  rho$df.t <- switch(rho$link,
-                     probit = Inf,
-                     logit  = as.integer(8))
-  # variance parameter (set to 1)
-  rho$sd.y <- switch(rho$link,
-                     probit = 1,
-                     logit =  pi/sqrt(3) * sqrt((rho$df.t - 2)/rho$df.t))
   rho$inf.value <- 1000
+
+  # check if degrees of freedom for the t-distribution are integer.
+  if(rho$link$name == "mvlogit" && !is.integer(rho$link$df)) {
+    warning("Degrees of freedom in mvlogit() need to be integer. Rounding to the closest integer.")
+    rho$link$df <- as.integer(rho$link$df)
+  }
+
 
   ###############################
   # error.structure
@@ -147,16 +140,17 @@ multord.fit <- function(rho){
                            corEqui    = transf.par.cor,
                            covGeneral = transf.par.cov,
                            corAR1     = transf.par.cor)
-  rho$pfun <- switch(rho$link,
-                 probit = pnorm,
-                 logit  = function(q) pt(q, df = rho$df.t)) # function for univariate probabilities
-  rho$bivpfun <- switch(rho$link,
-                     probit = function(U, L, r) rectbiv.norm.prob(U, L, r),
-                     logit  = function(U, L, r) sapply(seq_len(nrow(U)), function(i)
-                       biv.nt.prob2(df = rho$df.t,
+  rho$pfun <- switch(rho$link$name,
+                 mvprobit = pnorm,
+                 mvlogit  = function(q) pt(q, df = rho$link$df))# function for univariate probabilities
+  rho$bivpfun <- switch(rho$link$name,
+                     mvprobit = function(U, L, r) rectbiv.norm.prob(U, L, r),
+                     mvlogit  = function(U, L, r) {
+                       sapply(seq_len(nrow(U)), function(i)
+                       biv.nt.prob2(df = rho$link$df,
                                     lower = L[i, ],
                                     upper = U[i, ],
-                                    r     = r[i]))) # function for bivariate probabilities
+                                    r     = r[i]))}) # function for bivariate probabilities
 
   if(is.character(rho$solver)){
     rho$optRes <- suppressWarnings(optimx(rho$start, function(x) PLfun(x, rho),
@@ -175,8 +169,13 @@ multord.fit <- function(rho){
     rho$objective <- unlist(rho$optRes["value"])
     } else if(is.function(rho$solver)){
      #TODO. checks
+      #arguments solver
+      #arguments output
+      #control ? warning
+      #implement feval limit if exists
      rho$optRes <- rho$solver(rho$start, function(x) PLfun(x, rho), rho$control)
      rho$optpar <- rho$optRes$optpar
+     #rho$objvalue
      rho$objective <- rho$optRes$objvalue
   }
 
@@ -186,7 +185,7 @@ multord.fit <- function(rho){
   }
 
   res <- list()
-  res <- multord.finalize(rho)
+  res <- mvord.finalize(rho)
   res$rho <- rho
   res$rho$y.NA.ind <- NULL
   res$rho$bivpfun <- NULL
@@ -199,7 +198,7 @@ multord.fit <- function(rho){
   #res$rho$y <- NULL
   #res$rho$weights <- NULL
 
-  class(res) <- "multord"
+  class(res) <- "mvord"
 
   return(res)
 }
@@ -214,6 +213,12 @@ PLfun <- function(par, rho){
   pred.upper <- tmp$U
   pred.lower <- tmp$L
   sigmas <- tmp$sigmas
+  if (rho$link$name=="mvlogit"){
+     pred.upper <- qt(plogis(pred.upper), df = rho$link$df)
+     pred.lower <- qt(plogis(pred.lower), df = rho$link$df)
+     pred.upper[pred.upper > rho$inf.value] <- rho$inf.value
+     pred.lower[pred.lower < -rho$inf.value] <- -rho$inf.value
+  }
   vecPL <- sapply(1:length(rho$y.NA.ind), function(k){
     q <- as.numeric(strsplit(names(rho$y.NA.ind[k]), "")[[1]])# turn "1_0_1"to 1 0 1)
     if (sum(q) == 0) {

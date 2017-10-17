@@ -1,0 +1,12 @@
+This file documents updates and changes in the package mvord
+
+2017-10-17
+- changed function name from multord to mvord
+- changed function name from multord2 to mvord2
+- implemented predict function
+- implemented predict.marginal function
+- implemented get.prob function
+- changed link probit to mvprobit()
+- changed link logit to mvlogit(df = 8L); default value of degrees of freedom is 8
+- implemented a more flexible multivariate logistic distribution with logistic marginals and t copula (df are settable)
+- implemented PL.lag
