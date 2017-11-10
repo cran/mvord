@@ -1,7 +1,7 @@
 #' @title Marginal Predictions for Multivariate Ordinal Regression Models.
 #'
 #' @description
-#' Obtains marginal predictions/fitted measures for objects of class \code{"mvord"}. 
+#' Obtains marginal predictions/fitted measures for objects of class \code{"mvord"}.
 #' @param object of class \code{mvord}
 #' @param type \code{c("prob", "class", "pred","cum.prob")}
 # #' @param newdata (optional) data frame of new covariates and new responses.
@@ -21,19 +21,22 @@
 #'   }
 # #'   \code{newdata} has to be in the same data format as in the fitted object of class \code{"mvord"}.
 #'
-#' The current implemntation supports only in-sample predictions. 
+#' The current implementation supports only in-sample predictions.
 #' The rownames of the output correspond to the subjectIDs.
 #' @seealso \link{predict.mvord}, \code{\link{get.prob}}
 #' @export
 marginal.predict <- function(object, type = "prob", subjectID = NULL, ...){
   #NEWDATA is NULL
-  newdata <- NULL
+  args <- list(...)
+  exist <- "newdata" %in% names(args)
+  if(!exist) newdata <- NULL
+  if (!is.null(newdata)) stop("newdata is not supported at the moment!")
   if(is.null(newdata)){
     x <- object$rho$x
     y <- object$rho$y
-    error.struct.x <- object$rho$error.structure$x
+    error.struct.x <- attr(object$error.struct, "covariate")
   } else if(object$rho$function.name == "mvord") {
-    data.mvord <- mvord.data(newdata, object$rho$index, object$rho$response.name, unique(c(object$rho$x.names, object$rho$weights.name)),
+    data.mvord <- mvord_data(newdata, object$rho$index, object$rho$response.name, unique(c(object$rho$x.names, object$rho$weights.name)),
                                  y.levels = object$rho$response.levels, response.names = object$rho$response.names)
 
     y <- data.mvord$y
@@ -50,17 +53,25 @@ marginal.predict <- function(object, type = "prob", subjectID = NULL, ...){
       tmp
       }
     })
-    error.struct.x <- set.error.structure(object$rho$error.structure, data.mvord$x, object$rho$ndim)$x
   } else if(object$rho$function.name == "mvord2"){
     y <- newdata[,object$rho$y.names]
     x <- lapply(1:object$rho$ndim, function(j) model.matrix(object$rho$formula,
-                                                            model.frame(object$rho$formula, newdata, na.action = function(x)x)))
-    error.struct.x <- set.error.structure.mvord2(object$rho$error.structure, newdata)$x
+              model.frame(object$rho$formula, newdata, na.action = function(x)x)))
  }
 
   if(is.null(subjectID)) ind <- seq_len(NROW(y)) else ind <- match(subjectID, rownames(y))
 
-  pred.fixed <- sapply(1:object$rho$ndim, function(j) x[[j]][ind, , drop = F] %*% object$beta[j,])
+  ## getbetas
+
+  beta <- lapply(seq_len(object$rho$ndim), function(j){
+    sapply(seq_along(object$rho$coef.names), function(p) {
+      ifelse(is.na(object$rho$coef.ind[[j]][,p]), 0, object$beta[object$rho$coef.ind[[j]][,p]])
+    })
+  })
+
+  pred.fixed <- sapply(1:object$rho$ndim, function(j) (rowSums(object$rho$x[[j]] * beta[[j]]) + object$rho$offset[[j]])[ind] )
+  sigma <- get_error_struct(object, type = "sigmas")[ind]
+  stddevs <- sqrt(t(sapply(sigma, diag)))
 
   if(type == "pred"){
     colnames(pred.fixed) <- object$rho$y.names
@@ -68,35 +79,19 @@ marginal.predict <- function(object, type = "prob", subjectID = NULL, ...){
     return(pred.fixed)
   } else if(type == "class"){
     y.ord <- sapply(1:object$rho$ndim, function(j){
-      cut(pred.fixed[,j],c(-Inf,
-                           object$theta[[j]],
-                           Inf),
-          labels= levels(object$rho$y[,j]))}
-      , simplify = "array")
-        colnames(y.ord) <- object$rho$y.names
+      cut(pred.fixed[,j],c(-Inf,object$theta[[j]],Inf), labels= levels(object$rho$y[,j]))}, simplify = "array")
+    colnames(y.ord) <- object$rho$y.names
     rownames(y.ord) <- rownames(y)[ind]
     return(y.ord)
   } else if(type %in% c("prob", "cum.prob", "all.prob")){
     theta.lower <- lapply(1:object$rho$ndim, function(j) c(-object$rho$inf.value, object$theta[[j]]))
     theta.upper <- lapply(1:object$rho$ndim, function(j) c(object$theta[[j]], object$rho$inf.value))
 
-    if(object$rho$error.structure$type %in% c("covGeneral")){
-        lev <- match(error.struct.x, object$rho$error.structure$levels)
-        sigma <- lapply(ind, function(i) object$error.struct[[lev[i]]])
-        stddevs <- sqrt(t(sapply(sigma, diag)))
-    } else {
-        stddevs <- matrix(1, nrow = length(ind), ncol = object$rho$ndim)
-    }
-    pfun <- switch(object$rho$link$name,
-  	               mvprobit = pnorm,
-  	               mvlogit  = plogis)
     probs <- lapply(1:object$rho$ndim, function(j){
       pr <- sapply(1:length(theta.lower[[j]]), function(k){
         pred.lower <- (theta.lower[[j]][k] - pred.fixed[,j])/stddevs[,j]
-        #pred.lower[is.na(pred.lower)] <- -10000
         pred.upper <- (theta.upper[[j]][k] - pred.fixed[,j])/stddevs[,j]
-        #pred.upper[is.na(pred.upper)] <- 10000
-        pfun(pred.upper) - pfun(pred.lower)
+        object$rho$link$F_uni(pred.upper) - object$rho$link$F_uni(pred.lower)
       })
       colnames(pr) <- levels(object$rho$y[, j])
       rownames(pr) <- rownames(y)[ind]
@@ -139,21 +134,28 @@ marginal.predict <- function(object, type = "prob", subjectID = NULL, ...){
 #'   }
 # #' \code{newdata} has to be in the same data format as in the fitted object of class \code{"mvord"}.
 #'
-#' The current implemntation supports only in-sample predictions. 
+#' The current implementation supports only in-sample predictions.
 #' The rownames of the output correspond to the subjectIDs.
 #' @seealso \code{\link{marginal.predict}}, \code{\link{get.prob}}
-# #' @method predict mvord
+#' @method predict mvord
 #' @export
 predict.mvord <- function(object, type = "prob", subjectID = NULL, ...){
+  # checks
+  if (is.null(object$rho$link$F_multi)) stop("Multivariate probabilities cannot be computed! Try marginal.predict()!")
+
   #NEWDATA is NULL
-  newdata <- NULL
+  args <- list(...)
+  exist <- "newdata" %in% names(args)
+  if(!exist) newdata <- NULL
+  if (!is.null(newdata)) stop("newdata is not supported at the moment!")
+
   if(is.null(newdata)){
     x <- object$rho$x
     y <- object$rho$y
-    error.struct.x <- object$rho$error.structure$x
+    error.struct.x <- attr(object$error.struct, "covariate")
 
   } else if(object$rho$function.name == "mvord") {
-    data.mvord <- mvord.data(newdata, object$rho$index, object$rho$response.name, unique(c(object$rho$x.names, object$rho$weights.name)),
+    data.mvord <- mvord_data(newdata, object$rho$index, object$rho$response.name, unique(c(object$rho$x.names, object$rho$weights.name)),
                                  y.levels = object$rho$response.levels, response.names = object$rho$response.names)
 
     y <- data.mvord$y
@@ -170,76 +172,44 @@ predict.mvord <- function(object, type = "prob", subjectID = NULL, ...){
       tmp
       }
     })
-
-    error.struct.x <- set.error.structure(object$rho$error.structure, data.mvord$x, object$rho$ndim)$x
     if(is.null(subjectID)) ind <- seq_len(nrow(y)) else ind <- match(subjectID, rownames(y))
 
   } else if(object$rho$function.name == "mvord2"){
     y <- newdata[,object$rho$y.names]
     x <- lapply(1:object$rho$ndim, function(j) model.matrix(object$rho$formula,
                                                             model.frame(object$rho$formula, newdata, na.action = function(x)x)))
-
-    error.struct.x <- set.error.structure.mvord2(object$rho$error.structure, newdata)$x
   }
 
   if(is.null(subjectID)) ind <- seq_len(nrow(y)) else ind <- match(subjectID, rownames(y))
 
-  if(object$rho$error.structure$type %in% c("corAR1", "corEqui")){
-    alpha <- object$alpha
-    z <- error.struct.x[ind,, drop = F] %*% alpha
-    object$r <- z2r(z)
-    sigma <- r2sigma(object$r, object)
-  } else {
-    lev <- match(error.struct.x, object$rho$error.structure$levels)
-    sigma <- lapply(ind, function(i) object$error.struct[[lev[i]]])
-  }
+  ## get correlation/covariance matrices
+  sigma <- get_error_struct(object$error.struct, type ="sigmas")
 
-  pred.fixed <- sapply(1:object$rho$ndim, function(j) x[[j]][ind, , drop = F] %*% object$beta[j,])
+  ## get betas
+  beta <- lapply(seq_len(object$rho$ndim), function(j){
+    sapply(seq_along(object$rho$coef.names), function(p) {
+      ifelse(is.na(object$rho$coef.ind[[j]][,p]), 0, object$beta[object$rho$coef.ind[[j]][,p]])
+    })
+  })
+
+  pred.fixed <- sapply(1:object$rho$ndim, function(j) (rowSums(object$rho$x[[j]] * beta[[j]]) + object$rho$offset[[j]])[ind] )
+  theta.lower <- sapply(1:object$rho$ndim, function(j) c(-object$rho$inf.value, object$theta[[j]])[y[ind, j]])
+  theta.upper <- sapply(1:object$rho$ndim, function(j) c(object$theta[[j]], object$rho$inf.value)[y[ind, j]])
+  stddevs <- sqrt(t(sapply(sigma, diag)))[ind, ]
+  pred.lower <- (theta.lower - pred.fixed)/stddevs
+  pred.lower[is.na(pred.lower)] <- -10000
+  pred.upper <- (theta.upper - pred.fixed)/stddevs
+  pred.upper[is.na(pred.upper)] <- 10000
 
   if(type == "prob"){
-    theta.lower <- sapply(1:object$rho$ndim, function(j) c(-object$rho$inf.value, object$theta[[j]])[y[ind, j]])
-    theta.upper <- sapply(1:object$rho$ndim, function(j) c(object$theta[[j]], object$rho$inf.value)[y[ind, j]])
-    pred.lower <- (theta.lower - pred.fixed)
-    pred.lower[is.na(pred.lower)] <- -10000
-    pred.upper <- (theta.upper - pred.fixed)
-    pred.upper[is.na(pred.upper)] <- 10000
-
-    if(object$rho$link$name == "mvprobit"){
-      prob <- sapply(1:nrow(pred.lower), function(i) sadmvn(lower = pred.lower[i,], upper = pred.upper[i,],
-                                                            mean = rep(0, object$rho$ndim), varcov = sigma[[i]]))
-    } else { ## for mvlogit
-    stddevs <- sqrt(t(sapply(sigma, diag)))
-    pred.upper.new <- qt(plogis(pred.upper/stddevs), df = object$rho$link$df)
-    pred.lower.new <- qt(plogis(pred.lower/stddevs), df = object$rho$link$df)
-    pred.upper.new[pred.upper.new > object$rho$inf.value] <- object$rho$inf.value
-    pred.lower.new[pred.lower.new > object$rho$inf.value] <- object$rho$inf.value
-    pred.upper.new[pred.upper.new < -object$rho$inf.value] <- -object$rho$inf.value
-    pred.lower.new[pred.lower.new < -object$rho$inf.value] <- -object$rho$inf.value
-    prob <- sapply(1:nrow(pred.lower), function(i) sadmvt(df = object$rho$link$df, lower = pred.lower.new[i,], upper = pred.upper.new[i,],
-                                                          mean = rep(0,object$rho$ndim), S = cov2cor(sigma[[i]])))
-    }
+    prob <- object$rho$link$F_multi(U = pred.upper, L = pred.lower,
+                              list_R = lapply(sigma, cov2cor))
     names(prob) <- rownames(y)[ind]
     return(prob)
   } else if (type == "cum.prob"){
-    theta.lower <- sapply(1:object$rho$ndim, function(j) c(-object$rho$inf.value, object$theta[[j]])[y[ind, j]])
-    theta.upper <- sapply(1:object$rho$ndim, function(j) c(object$theta[[j]], object$rho$inf.value)[y[ind, j]])
     pred.lower <- matrix(-10000, ncol = object$rho$ndim, nrow = nrow(theta.lower))
-    pred.upper <- (theta.upper - pred.fixed)
-    pred.upper[is.na(pred.upper)] <- 10000
-
-    if(object$rho$link$name == "mvprobit"){
-      cum.prob <- sapply(1:nrow(pred.lower), function(i) sadmvn(lower = pred.lower[i,], upper = pred.upper[i,],
-                                                                mean = rep(0,object$rho$ndim), varcov = sigma[[i]]))
-    } else if(object$rho$link$name == "mvlogit"){
-      stddevs <- sqrt(t(sapply(sigma, diag)))
-      pred.upper.new <- qt(plogis(pred.upper/stddevs), df = object$rho$link$df)
-      pred.upper.new[pred.upper.new > object$rho$inf.value] <- object$rho$inf.value
-      pred.upper.new[pred.upper.new < -object$rho$inf.value] <- -object$rho$inf.value
-      cum.prob <- sapply(1:nrow(pred.lower), function(i) sadmvt(df = object$rho$link$df, lower = pred.lower[i,],
-    	                                                  upper = pred.upper.new[i,],
-                                                          mean = rep(0,object$rho$ndim),
-                                                          S = cov2cor(sigma[[i]])))
-    }
+    cum.prob <- object$rho$link$F_multi(U = pred.upper, L = pred.lower,
+                              list_R = lapply(sigma, cov2cor))
     names(cum.prob) <- rownames(y)[ind]
     return(cum.prob)
   } else if(type == "class.max"){
@@ -259,25 +229,10 @@ predict.mvord <- function(object, type = "prob", subjectID = NULL, ...){
       if (i %% 100 == 0)  cat('Computed probabilities for', i, 'out of', nrow(cmbn),'combinations\n')
       theta.lower <- sapply(1:object$rho$ndim, function(j) theta.lower.all[[j]][cmbn[i,j]])
       theta.upper <- sapply(1:object$rho$ndim, function(j) theta.upper.all[[j]][cmbn[i,j]])
-      pred.lower <- - sweep(pred.fixed, 2, theta.lower)
-      pred.upper <- - sweep(pred.fixed, 2, theta.upper)
-      if(object$rho$link$name == "mvprobit"){
-        sapply(ind, function(i) sadmvn(lower = pred.lower[i,], upper = pred.upper[i,],
-                                                      mean = rep(0,object$rho$ndim), varcov = sigma[[i]]))
-      } else {
-      	stddevs <- sqrt(t(sapply(sigma, diag)))
-        pred.upper.new <- qt(plogis(pred.upper/stddevs), df = object$rho$link$df)
-        pred.lower.new <- qt(plogis(pred.lower/stddevs), df = object$rho$link$df)
-        pred.upper.new[pred.upper.new > object$rho$inf.value] <- object$rho$inf.value
-        pred.lower.new[pred.lower.new > object$rho$inf.value] <- object$rho$inf.value
-        pred.upper.new[pred.upper.new < -object$rho$inf.value] <- -object$rho$inf.value
-        pred.lower.new[pred.lower.new < -object$rho$inf.value] <- -object$rho$inf.value
-        sapply(1:nrow(pred.lower), function(i) sadmvt(df = object$rho$link$df,
-        	                                      lower = pred.lower.new[i,],
-    	                                              upper = pred.upper.new[i,],
-                                                      mean = rep(0,object$rho$ndim),
-                                                      S = cov2cor(sigma[[i]])))
-        }
+      pred.lower <- - sweep(pred.fixed, 2, theta.lower)/stddevs
+      pred.upper <- - sweep(pred.fixed, 2, theta.upper)/stddevs
+      object$rho$link$F_multi(U = pred.upper, L = pred.lower,
+                       list_R = lapply(sigma, cov2cor))
     })
     ind.max <- apply(probs,1,which.max)
     class.max <- cmbn[ind.max,]
@@ -286,8 +241,6 @@ predict.mvord <- function(object, type = "prob", subjectID = NULL, ...){
    }
   }
 }
-
-
 
 #' @title Extracts fitted Probabilities for Multivariate Ordinal Regression Models.
 #'
@@ -304,20 +257,25 @@ predict.mvord <- function(object, type = "prob", subjectID = NULL, ...){
 #' @details
 # #' \code{newdata} has to be in the same data format as in the fitted object of class \code{"mvord"}.
 #'
-#' The current implemntation supports only in-sample predictions. 
+#' The current implementation supports only in-sample predictions.
 #' The rownames of the output correspond to the subjectIDs.
 #' @seealso \code{\link{predict.mvord}}, \code{\link{marginal.predict}}
 #' @export
-get.prob <- function(object, response.cat, subjectID = NULL) {
+get.prob <- function(object, response.cat, subjectID = NULL, ...) {
   #checks
-  newdata <- NULL
+  if (is.null(object$rho$link$F_multi)) stop("Multivariate probabilities cannot be computed! Try marginal.predict()!")
+
+  args <- list(...)
+  exist <- "newdata" %in% names(args)
+  if(!exist) newdata <- NULL
+  if (!is.null(newdata)) stop("newdata is not supported at the moment!")
   if(is.null(newdata)){
     x <- object$rho$x
     y <- object$rho$y
-    error.struct.x <- object$rho$error.structure$x
+    error.struct.x <- attr(object$error.struct, "covariate")
 
   } else if(object$rho$function.name == "mvord") {
-    data.mvord <- mvord.data(newdata, object$rho$index,
+    data.mvord <- mvord_data(newdata, object$rho$index,
     	                     object$rho$response.name, unique(c(object$rho$x.names, object$rho$weights.name)),
                              y.levels = object$rho$response.levels,
                              response.names = object$rho$response.names)
@@ -336,67 +294,42 @@ get.prob <- function(object, response.cat, subjectID = NULL) {
         tmp
       }
     })
-
-    error.struct.x <- set.error.structure(object$rho$error.structure, data.mvord$x, object$rho$ndim)$x
     if(is.null(subjectID)) ind <- seq_len(nrow(y)) else ind <- match(subjectID, rownames(y))
 
   } else if(object$rho$function.name == "mvord2"){
     y <- newdata[,object$rho$y.names]
     x <- lapply(1:object$rho$ndim, function(j) model.matrix(object$rho$formula,
                                                             model.frame(object$rho$formula, newdata, na.action=function(x)x)))
-
-    error.struct.x <- set.error.structure.mvord2(object$rho$error.structure, newdata)$x
   }
 
   if(is.null(subjectID)) ind <- seq_len(nrow(y)) else ind <- match(subjectID, rownames(y))
 
-  if(object$rho$error.structure$type %in% c("corAR1", "corEqui")){
-    alpha <- object$alpha
-    z <- error.struct.x[ind, , drop = F] %*% alpha
-    object$r <- z2r(z)
-    sigma <- r2sigma(object$r, object)
-  } else {
-    lev <- match(error.struct.x, object$rho$error.structure$levels)
-    sigma <- lapply(ind, function(i) object$error.struct[[lev[i]]])
-  }
-
+   ## get correlation/covariance matrices
+  sigma <- get_error_struct(object$error.struct, type ="sigmas")
+  stddevs <- sqrt(t(sapply(sigma, diag)))[ind, ]
 
   if(is.vector(response.cat)) response.cat <- matrix(response.cat, nrow = 1)
   response.cat <- lapply(1:object$rho$ndim, function(j){
   	if (!all(response.cat[,j] %in% levels(y[,j])))  stop("response.cat are different from the categories in the original data set")
     else ordered(response.cat[,j], levels = levels(y[,j]))
    })
+  beta <- lapply(seq_len(object$rho$ndim), function(j){
+    sapply(seq_along(object$rho$coef.names), function(p) {
+      ifelse(is.na(object$rho$coef.ind[[j]][,p]), 0, object$beta[object$rho$coef.ind[[j]][,p]])
+    })
+  })
 
-
-  pred.fixed <- sapply(1:object$rho$ndim, function(j) x[[j]][ind, , drop = F] %*% object$beta[j, ])
+  pred.fixed <- sapply(1:object$rho$ndim, function(j) (rowSums(object$rho$x[[j]] * beta[[j]]) + object$rho$offset[[j]])[ind] )
   if (is.null(dim(pred.fixed)))  dim(pred.fixed) <- c(1, length(pred.fixed))
 
   theta.lower <- sapply(1:object$rho$ndim, function(j) c(-object$rho$inf.value, object$theta[[j]])[response.cat[[j]]])
   theta.upper <- sapply(1:object$rho$ndim, function(j) c(object$theta[[j]], object$rho$inf.value)[response.cat[[j]]])
-  pred.lower <- -sweep(pred.fixed, 2, theta.lower)
+  pred.lower <- -sweep(pred.fixed, 2, theta.lower)/stddevs
   pred.lower[is.na(pred.lower)] <- -10000
-  pred.upper <- -sweep(pred.fixed, 2, theta.upper)
+  pred.upper <- -sweep(pred.fixed, 2, theta.upper)/stddevs
   pred.upper[is.na(pred.upper)] <- 10000
-
-  if(object$rho$link$name == "mvprobit"){
-    prob <- sapply(1:nrow(pred.lower), function(i) sadmvn(lower = pred.lower[i,],
-    	                                                  upper = pred.upper[i,],
-                                                          mean = rep(0,object$rho$ndim),
-                                                          varcov = sigma[[i]]))
-  } else { # if(object$rho$link$name == "mvlogit"){
-    stddevs <- sqrt(t(sapply(sigma, diag)))
-    pred.upper.new <- qt(plogis(pred.upper/stddevs), df = object$rho$link$df)
-    pred.lower.new <- qt(plogis(pred.lower/stddevs), df = object$rho$link$df)
-    pred.upper.new[pred.upper.new > object$rho$inf.value] <- object$rho$inf.value
-    pred.lower.new[pred.lower.new > object$rho$inf.value] <- object$rho$inf.value
-    pred.upper.new[pred.upper.new < -object$rho$inf.value] <- -object$rho$inf.value
-    pred.lower.new[pred.lower.new < -object$rho$inf.value] <- -object$rho$inf.value
-    prob <- sapply(1:nrow(pred.lower), function(i) sadmvt(df = object$rho$link$df,
-    	                                                  lower = pred.lower.new[i,],
-    	                                                  upper = pred.upper.new[i,],
-                                                          mean = rep(0,object$rho$ndim),
-                                                          S = cov2cor(sigma[[i]])))
-  }
+  prob <- object$rho$link$F_multi(U = pred.upper, L = pred.lower,
+                    list_R = lapply(sigma, cov2cor))
   names(prob) <- rownames(y)[ind]
   return(prob)
 }

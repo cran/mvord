@@ -26,7 +26,7 @@ Obtains predicted or fitted values for objects of class \code{"mvord"}.
   \code{"cum.prob"} \tab fitted joint cumulative probability for the observed response categories
   }
 
-The current implemntation supports only in-sample predictions. 
+The current implementation supports only in-sample predictions.
 The rownames of the output correspond to the subjectIDs.
 }
 \seealso{

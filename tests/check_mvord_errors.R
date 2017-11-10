@@ -168,13 +168,13 @@ formula <- yy ~ 0 + X1 + X2 + X3 + X4
 
 data4 <- data
 data4$X5 <- data4$X4
-#only one factor is allowed in covGeneral and corGeneral
+#only one factor is allowed in cov_general and cor_general
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula,
                     data = data4,
         link = mvprobit(),
         solver = "newuoa",
-        error.structure = corGeneral(~ X4 + X5),
+        error.structure = cor_general(~ X4 + X5),
         index = c("firm", "rater"))
 , silent = TRUE), "condition")))
 
@@ -183,7 +183,7 @@ mvord:::check(!is.null(attr(try(
                     data = data,
         link = mvprobit(),
         solver = "newuoa",
-        error.structure = corGeneral(~X1),
+        error.structure = cor_general(~X1),
         index = c("firm", "rater"))
 , silent = TRUE), "condition")))
 
@@ -192,7 +192,7 @@ mvord:::check(!is.null(attr(try(
                     data = data,
         link = mvprobit(),
         solver = "newuoa",
-        error.structure = covGeneral(~X1 + X2),
+        error.structure = cov_general(~X1 + X2),
         index = c("firm", "rater"))
 , silent = TRUE), "condition")))
 
@@ -201,7 +201,7 @@ mvord:::check(!is.null(attr(try(
                     data = data,
         link = mvprobit(),
         solver = "newuoa",
-        error.structure = corGeneral(~X1 *X3),
+        error.structure = cor_general(~X1 *X3),
         index = c("firm", "rater"))
 , silent = TRUE), "condition")))
 
@@ -209,13 +209,13 @@ mvord:::check(!is.null(attr(try(
 
 
 
-#Use PL.lag only with corAR1 error.structure
+#Use PL.lag only with cor_ar1 error.structure
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data,
         link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
-        error.structure = corGeneral(~1),
+        error.structure = cor_general(~1),
         PL.lag = 1)
 , silent = TRUE), "condition")))
 
@@ -224,7 +224,7 @@ mvord:::check(!is.null(attr(try(
         link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
-        error.structure = covGeneral(~1),
+        error.structure = cov_general(~1),
         PL.lag = 1)
 , silent = TRUE), "condition")))
 
@@ -233,7 +233,7 @@ mvord:::check(!is.null(attr(try(
         link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
-        error.structure = corEqui(~1),
+        error.structure = cor_equi(~1),
         PL.lag = 1)
 , silent = TRUE), "condition")))
 #PL.lag must be greater than 0
@@ -242,7 +242,7 @@ mvord:::check(!is.null(attr(try(
         link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
-        error.structure = corAR1(~1),
+        error.structure = cor_ar1(~1),
         PL.lag = -1)
 , silent = TRUE), "condition")))
 
@@ -263,7 +263,7 @@ mvord:::check(!is.null(attr(try(
         link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
-        error.structure = covGeneral(~1),
+        error.structure = cov_general(~1),
         threshold.values = list(c(0), c(-1,NA,NA),c(-2,NA,NA),c(-1.5, NA, NA, NA, NA)))
 , silent = TRUE), "condition")))
 mvord:::check(!is.null(attr(try(
@@ -271,7 +271,7 @@ mvord:::check(!is.null(attr(try(
         link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
-        error.structure = covGeneral(~1),
+        error.structure = cov_general(~1),
         threshold.values = list(c(NA), c(NA,NA,NA),c(NA,NA,NA),c(NA, NA, NA, NA, NA)))
 , silent = TRUE), "condition")))
 
@@ -282,7 +282,7 @@ mvord:::check(!is.null(attr(try(
         link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
-        error.structure = covGeneral(~1),
+        error.structure = cov_general(~1),
         threshold.values = list(c(0), c(-1,NA,NA),c(-2,-1,NA),c(-1.5, NA, NA, NA, NA)))
 , silent = TRUE), "condition")))
 
@@ -291,7 +291,7 @@ mvord:::check(!is.null(attr(try(
         link = mvprobit(),
         solver = "newuoa",
         index = c("firm", "rater"),
-        error.structure = covGeneral(~1),
+        error.structure = cov_general(~1),
         threshold.values = list(c(0), c(-1,NA,NA),c(NA,NA,NA),c(-1.5, NA, NA, NA, NA)))
 , silent = TRUE), "condition")))
 

@@ -1,4 +1,4 @@
-## --------------- mvord.data  ----------------------------------------------
+## --------------- mvord_data  ----------------------------------------------
 data <- data.frame(firm= rep(1:3, each = 3), rater = c("A",3,1,1,2,3,1,2,3), X1 = rep(1,9), X2 = 1:9, yy = 1:9)
 index <- c("firm", "rater")
 y.names <- "yy"
@@ -6,7 +6,7 @@ x.names <- c("X1", "X2")
 response.names <- c("A",1,3,2)
 
 
-data.mvord <- mvord:::mvord.data(data, index, y.names, x.names, y.levels = NULL, response.names)
+data.mvord <- mvord:::mvord_data(data, index, y.names, x.names, y.levels = NULL, response.names)
 tmp <- cbind.data.frame( A = ordered(c(1,NA,NA)),
                          "1" = ordered(c(3,4,7)),
                          "3" = ordered(c(2,6,9)),
@@ -34,7 +34,7 @@ response.names <- c("A",1,3,2)
 y.levels <- list("B", c("3","1"), c("a","b","c"),c("Z","X"))
 
 
-z <- mvord:::mvord.data(data, index, y.names, x.names, y.levels, response.names)
+z <- mvord:::mvord_data(data, index, y.names, x.names, y.levels, response.names)
 
 
 mvord:::check(identical(z$y[,1], ordered(c("B",NA,NA), levels = "B")))
@@ -52,7 +52,7 @@ response.names <- c("A",1,3,2)
 y.levels <- list("C", c("3","1"), c("a","b","c"),c("Z","X"))
 
 #should not work
-mvord:::check(!is.null(attr(try(mvord:::mvord.data(data, index, y.names, x.names, y.levels, response.names), silent = TRUE), "condition")))
+mvord:::check(!is.null(attr(try(mvord:::mvord_data(data, index, y.names, x.names, y.levels, response.names), silent = TRUE), "condition")))
 
 data <- data.frame(firm= rep(1:3, each = 3), rater = c("A","A",1,1,2,3,1,2,3), X1 = rep(1,9), X2 = 1:9, yy = c("B","c",1,3,"X","a",1,"Z","b"))
 index <- c("firm", "rater")
@@ -62,7 +62,7 @@ response.names <- c("A",1,3,2)
 y.levels <- list("B", c("3","1"), c("a","b","c"),c("Z","X"))
 
 #should not work
-mvord:::check(!is.null(attr(try(mvord:::mvord.data(data, index, y.names, x.names, y.levels, response.names), silent = TRUE), "condition")))
+mvord:::check(!is.null(attr(try(mvord:::mvord_data(data, index, y.names, x.names, y.levels, response.names), silent = TRUE), "condition")))
 #-------------------------------------------------------------------------------------
 
 data <- data.frame(firm= rep(1:3, each = 3), year = c(2007,2003,2001,2001,2002,2003,2001,2002,2003), X1 = rep(1,9), X2 = 1:9, yy = c("B","c",1,3,"X","a",1,"Z","b"))
@@ -71,7 +71,7 @@ y.names <- "yy"
 x.names <- c("X1", "X2")
 response.names <- c(2001:2003,2007)
 y.levels <- list(c("3","1"),c("Z","X"), c("a","b","c"), "B")
-z <- mvord:::mvord.data(data, index, y.names, x.names, y.levels, response.names)
+z <- mvord:::mvord_data(data, index, y.names, x.names, y.levels, response.names)
 mvord:::check(identical(z$y[,1], ordered(c(1,3,1), levels = c("3","1"))))
 mvord:::check(identical(z$y[,2], ordered(c(NA,"X","Z"), levels = c("Z","X"))))
 mvord:::check(identical(z$y[,3], ordered(c("c","a","b"), levels =  c("a","b","c"))))
@@ -85,7 +85,7 @@ mvord:::check(identical(z$x, tmp))
 
 response.names <- c(2001:2007)
 y.levels <- list(c("3","1"),c("Z","X"), c("a","b","c"), NA,NA,NA,"B")
-z <- mvord:::mvord.data(data, index, y.names, x.names, y.levels, response.names)
+z <- mvord:::mvord_data(data, index, y.names, x.names, y.levels, response.names)
 mvord:::check(identical(z$y[,1], ordered(c(1,3,1), levels = c("3","1"))))
 mvord:::check(identical(z$y[,2], ordered(c(NA,"X","Z"), levels = c("Z","X"))))
 mvord:::check(identical(z$y[,3], ordered(c("c","a","b"), levels =  c("a","b","c"))))
@@ -104,7 +104,7 @@ mvord:::check(identical(z$x, tmp))
 
 response.names <- c(2001:2008)
 y.levels <- list(c("3","1"),c("Z","X"), c("a","b","c"), NA,NA,NA,"B",NA)
-z <- mvord:::mvord.data(data, index, y.names, x.names, y.levels, response.names)
+z <- mvord:::mvord_data(data, index, y.names, x.names, y.levels, response.names)
 mvord:::check(identical(z$y[,1], ordered(c(1,3,1), levels = c("3","1"))))
 mvord:::check(identical(z$y[,2], ordered(c(NA,"X","Z"), levels = c("Z","X"))))
 mvord:::check(identical(z$y[,3], ordered(c("c","a","b"), levels =  c("a","b","c"))))
@@ -125,7 +125,7 @@ mvord:::check(identical(z$x, tmp))
 
 response.names <- c(2000:2008)
 y.levels <- list(NA,c("3","1"),c("Z","X"), c("a","b","c"), NA,NA,NA,"B",NA)
-z <- mvord:::mvord.data(data, index, y.names, x.names, y.levels, response.names)
+z <- mvord:::mvord_data(data, index, y.names, x.names, y.levels, response.names)
 mvord:::check(identical(z$y[,1], ordered(c(NA,NA,NA))))
 mvord:::check(identical(z$y[,2], ordered(c(1,3,1), levels = c("3","1"))))
 mvord:::check(identical(z$y[,3], ordered(c(NA,"X","Z"), levels = c("Z","X"))))
@@ -155,7 +155,7 @@ x.names <- c("X1", "X2")
 response.names <- c("A",1,2)
 
 
-data.mvord <- mvord:::mvord.data(data, index, y.names, x.names, y.levels = NULL, response.names)
+data.mvord <- mvord:::mvord_data(data, index, y.names, x.names, y.levels = NULL, response.names)
 tmp <- cbind.data.frame( A = ordered(c(1,NA,NA)),
                          "1" = ordered(c(3,4,7)),
                          #"3" = ordered(c(2,6,9)),

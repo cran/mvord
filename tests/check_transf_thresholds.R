@@ -11,7 +11,7 @@ rho$ind.thresholds <- list(1,2:4,5:7,8:12,13:14)
 
 theta <- c(1,0,1,2,1,1,1,-5:-1, -10,-3)
 
-mvord:::check(all.equal(mvord:::transf.thresholds.flexible(theta, rho), list(1,
+mvord:::check(all.equal(mvord:::transf_thresholds_flexible(theta, rho), list(1,
                                                              c(0, exp(1), exp(1) + exp(2)),
                                                              c(1,1 + exp(1), 1+ exp(1) + exp(1)),
                                                              c(-5, -5 + exp(-4), -5 + exp(-4) + exp(-3), -5 + exp(-4) + exp(-3) +exp(-2), -5 + exp(-4) + exp(-3) + exp(-2) + exp(-1)),
@@ -24,7 +24,7 @@ rho$ind.thresholds <- list(1,2:4,2:4,5:9,10:11)
 theta <- c(1,0,1,2,-5:-1, -10,-3)
 
 
-mvord:::check(all.equal(mvord:::transf.thresholds.flexible(theta, rho), list(1,
+mvord:::check(all.equal(mvord:::transf_thresholds_flexible(theta, rho), list(1,
                                                                              c(0, exp(1), exp(1) + exp(2)),
                                                                              c(0,exp(1), exp(1) + exp(2)),
                                                                              c(-5, -5 + exp(-4), -5 + exp(-4) + exp(-3), -5 + exp(-4) + exp(-3) +exp(-2), -5 + exp(-4) + exp(-3) + exp(-2) + exp(-1)),
@@ -43,7 +43,7 @@ rho$threshold.values[[j]][ind]})
 
 theta <- c(1,0,1,2,1,1,-3,-10, -5)
 
-mvord:::check(all.equal(mvord:::transf.thresholds.fix1.first(theta, rho), list(1,
+mvord:::check(all.equal(mvord:::transf_thresholds_fix1_first(theta, rho), list(1,
                                                                c(2, 2 + exp(1), 2 + exp(1) + exp(0)),
                                                                c(3, 3 + exp(1), 3 + exp(1)+ exp(2)),
                                                                c(4, 4+ exp(1), 4+ exp(1)+ exp(1), 4+ exp(1)+ exp(1)+ exp(-3),4+ exp(1)+ exp(1)+ exp(-3)+ exp(-10)),
@@ -63,7 +63,7 @@ rho$threshold.values[[j]][ind]})
 
 theta <- c(1,0,1,1,-3,-10, -5)
 
-mvord:::check(all.equal(mvord:::transf.thresholds.fix1.first(theta, rho), list(1,
+mvord:::check(all.equal(mvord:::transf_thresholds_fix1_first(theta, rho), list(1,
                                                                                c(2, 2 + exp(1), 2 + exp(1) + exp(0)),
                                                                                c(2, 2 + exp(1), 2 + exp(1) + exp(0)),
                                                                                c(4, 4+ exp(1), 4+ exp(1)+ exp(1), 4+ exp(1)+ exp(1)+ exp(-3),4+ exp(1)+ exp(1)+ exp(-3)+ exp(-10)),
@@ -86,7 +86,7 @@ rho$first.ind.theta <- c(NA,1,2,3,NA)
 
 gamma <- c(1,0,1,2,-10)
 
-mvord:::check(all.equal(mvord:::transf.thresholds.fix2.first(gamma, rho), list(1,
+mvord:::check(all.equal(mvord:::transf_thresholds_fix2_first(gamma, rho), list(1,
                                                                c(2, 4, 4 + exp(1)),
                                                                c(3, 4, 4 + exp(0)),
                                                                c(4,10, 10 + exp(1), 10 + exp(1) + exp(2),10 + exp(1) + exp(2) + exp(-10)),
@@ -108,7 +108,7 @@ rho$first.ind.theta <- c(NA,1,1,2,NA)
 
 gamma <- c(1,1,2,-10)
 
-mvord:::check(all.equal(mvord:::transf.thresholds.fix2.first(gamma, rho), list(1,
+mvord:::check(all.equal(mvord:::transf_thresholds_fix2_first(gamma, rho), list(1,
                                                                                c(2, 4, 4 + exp(1)),
                                                                                c(2, 4, 4 + exp(1)),
                                                                                c(4,10, 10 + exp(1), 10 + exp(1) + exp(2),10 + exp(1) + exp(2) + exp(-10)),
@@ -132,7 +132,7 @@ th41 <- exp(1)/(1 + exp(1))
 th42 <- (exp(2) + th41)/(1 + exp(2))
 th43 <- (exp(-10) + th42)/(1 + exp(-10))
 
-mvord:::check(all.equal(mvord:::transf.thresholds.fix2.firstlast(gamma, rho),
+mvord:::check(all.equal(mvord:::transf_thresholds_fix2_firstlast(gamma, rho),
                         list(1,
                              c(2, c(exp(1)/(1 + exp(1))) *(4 - 2) + 2, 4),
                              c(2, c(exp(1)/(1 + exp(1))) *(4 - 2) + 2, 4),
@@ -157,7 +157,7 @@ th41 <- exp(1)/(1 + exp(1))
 th42 <- (exp(2) + th41)/(1 + exp(2))
 th43 <- (exp(-10) + th42)/(1 + exp(-10))
 
-mvord:::check(all.equal(mvord:::transf.thresholds.fix2.firstlast(gamma, rho),
+mvord:::check(all.equal(mvord:::transf_thresholds_fix2_firstlast(gamma, rho),
                         list(1,
                              c(2, c(exp(1)/(1 + exp(1))) *(4 - 2) + 2, 4),
                              c(3, c(exp(0)/(1 + exp(0))) *(4 - 3) + 3, 4),

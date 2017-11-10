@@ -4,11 +4,12 @@
 \alias{mvord2}
 \title{Multivariate Ordinal Regression Models with Subject Specific Covariates}
 \usage{
-mvord2(formula, data, error.structure = corGeneral(~1), link = mvprobit(),
+mvord2(formula, data, error.structure = cor_general(~1), link = mvprobit(),
   coef.constraints = NULL, coef.values = NULL,
   threshold.constraints = NULL, threshold.values = NULL, weights = NULL,
-  se = TRUE, start.values = NULL, solver = "BFGS", PL.lag = NULL,
-  control = list(maxit = 2e+05, trace = 1, kkt = FALSE))
+  offset = NULL, scale = FALSE, se = TRUE, start.values = NULL,
+  solver = "newuoa", PL.lag = NULL, control = list(maxit = 2e+05, trace =
+  1, kkt = FALSE))
 }
 \arguments{
 \item{formula}{a \code{\link{formula}} object for multivariate responses in the form of\cr
@@ -17,14 +18,14 @@ mvord2(formula, data, error.structure = corGeneral(~1), link = mvprobit(),
 
 \item{data}{\code{\link{data.frame}} containing the ordinal observations and the covariates to be used in the model}
 
-\item{error.structure}{different \code{\link{error.structures}}: general correlation structure (default)\cr
-\code{corGeneral(~1)},
-general covariance structure \code{covGeneral(~1)}, factor dependent correlation structure \code{covGeneral(~f)},
-factor dependent covariance structure \code{covGeneral(~f)}, covariate dependent equicorrelation structure \cr
-\code{corEqui(~S)},
-AR(1) correlation structure \code{corAR1(~1)} or a covariate dependent \cr
-AR(1) correlation structure \code{corAR1(~S)}.
-See \code{\link{error.structures}} or 'Details'.}
+\item{error.structure}{different \code{error.structures}: general correlation structure (default)\cr
+\code{cor_general(~1)},
+general covariance structure \code{cov_general(~1)}, factor dependent correlation structure \code{cov_general(~f)},
+factor dependent covariance structure \code{cov_general(~f)}, covariate dependent equicorrelation structure \cr
+\code{cor_equi(~S)},
+AR(1) correlation structure \code{cor_ar1(~1)} or a covariate dependent \cr
+AR(1) correlation structure \code{cor_ar1(~S)}.
+See \code{\link{error_struct}} or 'Details'.}
 
 \item{link}{specifies the link function by \code{mvprobit()} (multivariate normally distributed errors)
 or \code{mvlogit(df = 8)} (multivariate logistically distributed errors), where \code{df} specifies the degrees of freedom of the t copula.}
@@ -40,11 +41,18 @@ or \code{mvlogit(df = 8)} (multivariate logistically distributed errors), where 
 \item{weights}{(optional) column name of subject-specific weights in \code{data} which need to be
 constant across multiple measurements. Negative weights are not allowed.}
 
+\item{offset}{this can be used to specify an a priori known component to be included in the linear predictor during fitting.
+This should be NULL or a numeric vector of length equal to the number of cases. One or more offset terms can be included
+in the formula instead or as well, and if more than one is specified their sum is used. See model.offset.}
+
+\item{scale}{If \code{scale = TRUE}, the continuous covariates are standardized by substracting the mean and dividing by the standard deviation.
+This operation is performed for each repeated measurement before fitting.}
+
 \item{se}{logical, if \code{TRUE} standard errors are computed.}
 
 \item{start.values}{vector of (optional) starting values.}
 
-\item{solver}{character string containing the name of the applicable solver of \code{\link{optimx}} (default is \code{"BFGS"})
+\item{solver}{character string containing the name of the applicable solver of \code{\link{optimx}} (default is \code{"newuoa"})
 or wrapper function for user defined solver.}
 
 \item{PL.lag}{specifies the time lag of the pairs in the pairwise likelihood approach to be optimized.}
@@ -68,21 +76,21 @@ res <- mvord2(formula = cbind(Y1,Y2) ~ 0 + X1 + X2,
                 link = mvprobit(),
                 solver = "BFGS",
                 se = TRUE,
-                error.structure = corGeneral(~1),
+                error.structure = cor_general(~1),
                 threshold.constraints = c(1,1),
                 coef.constraints = c(1,1))
 print(res)
 summary(res)
 thresholds(res)
 coefficients(res)
-get.error.struct(res)
+get_error_struct(res)
 
 #load data
 data(data_mvord2)
 head(data_mvord2)
 
 #-------------
-# corGeneral
+# cor_general
 #-------------
 \donttest{
 #approx 1 min
@@ -90,7 +98,7 @@ res_cor <- mvord2(formula = cbind(rater1, rater2, rater3) ~ 0 + X1 + X2 + X3 + X
 #formula ~ 0 ... without intercept
                data = data_mvord2, #choose data
                link = mvprobit(), #mvprobit() or mvlogit()
-               error.structure = corGeneral(~1), #different error structures
+               error.structure = cor_general(~1), #different error structures
                coef.constraints = cbind(c(1,2,2),
                                         c(1,1,2),
                                         c(NA,1,2),
@@ -108,7 +116,7 @@ print(res_cor)
 summary(res_cor)
 thresholds(res_cor)
 coefficients(res_cor)
-get.error.struct(res_cor)
+get_error_struct(res_cor)
 }
 
 }

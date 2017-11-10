@@ -4,7 +4,7 @@
 \alias{get.prob}
 \title{Extracts fitted Probabilities for Multivariate Ordinal Regression Models.}
 \usage{
-get.prob(object, response.cat, subjectID = NULL)
+get.prob(object, response.cat, subjectID = NULL, ...)
 }
 \arguments{
 \item{object}{of class \code{mvord}}
@@ -19,7 +19,7 @@ get.prob(object, response.cat, subjectID = NULL)
 Extracts fitted probabilities for given response categories from a fitted model of class \code{"mvord"}.
 }
 \details{
-The current implemntation supports only in-sample predictions. 
+The current implementation supports only in-sample predictions.
 The rownames of the output correspond to the subjectIDs.
 }
 \seealso{

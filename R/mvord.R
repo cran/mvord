@@ -203,11 +203,14 @@ NULL
 
 ##IMPORTS
 #' @importFrom optimx optimx
-#' @importFrom stats model.frame model.matrix coef as.formula cov2cor dnorm dt pnorm pt terms.formula plogis dlogis qt
+#' @importFrom stats formula update model.frame model.matrix coef as.formula cov2cor dnorm dt pnorm pt terms.formula plogis dlogis qt nobs predict terms printCoefmat model.offset na.omit
 #' @importFrom pbivnorm pbivnorm
 #' @importFrom MASS polr
 #' @importFrom utils combn data write.table
 #' @importFrom mnormt sadmvn sadmvt
+#' @importFrom Matrix bdiag
+#' @importFrom numDeriv grad hessian
+
 
 
 #############################################################################################
@@ -215,7 +218,7 @@ NULL
 #'
 #' @description
 #' \code{mvord} is used to estimate multivariate ordinal regression models. Different model types are implemented and can be chosen by
-#' the use of different \code{\link{error.structures}}. Constraints on the threshold as well as on the regression parameters can be imposed.
+#' the use of different \code{error.structures}. Constraints on the threshold as well as on the regression parameters can be imposed.
 #'
 #' @details
 #' \describe{
@@ -285,10 +288,10 @@ NULL
 #'\itemize{
 #'   \item {Correlation:}
 #'   \itemize{
-#'   \item \code{corGeneral}
+#'   \item \code{cor_general}
 #' The most common parameterization is the general correlation matrix.
 #'
-#'  \code{error.structure = corGeneral(~ 1)}
+#'  \code{error.structure = cor_general(~ 1)}
 #'
 #' This parameterization can be extended by allowing a factor dependent
 #' correlation structure, where the correlation of each subject \eqn{i} depends
@@ -296,38 +299,38 @@ NULL
 #' across multiple measurements \eqn{j} for the same subject \eqn{i} and due to numerical
 #' constraints only up to maximum 30 levels are allowed.
 #'
-#'       \code{error.structure = corGeneral(~ f)}
+#'       \code{error.structure = cor_general(~ f)}
 #'
-#'   \item \code{corEqui}
+#'   \item \code{cor_equi}
 #' A covariate dependent equicorrelation structure, where the correlations
 #' are equal across all \eqn{J} dimensions and depend on subject-specific covariates \code{S1, ..., Sm}.
 #' It has to be noted that these covariates \code{S1, ..., Sm} are not allowed to vary across
 #'  multiple measurements \eqn{j} for the same subject \eqn{i}.
 #'
-#'          \code{error.structure = corEqui(~ S1 + ... + Sm)}
+#'          \code{error.structure = cor_equi(~ S1 + ... + Sm)}
 #'
-#'   \item \code{corAR1}
+#'   \item \code{cor_ar1}
 #' In order to account for some heterogeneity the \eqn{AR(1)} error structure
 #' is allowed to depend on covariates \code{X1, ..., Xp} that are constant
 #' over time for each subject \eqn{i}.
 #'
-#'       \code{error.structure = corAR1(~ S1 + ... + Sm)}
+#'       \code{error.structure = cor_ar1(~ S1 + ... + Sm)}
 #'}
 #'
 #'
 #'\item {Covariance:}
 #'\itemize{
-#'\item \code{covGeneral}
+#'\item \code{cov_general}
 #'
 #' In case of a full variance-covariance parameterization the standard parameterization
 #'  with a full variance-covariance is obtained by:
 #'
-#'  \code{error.structure = covGeneral(~ 1)}
+#'  \code{error.structure = cov_general(~ 1)}
 #'
 #'  This parameterization can be extended to the factor dependent covariance structure,
 #'   where the covariance of each subject depends on a given factor \code{f}:
 #'
-#'  \code{error.structure = covGeneral(~ f)}
+#'  \code{error.structure = cov_general(~ f)}
 #'   }
 #'   }
 #'   }
@@ -335,8 +338,30 @@ NULL
 
 #'
 #'   \item{\code{coef.constraints}}{
-#'   In order to achieve a more flexible framework we allow for constraints on the regression
-#'    coefficients. These constraints can be specified by a vector or a matrix \cr
+#'   The package supports
+#'   constraints on the regression coefficients. Firstly, the
+#'   user can specify whether the regression coefficients should be equal
+#'   across some or all response dimensions. Secondly, the values of some
+#'   of the regression coefficients can be fixed.
+#'
+#'   As there is no unanimous way to specify such constraints, we offer
+#'   two options. The first option is similar to the specification of constraints on the thresholds.
+#'    The constraints can be specified in this case as a vector or matrix of integers,
+#'     where coefficients getting same integer value are set equal.
+#'   Values of the regression coefficients can be fixed through a matrix.
+#'   Alternatively constraints on the regression coefficients can be specified
+#'   by using the design employed by the \pkg{VGAM} package.
+#'   The constraints in this setting are set through a named list,
+#'   where each element of the list contains a matrix full-column rank.
+#'   If the values of some regression coefficients should be fixed, offsets can be used.
+#'   This design has the advantage that it supports
+#'   constraints on outcome-specific as well as category-specific
+#'   regression coefficients. While the first option has the advantage of requiring a more concise input,
+#'    it does not support category-specific coefficients.
+#'   The second option offers a more flexible design in this respect. For further information
+#'   on the second option we refer to the vignette and to the documentation of \code{\link[VGAM]{vglm}}.
+#'
+#' Using the first option, constraints can be specified by a vector or a matrix \cr
 #'    \code{coef.constraints}.
 #'     First, a simple and less flexible way by specifying a vector \cr
 #'     \code{coef.constraints}
@@ -435,7 +460,7 @@ NULL
 #' The functions \code{summary} and \code{print} are used to display the results.
 #' The function \code{coef} extracts the regression coefficients, a function \code{thresholds} the threshold coefficients
 #' and the function \cr
-#' \code{get.error.struct} returns the estimated parameters of the corresponding error structure.
+#' \code{get_error_struct} returns the estimated parameters of the corresponding error structure.
 #'
 #' An object of \code{\link{class}} \code{"mvord"} is a list containing the following components:
 #'
@@ -448,9 +473,8 @@ NULL
 #'  a named \code{\link{list}}{ of threshold parameters}
 #'   \item{\code{error.struct}}{
 #'
-#'     a named \code{\link{list}} of correlation (covariance) matrices,
-#'   or a vector of coefficients in the \cr
-#'   \code{corEqui()} and \code{corAR1()} error structures}
+#'   an object of class \code{\link{error_struct}} containing the parameters of the error
+#'   structure}
 #'   \item{\code{sebeta}}{
 #'
 #'     a named \code{\link{matrix}} of the standard errors of the regression coefficients}
@@ -459,8 +483,7 @@ NULL
 #'     a named \code{\link{list}} of the standard errors of the threshold parameters}
 #'   \item{\code{seerror.struct}}{
 #'
-#'     a named \code{\link{list}} of the standard errors of the correlation (covariance) matrices,
-#'   or a vector of coefficients in the \code{error.structure = corEqui} setting}
+#'   a \code{vector} of standard errors for the parameters of the error structure}
 #'   \item{\code{rho}}{
 #'
 #'     a \code{\link{list}} of all objects that are used in \code{mvord()}}
@@ -468,8 +491,7 @@ NULL
 #'
 #' @seealso %\code{\link{predict.mvord}},
 #' \code{\link{print.mvord}}, \code{\link{summary.mvord}}, \code{\link{coef.mvord}},
-#'  \code{\link{thresholds.mvord}}, \code{\link{get.error.struct.mvord}}, \code{\link{logPL}},
-#'  \code{\link{claic}}, \code{\link{clbic}},
+#'  \code{\link{thresholds.mvord}}, \code{\link{get_error_struct.mvord}},
 #'  \code{\link{data_cr_panel}},\code{\link{data_cr_mvord}}, \code{\link{data_cr_mvord2}},
 #'  \code{\link{data_mvord_panel}},\code{\link{data_mvord}}, \code{\link{data_mvord2}}
 #'
@@ -490,27 +512,33 @@ NULL
 #'  of multiple measurements.
 #' @param link specifies the link function by \code{mvprobit()} (multivariate normally distributed errors)
 #' or \code{mvlogit(df = 8)} (multivariate logistically distributed errors), where \code{df} specifies the degrees of freedom of the t copula.
-#' @param error.structure different \code{\link{error.structures}}: general correlation structure (default)\cr
-#' \code{corGeneral(~1)},
-#' general covariance structure \code{covGeneral(~1)}, factor dependent correlation structure \code{covGeneral(~f)},
-#' factor dependent covariance structure \code{covGeneral(~f)}, covariate dependent equicorrelation structure \cr
-#' \code{corEqui(~S)},
-#' AR(1) correlation structure \code{corAR1(~1)} or a covariate dependent \cr
-#' AR(1) correlation structure \code{corAR1(~S)}.
-#' See \code{\link{error.structures}} or 'Details'.
+#' @param error.structure different \code{error.structures}: general correlation structure (default)\cr
+#' \code{cor_general(~1)},
+#' general covariance structure \code{cov_general(~1)}, factor dependent correlation structure \code{cov_general(~f)},
+#' factor dependent covariance structure \code{cov_general(~f)}, covariate dependent equicorrelation structure \cr
+#' \code{cor_equi(~S)},
+#' AR(1) correlation structure \code{cor_ar1(~1)} or a covariate dependent \cr
+#' AR(1) correlation structure \code{cor_ar1(~S)}.
+#' See \code{\link{error_struct}} or 'Details'.
 #' @param weights (optional) column name of subject-specific weights in \code{data} which need to be
 #' constant across multiple measurements. Negative weights are not allowed.
+#' @param offset this can be used to specify an a priori known component to be included in the linear predictor during fitting.
+#'  This should be NULL or a numeric vector of length equal to the number of cases. One or more offset terms can be included
+#'  in the formula instead or as well, and if more than one is specified their sum is used. See model.offset.
+#' @param scale If \code{scale = TRUE}, the continuous covariates are standardized
+#'  by substracting the mean and dividing by the standard deviation.
+#'  This operation is performed for each repeated measurement before fitting.
 #' @param coef.constraints \code{\link{vector}} or \code{\link{matrix}} of constraints on the regression coefficients. See 'Details'.
 #' @param coef.values \code{\link{matrix}} setting fixed values on the regression coefficients. See 'Details'.
 #' @param threshold.constraints \code{\link{vector}} of constraints on the threshold parameters. See 'Details'.
 #' @param threshold.values \code{\link{list}} of (optional) fixed values for the threshold parameters. See 'Details'.
 #' @param se logical, if \code{TRUE} standard errors are computed.
 #' @param start.values vector of (optional) starting values.
-#' @param solver character string containing the name of the applicable solver of \code{\link{optimx}} (default is \code{"BFGS"})
+#' @param solver character string containing the name of the applicable solver of \code{\link{optimx}} (default is \code{"newuoa"})
 #'  or wrapper function for user defined solver.
 #' @param PL.lag specifies the time lag of the pairs in the pairwise likelihood approach to be optimized.
 #' @param control a list of control arguments. See \code{\link{optimx}}.
-# #' Only applicable with \code{error.structure = corAR1}.
+# #' Only applicable with \code{error.structure = cor_ar1}.
 #'
 #'
 #' @examples
@@ -531,14 +559,14 @@ NULL
 #'                link = mvprobit(),
 #'                solver = "BFGS",
 #'                se = TRUE,
-#'                error.structure = corGeneral(~1),
+#'                error.structure = cor_general(~1),
 #'                threshold.constraints = c(1,1),
 #'                coef.constraints = c(1,1))
 #' print(res)
 #' summary(res)
 #' thresholds(res)
 #' coefficients(res)
-#' get.error.struct(res)
+#' get_error_struct(res)
 #'
 #' ## examples
 #' #load data
@@ -546,7 +574,7 @@ NULL
 #' head(data_mvord)
 #'
 #' #-------------
-#' # corGeneral
+#' # cor_general
 #' #-------------
 #' \donttest{
 #' # approx 1 min
@@ -563,7 +591,7 @@ NULL
 #'                response.names = c("rater1", "rater2", "rater3"),
 #' # set if not all raters are used and specifies ordering
 #'                link = mvprobit(), #mvprobit() or mvlogit()
-#'                error.structure = corGeneral(~1), #different error structures
+#'                error.structure = cor_general(~1), #different error structures
 #'                coef.constraints = cbind(c(1,2,2),
 #'                                         c(1,1,2),
 #'                                         c(NA,1,2),
@@ -581,10 +609,10 @@ NULL
 #' summary(res_cor)
 #' thresholds(res_cor)
 #' coefficients(res_cor)
-#' get.error.struct(res_cor)
+#' get_error_struct(res_cor)
 #'
 #' #-------------
-#' # covGeneral
+#' # cov_general
 #' #-------------
 #' #approx 4 min
 #' res_cov <- mvord(formula = rating ~ 1 + X1 + X2 + X3 + X4 + X5,
@@ -600,7 +628,7 @@ NULL
 #'             response.names = c("rater1", "rater2", "rater3"),
 #' # set if not all raters are used and specifies ordering
 #'             link = mvprobit(), #mvprobit() or mvlogit()
-#'             error.structure = covGeneral(~1), #different error structures
+#'             error.structure = cov_general(~1), #different error structures
 #'             threshold.constraints = NULL, #vector
 #'             threshold.values = list(c(-4,NA,NA,NA,NA,4.5),
 #'                                     c(-4,NA,NA,NA,NA,4),
@@ -612,11 +640,11 @@ NULL
 #' summary(res_cov)
 #' thresholds(res_cov)
 #' coefficients(res_cov)
-#' get.error.struct(res_cov)
+#' get_error_struct(res_cov)
 #'
 #'
 #' #-------------
-#' # corAR1
+#' # cor_ar1
 #' #-------------
 #' #approx 4min
 #' data(data_mvord_panel)
@@ -633,7 +661,7 @@ NULL
 #'            response.names = c("year3", "year4", "year5", "year6", "year7"),
 #' # set if not all raters are used and specifies ordering
 #'            link = mvprobit(), #mvprobit() or mvlogit()
-#'            error.structure = corAR1(~1), #different error structures
+#'            error.structure = cor_ar1(~1), #different error structures
 #'            threshold.constraints = c(1,1,1,2,2),
 #'            coef.constraints = c(1,1,1,2,2),
 #'            solver = "BFGS")
@@ -641,14 +669,14 @@ NULL
 #' summary(res_AR1)
 #' thresholds(res_AR1)
 #' coefficients(res_AR1)
-#' get.error.struct(res_AR1)
-#' get.error.struct(res_AR1, type = "corr")
+#' get_error_struct(res_AR1)
+#' get_error_struct(res_AR1, type = "corr")
 #' }
 #'
 #' @name mvord
 #' @export
 mvord <- function(formula,
-                  error.structure = corGeneral(~1),
+                  error.structure = cor_general(~1),
                   link = mvprobit(),
                   data,
                   index = NULL,
@@ -659,9 +687,11 @@ mvord <- function(formula,
                   threshold.constraints = NULL,
                   threshold.values = NULL,
                   weights = NULL, #TODO
+                  offset = NULL,
+                  scale = FALSE,
                   se = TRUE,
                   start.values = NULL,
-                  solver = "BFGS",
+                  solver = "newuoa",
                   PL.lag = NULL,
                   control = list(maxit=200000, trace = 1, kkt = FALSE)
 ){
@@ -684,7 +714,8 @@ mvord <- function(formula,
   rho$weights.name <- weights
   rho$response.levels <- response.levels
   rho$response.names <- response.names
-  rho$error.structure.input <- error.structure
+  rho$scale <- scale
+  rho$offset <- offset
   nm <- names(as.list(rho$mc))
 
   if(!"data" %in% nm) stop("Model needs formula, data and link.", call.=FALSE)
@@ -699,56 +730,88 @@ mvord <- function(formula,
     }}
   if(length(rho$response.name) > 1) stop("only one response needed", call.=FALSE)
   rho$x.names <- c(all.vars(rho$formula[[3]]),
-                   all.vars(rho$error.structure.input$formula[[2]]))
+                   all.vars(formula(error.structure)[[2]]))
   if(is.null(rho$index)) index <- colnames(data)[1:2]
   if(!all(rho$index %in% colnames(data))) stop("index names do not match with column names of data", call.=FALSE)
-  data.mvord <- mvord.data(data, rho$index, rho$response.name, unique(c(rho$x.names, rho$weights.name)),
+
+  if(rho$scale) {
+    data.classes <- sapply(data, class)
+    scale_names <- rho$x.names[rho$x.names %in% names(data.classes[data.classes == "numeric"])]
+    data <- do.call("rbind.data.frame",
+                                    by(data, data[, rho$index[2]],
+                                       function(x){x[, scale_names] <- scale(x[, scale_names]); x}))
+  }
+
+  data.mvord <- mvord_data(data, rho$index, rho$response.name, unique(c(rho$x.names, rho$weights.name)),
                                y.levels = rho$response.levels, response.names = rho$response.names)
+
+  rho$rownames.constraints <- unlist(data.mvord$ylevels)
+  rho$intercept <- ifelse(attr(terms.formula(rho$formula), "intercept") == 1, TRUE, FALSE)
 
   rho$y <- data.mvord$y
   rho$y.names <- colnames(rho$y)
   rho$ndim <- ncol(rho$y)
   rho$x <- lapply(1:rho$ndim, function(j) {
-    tmp <- model.matrix(as.formula(paste0("~",deparse(rho$formula[[3]]))), data.mvord$x[[j]])
+  	rhs.form <- as.formula(paste0("~",deparse(rho$formula[[3]])))
+  	new.rhs.form <- update(rhs.form, ~ . + 1)
+  	tmp <-  model.matrix(new.rhs.form, model.frame(new.rhs.form,  data.mvord$x[[j]],
+      na.action = function(x) x))
+
     attribute <- attr(tmp, "assign")
-    tmp <- tmp[match(rownames(data.mvord$x[[j]]),rownames(tmp)),]
+
+    if(rho$intercept == FALSE){
+    attribute <- attribute[-1]
+    tmp <- tmp[,-1, drop = F]
+    }
+
+    tmp <- tmp[match(rownames(data.mvord$x[[j]]), rownames(tmp)), , drop = FALSE]
     rownames(tmp) <- rownames(data.mvord$x[[j]])
     attr(tmp, "assign") <- attribute
     tmp
   })
+  if (is.null(rho$offset)) {
+    rho$offset <- lapply(1:rho$ndim, function(j) {
+      mf <- model.frame(as.formula(paste0("~",deparse(rho$formula[[3]]))), data.mvord$x[[j]],
+                        na.action = function(x) x)
+      mf[is.na(mf)] <- 0
+      model.offset(mf)
+  })
+  }
   if (is.null(rho$weights.name)) {
-    rho$weights <- rep(1, nrow(rho$y))#matrix(1, nrow = rho$n, ncol = rho$ndim)
+    rho$weights <- rep(1, nrow(rho$y))
   } else {
     tmp <- sapply(data.mvord$x, function(j) as.numeric(j[,rho$weights.name]))
     rho$weights <- apply(tmp,1,function(x) unique(x[!is.na(x)]))
     if(is.list(rho$weights)) stop("Weights need to be constant across multiple measurements", call.=FALSE)
     if(any(rho$weights < 0)) stop("Weights must be non-negative", call.=FALSE)
   }
+  ## initialize error structure
+  rho$error.structure <- init_fun(error.structure, data.mvord)
 
-  rho$error.structure <- set.error.structure(rho$error.structure.input, data.mvord$x, rho$ndim)
-  if(!is.null(rho$PL.lag) && rho$error.structure$type != "corAR1") stop("Use PL.lag only with corAR1 error.structure", call.=FALSE)
+
+  if(!is.null(rho$PL.lag) && rho$error.structure$name != "cor_ar1") stop("Use PL.lag only with cor_ar1 error.structure", call.=FALSE)
   if(!is.null(rho$PL.lag) && rho$PL.lag <= 0) stop("PL.lag must be greater than 0", call.=FALSE)
 
-  rho$intercept <- ifelse(attr(terms.formula(rho$formula), "intercept") == 1, TRUE, FALSE)
 
   if(is.null(rho$coef.constraints)) rho$coef.constraints <- matrix(1:rho$ndim, ncol = ncol(rho$x[[1]]), nrow = rho$ndim)
-  if(is.vector(rho$coef.constraints)) rho$coef.constraints <- matrix(rho$coef.constraints,
-                                                                     ncol = length(rho$x.names) + (rho$intercept),
-                                                                     nrow = rho$ndim)
 
-  if(rho$intercept){
-    rho$coef.constraints <- rho$coef.constraints[,attr(rho$x[[1]], "assign") + 1]
-  } else rho$coef.constraints <- rho$coef.constraints[,attr(rho$x[[1]], "assign")]
+  if(is.list(rho$coef.constraints) && !is.null(rho$coef.values)) stop("This coef.constraints design requires offsets instead of coef.values.", call.=FALSE)
+
+  if(!is.list(rho$coef.constraints)){
+  if(is.vector(rho$coef.constraints)) rho$coef.constraints <- matrix(rho$coef.constraints,
+                                                                     ncol = ncol(rho$x[[1]]),
+                                                                     nrow = rho$ndim)
 
   if(is.null(rho$coef.values)){
     rho$coef.values <- matrix(NA, ncol = ncol(rho$coef.constraints), nrow = nrow(rho$coef.constraints))
     rho$coef.values[is.na(rho$coef.constraints)] <- 0 #default 0
-  } else {
-    if(rho$intercept){
-      rho$coef.values <- rho$coef.values[,attr(rho$x[[1]], "assign") + 1]
-    } else rho$coef.values <- rho$coef.values[,attr(rho$x[[1]], "assign")]
   }
+  #check if coef.values fit to coef.constraints
+  check_args_coef(rho)
+  # set coef.constraints NA where coef.values are set
+  rho$coef.constraints[!is.na(rho$coef.values)] <- NA
   rho$intercept.type <- ifelse(rho$intercept == FALSE, "fixed", ifelse(any(is.na(rho$coef.values[,1])), "flexible", "fixed"))
+  } else rho$intercept.type <- "fixed" #TODO ?
 
   mvord.fit(rho)
 }
@@ -763,14 +826,14 @@ mvord <- function(formula,
 #' @param formula a \code{\link{formula}} object for multivariate responses in the form of\cr
 #' \code{cbind(Y1, ..., Yj) ~ X1 + ... + Xp}.
 #'        Responses need to be ordered factors.
-#' @param error.structure different \code{\link{error.structures}}: general correlation structure (default)\cr
-#' \code{corGeneral(~1)},
-#' general covariance structure \code{covGeneral(~1)}, factor dependent correlation structure \code{covGeneral(~f)},
-#' factor dependent covariance structure \code{covGeneral(~f)}, covariate dependent equicorrelation structure \cr
-#' \code{corEqui(~S)},
-#' AR(1) correlation structure \code{corAR1(~1)} or a covariate dependent \cr
-#' AR(1) correlation structure \code{corAR1(~S)}.
-#' See \code{\link{error.structures}} or 'Details'.
+#' @param error.structure different \code{error.structures}: general correlation structure (default)\cr
+#' \code{cor_general(~1)},
+#' general covariance structure \code{cov_general(~1)}, factor dependent correlation structure \code{cov_general(~f)},
+#' factor dependent covariance structure \code{cov_general(~f)}, covariate dependent equicorrelation structure \cr
+#' \code{cor_equi(~S)},
+#' AR(1) correlation structure \code{cor_ar1(~1)} or a covariate dependent \cr
+#' AR(1) correlation structure \code{cor_ar1(~S)}.
+#' See \code{\link{error_struct}} or 'Details'.
 #' @param data \code{\link{data.frame}} containing the ordinal observations and the covariates to be used in the model
 #' @param link specifies the link function by \code{mvprobit()} (multivariate normally distributed errors)
 #' or \code{mvlogit(df = 8)} (multivariate logistically distributed errors), where \code{df} specifies the degrees of freedom of the t copula.
@@ -780,9 +843,14 @@ mvord <- function(formula,
 #' @param threshold.values (optional) \code{\link{list}} of fixed values for threshold parameters. See 'Details'.
 #' @param weights (optional) column name of subject-specific weights in \code{data} which need to be
 #' constant across multiple measurements. Negative weights are not allowed.
+#' @param offset this can be used to specify an a priori known component to be included in the linear predictor during fitting.
+#'  This should be NULL or a numeric vector of length equal to the number of cases. One or more offset terms can be included
+#'  in the formula instead or as well, and if more than one is specified their sum is used. See model.offset.
+#' @param scale If \code{scale = TRUE}, the continuous covariates are standardized by substracting the mean and dividing by the standard deviation.
+#'  This operation is performed for each repeated measurement before fitting.
 #' @param se logical, if \code{TRUE} standard errors are computed.
 #' @param start.values vector of (optional) starting values.
-#' @param solver character string containing the name of the applicable solver of \code{\link{optimx}} (default is \code{"BFGS"})
+#' @param solver character string containing the name of the applicable solver of \code{\link{optimx}} (default is \code{"newuoa"})
 #' or wrapper function for user defined solver.
 #' @param PL.lag specifies the time lag of the pairs in the pairwise likelihood approach to be optimized.
 #' @param control a list of control arguments. See \code{\link{optimx}}.
@@ -798,21 +866,21 @@ mvord <- function(formula,
 #'                 link = mvprobit(),
 #'                 solver = "BFGS",
 #'                 se = TRUE,
-#'                 error.structure = corGeneral(~1),
+#'                 error.structure = cor_general(~1),
 #'                 threshold.constraints = c(1,1),
 #'                 coef.constraints = c(1,1))
 #' print(res)
 #' summary(res)
 #' thresholds(res)
 #' coefficients(res)
-#' get.error.struct(res)
+#' get_error_struct(res)
 #'
 #' #load data
 #' data(data_mvord2)
 #' head(data_mvord2)
 #'
 #' #-------------
-#' # corGeneral
+#' # cor_general
 #' #-------------
 #' \donttest{
 #' #approx 1 min
@@ -820,7 +888,7 @@ mvord <- function(formula,
 #' #formula ~ 0 ... without intercept
 #'                data = data_mvord2, #choose data
 #'                link = mvprobit(), #mvprobit() or mvlogit()
-#'                error.structure = corGeneral(~1), #different error structures
+#'                error.structure = cor_general(~1), #different error structures
 #'                coef.constraints = cbind(c(1,2,2),
 #'                                         c(1,1,2),
 #'                                         c(NA,1,2),
@@ -838,23 +906,25 @@ mvord <- function(formula,
 #' summary(res_cor)
 #' thresholds(res_cor)
 #' coefficients(res_cor)
-#' get.error.struct(res_cor)
+#' get_error_struct(res_cor)
 #' }
 #'
 #' @name mvord2
 #' @export
 mvord2 <- function(formula,
                    data,
-                   error.structure = corGeneral(~1),
+                   error.structure = cor_general(~1),
                    link = mvprobit(),
                    coef.constraints = NULL,
                    coef.values = NULL,
                    threshold.constraints = NULL,
                    threshold.values = NULL,
                    weights = NULL,
+                   offset = NULL,
+                   scale = FALSE,
                    se = TRUE,
                    start.values = NULL,
-                   solver = "BFGS",
+                   solver = "newuoa",
                    PL.lag = NULL,
                    control = list(maxit = 200000, trace = 1, kkt = FALSE)){
   #check arguments
@@ -873,22 +943,62 @@ mvord2 <- function(formula,
   nm <- names(as.list(rho$mc))
   rho$control <- control
   rho$PL.lag <- PL.lag
-  rho$error.structure.input <- error.structure
   rho$weights.name <- weights
+  rho$scale <- scale
+  rho$offset <- offset
+
   if(!"data" %in% nm) stop("Model needs formula, data and link.", call.=FALSE)
   if(!"link" %in% nm) stop("Model needs formula, data and link.", call.=FALSE)
   if(!"formula" %in% nm) stop("Model needs formula, data and link.", call.=FALSE)
-
   #CALL mvord2
   rho$y.names <- all.vars(rho$formula[[2]])
   rho$y <- data[,rho$y.names]
   rho$ndim <- ncol(rho$y)
-  rho$x <- lapply(1:rho$ndim, function(j) model.matrix(rho$formula,
-	model.frame(rho$formula, data, na.action=function(x)x)))
 
-  rho$x.names <- c(all.vars(rho$formula[[3]]), all.vars(rho$error.structure.input$formula[[2]]))
-  rho$y.names <- colnames(rho$y)
-  rho$ndim <- ncol(rho$y)
+  rho$x.names <- c(all.vars(rho$formula[[3]]), all.vars(formula(error.structure)[[2]]))
+
+  if(rho$scale) {
+    data.classes <- sapply(data, class)
+    scale_names <- rho$x.names[rho$x.names %in% names(data.classes[data.classes == "numeric"])]
+    data[, scale_names] <- scale(data[, scale_names])
+  }
+
+  rho$intercept <- ifelse(attr(terms.formula(rho$formula), "intercept") == 1, TRUE, FALSE)
+  rho$x <- lapply(1:rho$ndim, function(j) {
+  	rhs.form <- as.formula(paste0("~",deparse(rho$formula[[3]])))
+  	new.rhs.form <- update(rhs.form, ~ . + 1)
+  	tmp <-  model.matrix(new.rhs.form,
+  		model.frame(new.rhs.form,  data, na.action = function(x) x))
+    attribute <- attr(tmp, "assign")
+
+    if(rho$intercept == FALSE){
+    attribute <- attribute[-1]
+    tmp <- tmp[,-1, drop = F]
+    }
+
+    tmp <- tmp[match(rownames(data), rownames(tmp)), , drop = FALSE]
+    rownames(tmp) <- rownames(data)
+    attr(tmp, "assign") <- attribute
+    tmp
+  })
+
+ #  if(rho$intercept){
+  #  rho$x <- lapply(1:rho$ndim, function(j) model.matrix(rho$formula,
+#	    model.frame(rho$formula, data, na.action=function(x)x)))
+#  } else {
+ #   rho$x <- lapply(1:rho$ndim, function(j){
+ #   	tmp <- model.matrix(update(rho$formula, ~ . + 1),
+ #         model.frame(rho$formula, data, na.action=function(x)x))[,-1, drop = F]
+ #
+ #   })
+ # }
+
+  if (is.null(rho$offset)) {
+    rho$offset <- lapply(1:rho$ndim, function(j) {
+      mf <- model.frame(rho$formula, data, na.action = function(x) x)
+      model.offset(mf)
+    })
+  }
 
   if (is.null(rho$weights.name)) {
     rho$weights <- rep(1, nrow(rho$y))
@@ -896,44 +1006,58 @@ mvord2 <- function(formula,
     rho$weights <- data[,rho$weights.name]
     if(any(rho$weights < 0)) stop("Weights must be non-negative", call.=FALSE)
   }
+  data.mvord2 <- list(y = data[, rho$y.names],
+  	                  x = rep(list(data[, rho$x.names]), rho$ndim))
 
-  rho$error.structure <- set.error.structure.mvord2(rho$error.structure.input, data)
-  rho$intercept <- ifelse(attr(terms.formula(rho$formula), "intercept") == 1, TRUE, FALSE)
+  rho$error.structure <- init_fun(error.structure, data.mvord2)
 
-  if(is.null(rho$coef.constraints)) rho$coef.constraints <- matrix(1:rho$ndim, ncol = length(rho$x.names) + (rho$intercept), nrow = rho$ndim)
-  if(is.vector(rho$coef.constraints)) rho$coef.constraints <- matrix(rho$coef.constraints,
-                                                                     ncol = length(rho$x.names) + (rho$intercept),
-                                                                     nrow = rho$ndim)
 
-  if(rho$intercept){
-    rho$coef.constraints <- rho$coef.constraints[,attr(rho$x[[1]], "assign") + 1]
-  } else rho$coef.constraints <- rho$coef.constraints[,attr(rho$x[[1]], "assign"), drop = F]
+  if(is.null(rho$coef.constraints)) rho$coef.constraints <- matrix(1:rho$ndim,
+                                                                   ncol = ncol(rho$x[[1]]),
+                                                                   nrow = rho$ndim)
 
-  if(is.null(rho$coef.values)){
-    rho$coef.values <- matrix(NA, ncol = ncol(rho$coef.constraints), nrow = nrow(rho$coef.constraints))
-    rho$coef.values[is.na(rho$coef.constraints)] <- 0 #default 0
-  } else {
-    if(rho$intercept){
-      rho$coef.values <- rho$coef.values[,attr(rho$x[[1]], "assign") + 1]
-    } else rho$coef.values <- rho$coef.values[,attr(rho$x[[1]], "assign"), drop = F]
-  }
-  rho$intercept.type <- ifelse(rho$intercept == FALSE, "fixed", ifelse(any(is.na(rho$coef.values[,1])), "flexible", "fixed"))
+  if(is.list(rho$coef.constraints) && !is.null(rho$coef.values)) stop("This coef.constraints design requires offsets instead of coef.values.", call.=FALSE)
+
+  if(!is.list(rho$coef.constraints)){
+    if(is.vector(rho$coef.constraints)) rho$coef.constraints <- matrix(rho$coef.constraints,
+                                                                       ncol = ncol(rho$x[[1]]),
+                                                                       nrow = rho$ndim)
+
+    if(is.null(rho$coef.values)){
+      rho$coef.values <- matrix(NA, ncol = ncol(rho$coef.constraints), nrow = nrow(rho$coef.constraints))
+      rho$coef.values[is.na(rho$coef.constraints)] <- 0 #default 0
+    }
+    #check if coef.values fit to coef.constraints
+    check_args_coef(rho)
+    # set coef.constraints NA  coef.values are set
+    rho$coef.constraints[!is.na(rho$coef.values)] <- NA
+    rho$intercept.type <- ifelse(rho$intercept == FALSE, "fixed", ifelse(any(is.na(rho$coef.values[,1])), "flexible", "fixed"))
+  } else rho$intercept.type <- "fixed" #TODO ?
 
   mvord.fit(rho)
 }
 #-----------------------------------------------------------------------------------------------------------------
 #
 #-----------------------------------------------------------------------------------------------------------------
-mvord.finalize <- function(rho){
+mvord_finalize <- function(rho){
   est <- list()
-  est$theta <- rho$transf.thresholds(rho$optpar[seq_len(rho$npar.thetas)], rho)
+
+  ## Thresholds
+  est$theta <- rho$transf_thresholds(rho$optpar[seq_len(rho$npar.thetas)], rho)
   names(est$theta) <- rho$y.names
   for(j in 1:rho$ndim){
-    names(est$theta[[j]]) <- get.labels.theta(rho,j)
+    names(est$theta[[j]]) <- get_labels_theta(rho,j)
   }
-  if (rho$se){
-    tmp <- rho$threshold.values
-    est$setheta <- lapply(1:rho$ndim, function(j){
+  tmp <- rho$threshold.values
+  ## Regression coefficients
+  est$beta <- rho$optpar[rho$npar.thetas + seq_len(rho$npar.betas)]
+  names(est$beta) <- unlist(lapply(1:length(rho$constraints), function(p) colnames(rho$constraints[[p]])))
+  ## Error Structure
+  tparsigma <- rho$optpar[rho$npar.thetas + rho$npar.betas +  seq_len(attr(rho$error.structure, "npar"))]
+  est$error.struct <- finalize(rho$error.structure, tparsigma)
+
+  if (rho$se) {
+  est$setheta <- lapply(1:rho$ndim, function(j){
       if(rho$threshold.constraints[j] %in% rho$threshold.constraints[seq_len(j-1)]){#check threshold.constraints
         tmp[[j]][!is.na(tmp[[j-1]])] <- 0
         tmp[[j]][is.na(tmp[[j-1]])] <- rho$seGamma[rho$ind.thresholds[[j-1]]]
@@ -944,59 +1068,15 @@ mvord.finalize <- function(rho){
       tmp[[j]]
     })
 
-    names(est$setheta) <- rho$y.names
+  names(est$setheta) <- rho$y.names
     for(j in 1:rho$ndim){
-      names(est$setheta[[j]]) <- get.labels.theta(rho,j)
-    }
+    names(est$setheta[[j]]) <- get_labels_theta(rho,j)
   }
-  #if corEqui else...
-  if(rho$error.structure$type %in% c("corAR1")){
-    est$alpha <- rho$optpar[rho$npar.thetas + rho$npar.betas + seq_len(rho$npar.sigmas)]
-    names(est$alpha) <- colnames(rho$error.structure$x)
-    est$z <- rho$error.structure$x %*% est$alpha
-    colnames(est$z) <- "Fisher-z Score"
-    est$error.struct <- est$alpha
-    est$r <- z2r(est$z)
-    colnames(est$r) <- "Correlation"
-    } else if(rho$error.structure$type %in% c("corEqui")){
-      est$alpha <- rho$optpar[rho$npar.thetas + rho$npar.betas + seq_len(rho$npar.sigmas)]
-      names(est$alpha) <- colnames(rho$error.structure$x)
-      est$z <- rho$error.structure$x %*% est$alpha
-      colnames(est$z) <- "Fisher-z Score"
-      est$r <- z2r(est$z)#TODO ???rho$transf.sigmas(est$alpha,rho)
-      colnames(est$r) <- "Correlation"
-      est$error.struct <- est$alpha
-  } else {
-    #spherical parametrization of correlation matrix
-    if (rho$error.structure$type == "covGeneral"){
-      exp.par.sd <- exp(rho$optpar[rho$npar.thetas + rho$npar.betas + rho$npar.cor * rho$ncor.levels + seq_len(rho$npar.cor.sd * rho$ncor.levels)])
-      sigmas <- rho$transf.sigmas(rho$optpar[rho$npar.thetas + rho$npar.betas + seq_len(rho$npar.cor * rho$ncor.levels)],rho, exp.par.sd)
-    } else {
-      sigmas <- rho$transf.sigmas(rho$optpar[rho$npar.thetas + rho$npar.betas + seq_len(rho$npar.cor * rho$ncor.levels)],rho)
-    }
-    sigmas <- lapply(1:rho$ncor.levels, function(j){
-      rownames(sigmas[[j]]) <- colnames(sigmas[[j]]) <- rho$y.names
-      sigmas[[j]]
-    })
-    if(length(sigmas) > 1) names(sigmas) <- rho$error.structure$levels
-    est$error.struct <- sigmas
-  }
-    if(rho$se){
-      est$seerror.struct <- rho$seGamma[rho$npar.thetas + rho$npar.betas + seq_len(rho$npar.sigmas)] #seq_len(rho$npar.cor * rho$ncor.levels)]
-    }
-  par.beta <- rho$optpar[rho$npar.thetas + seq_len(rho$npar.betas)]
-  est$beta <- sapply(1:ncol(rho$coef.constraints), function(j){
-    sapply(1:nrow(rho$coef.constraints), function(i,j) ifelse(is.na(rho$ind.coef[i,j]), rho$coef.values[i,j], par.beta[rho$ind.coef[i, j]]), j)
-  })
-  colnames(est$beta) <- colnames(rho$x[[1]])
-  rownames(est$beta) <- rho$y.names
-  if(rho$se){
-    se.beta <- rho$seGamma[rho$npar.thetas + seq_len(rho$npar.betas)]
-    est$sebeta <- sapply(1:ncol(rho$coef.constraints), function(j){
-      sapply(1:nrow(rho$coef.constraints), function(i,j) ifelse(is.na(rho$ind.coef[i,j]), 0, se.beta[rho$ind.coef[i, j]]), j)
-    })
-    colnames(est$sebeta) <- colnames(rho$x[[1]])
-    rownames(est$sebeta) <- rho$y.names
+
+  est$sebeta <- rho$seGamma[rho$npar.thetas + seq_len(rho$npar.betas)]
+  names(est$sebeta) <- unlist(lapply(1:length(rho$constraints), function(p) colnames(rho$constraints[[p]])))
+
+  est$seerror.struct <- rho$seGamma[rho$npar.thetas + rho$npar.betas +  seq_len(attr(rho$error.structure, "npar"))]
   }
   est
 }
@@ -1023,23 +1103,8 @@ print.mvord <- function(x, call = TRUE, ...){
   cat("Coefficients:\n")
   print(x$beta, ...)
   cat("\n")
-  if(x$rho$error.structure$type %in% c("corGeneral", "covGeneral")){
-    if(length(x$error.struct) == 1){
-      cat("Sigma:\n")
-      print(x$error.struct[[1]], names = FALSE, ...)
-      } else {
-        cat("Sigmas:\n")
-        print(x$error.struct, names = FALSE, ...)
-      }
-  } else{
-    if (x$rho$error.structure$formula == ~1) {
-      cat("correlation parameter:\n")
-      cat(x$r[1], ...)
-    } else {
-      cat("alpha parameters error.structure:\n")
-      print(x$alpha, names = FALSE, ...)
-    }
-  }
+  cat("Parameters of the error structure:\n")
+  print(attr(x$error.struct, "par"), ...)
   cat("\n")
   invisible(x)
 }
@@ -1056,59 +1121,17 @@ print.mvord <- function(x, call = TRUE, ...){
 # #' @exportMethod  summary mvord
 #' @export
 summary.mvord <- function(object, short = TRUE, call = TRUE, ...){
-  ntotal <- sum(object$rho$ntheta) + length(object$beta) + object$rho$npar.sigmas
-  ## only for mvord2cor
-  names.theta <- unlist(lapply(1:object$rho$ndim, function(j) paste(names(object$theta)[j], names(object$theta[[j]]), sep = " ")))
-  names.beta <- unlist(lapply(1:ncol(object$beta), function(p){
-    lapply(1:object$rho$ndim, function(j) paste(colnames(object$beta)[p], row.names(object$beta)[j], sep = " "))}))
-  ind <- combn(1:object$rho$ndim,2)
-  if(object$rho$error.structure$type == "covGeneral") sigmascor <- lapply(object$error.struct, cov2cor)
-  ## if only one r, print r and its standard error
-  if (object$rho$error.structure$type %in% c("corEqui", "corAR1") && object$rho$error.structure$formula == ~1){
-    object$alpha <- object$r[1]
-    names(object$alpha) <- "corr"
-    ## dL/dr = dL/dalpha * dalpha/dr
-    dadr <- 1/((1 + object$r[1]) * (1 - object$r[1]))
-    object$seerror.struct <- object$seerror.struct/dadr
-  }
-  if (object$rho$error.structure$type %in% c("corGeneral", "covGeneral")) {
-    if (object$rho$error.structure$formula == ~1) {
-      ## correlation names
-      names.corr <- paste("corr", sapply(seq_len(NCOL(ind)), function(j){
-        paste(colnames(object$error.struct[[1]])[ind[1,j]], colnames(object$error.struct[[1]])[ind[2,j]], sep = " ")
-            }), sep = " ")
-      ## std deviation names
-      names.sigma <- paste("sigma", colnames(object$error.struct[[1]]), sep = " ")
-    } else { ## if factor dependent
-      ## correlation names
-      si <- object$error.struct
-      names.corr.pair <- apply(ind, 2, function(i)
-        paste(colnames(si[[1]])[i], collapse = " "))
-      names.corr <- paste("corr", rep(names(si), each = NCOL(ind)),
-            rep(names.corr.pair, length(si)))
-      ## std deviation names
-      names.sigma <- paste("sigma",  rep(names(si), each = NCOL(ind)),
-                           rep(colnames(object$error.struct[[1]]), length(si)), sep = " ")
-    }
-  }
-  names.sigma <- switch(object$rho$error.structure$type,
-                        corGeneral = names.corr,
-                        covGeneral = c(names.corr, names.sigma),
-                        corEqui    =  names(object$alpha),
-                        corAR1     =  names(object$alpha))
+  ntotal <-  sum(object$rho$ntheta) + length(object$beta) +
+    attr(object$error.struct, "npar")
 
-  coef <- switch(object$rho$error.structure$type,
-                 corGeneral = as.matrix(c(unlist(object$theta), as.vector(object$beta),
-                                          as.vector(sapply(seq_len(length(object$error.struct)), function(l){
-                                            sapply(1:ncol(ind), function(j) object$error.struct[[l]][ind[1,j],ind[2,j]])}))), ncol = 1),
-                 covGeneral = as.matrix(c(unlist(object$theta), as.vector(object$beta),
-                                          as.vector(sapply(seq_len(length(object$error.struct)), function(l){
-                                            sapply(1:ncol(ind), function(j) sigmascor[[l]][ind[1,j],ind[2,j]])})),
-                                          as.vector(sapply(seq_len(length(object$error.struct)), function(l){
-                                            sapply(1:object$rho$ndim, function(j) sqrt(object$error.struct[[l]][j,j]))})))
-                                        , ncol = 1),
-                 corEqui    = as.matrix(c(unlist(object$theta), as.vector(object$beta),object$alpha), ncol = 1),
-                 corAR1     = as.matrix(c(unlist(object$theta), as.vector(object$beta),object$alpha), ncol = 1))
+  names.theta <- unlist(lapply(1:object$rho$ndim, function(j) paste(names(object$theta)[j], names(object$theta[[j]]))))
+  names.beta <- names(object$beta)
+  ind <- combn(1:object$rho$ndim,2)
+
+  names.sigma <- attr(object$error.struct, "parnames")
+
+  coef <- as.matrix(c(unlist(object$theta), as.vector(object$beta),
+  	attr(object$error.struct, "par")), ncol = 1)
   rownames(coef) <- c(names.theta, names.beta, names.sigma)
   colnames(coef) <- c("Estimate")
   if(object$rho$se){
@@ -1119,14 +1142,9 @@ summary.mvord <- function(object, short = TRUE, call = TRUE, ...){
     tmp[, 2] <- c(unlist(object$setheta), as.vector(object$sebeta), object$seerror.struct)
     tmp[, 3] <- tmp[, 1]/tmp[, 2]
     tmp[, 4] <- 2 * pnorm(abs(tmp[, 3]), lower.tail=FALSE)
-    signif <- ifelse(tmp[,4] >=  0.1," ",
-                     ifelse(tmp[,4] >=  0.05,".",
-                            ifelse(tmp[,4] >=  0.01,"*",
-                                   ifelse(tmp[,4] >=  0.001,"**","***"))))
-    coef <- cbind.data.frame(tmp, signif)
+    coef <- cbind.data.frame(tmp)
     coef[tmp[, 2] == 0, 3] <- NA
     coef[tmp[, 2] == 0, 4] <- NA
-    coef[tmp[, 2] == 0, 5] <- NA
   }
   mat <- cbind.data.frame(c("link",object$rho$link$name), c("threshold",object$rho$threshold),
                           c("nsubjects", object$rho$n), c("ndim", object$rho$ndim),
@@ -1150,25 +1168,32 @@ summary.mvord <- function(object, short = TRUE, call = TRUE, ...){
     len.thresh <- object$rho$ntheta
     lower.ind <- cumsum(c(1, len.thresh[-length(len.thresh)]))
     upper.ind <- cumsum(len.thresh)
-    tmp.ind <- lapply(seq_len(length(len.thresh)), function(j) if(tmp.duplicated[j] == FALSE) seq(lower.ind[j], upper.ind[j]) else c())
+    tmp.ind <- lapply(seq_along(len.thresh), function(j) if(tmp.duplicated[j] == FALSE) seq(lower.ind[j], upper.ind[j]) else c())
     cat("Thresholds:\n")
-    summary.output$thresholds <- print(coef[unlist(tmp.ind),], ...)
+    if(object$rho$se) {
+      summary.output$thresholds <- printCoefmat(coef[unlist(tmp.ind),])
+    } else summary.output$thresholds <- print(coef[unlist(tmp.ind),], ...)
 
     cat("\nCoefficients:\n")
-    tmp.duplicated <- duplicated(object$rho$ind.coef)
-    ind.beta <- matrix(seq_len(length(names.beta)), ncol = ncol(object$rho$ind.coef), nrow = nrow(object$rho$ind.coef))
-    tmp.ind <- length(names.theta) + as.vector(ind.beta[!tmp.duplicated,])
-    summary.output$coefficients <- print(coef[tmp.ind,], ...)
+    tmp.ind <- length(names.theta) + seq_along(names.beta)
+    if(object$rho$se) {
+      summary.output$coefficients <- printCoefmat(coef[unlist(tmp.ind),])
+    } else summary.output$coefficients <- print(coef[unlist(tmp.ind),], ...)
   } else{
     cat("Thresholds:\n")
-    summary.output$thresholds <- print(coef[seq_len(length(names.theta)),], ...)
+    if(object$rho$se) {
+      summary.output$thresholds <- printCoefmat(coef[seq_along(names.theta),])
+    } else summary.output$thresholds <- print(coef[seq_along(names.theta),], ...)
+
     cat("\nCoefficients:\n")
-    summary.output$coefficients <- print(coef[length(names.theta) + seq_len(length(names.beta)),], ...)
+    if(object$rho$se) {
+      summary.output$coefficients <- printCoefmat(coef[length(names.theta) + seq_along(names.beta),])
+    } else summary.output$coefficients <- print(coef[length(names.theta) + seq_along(names.beta),], ...)
   }
   cat("\nError Structure:\n")
-  summary.output$error.structure <- print(coef[length(names.theta) + length(names.beta) + seq_len(length(names.sigma)),], ...)
-  cat("---\n")
-  cat("Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n")
+    if(object$rho$se) {
+    summary.output$error.structure <- printCoefmat(coef[length(names.theta) + length(names.beta) + seq_along(names.sigma),])
+  } else summary.output$error.structure <- print(coef[length(names.theta) + length(names.beta) + seq_along(names.sigma),], ...)
   class(summary.output) <- "summary.mvord"
   invisible(summary.output)
 }
@@ -1184,13 +1209,12 @@ print.summary.mvord <- function(summary.output, ...){
   write.table(summary.output$info, row.names = FALSE, col.names = FALSE, quote = FALSE)
   cat("\n")
     cat("Thresholds:\n")
-    print(summary.output$thresholds, ...)
+    if(ncol(summary.output$thresholds) > 1) printCoefmat(summary.output$thresholds) else print(summary.output$thresholds, ...)
     cat("\nCoefficients:\n")
-    print(summary.output$coefficients, ...)
+    if(ncol(summary.output$coefficients) > 1) print(summary.output$coefficients) else print(summary.output$coefficients, ...)
   cat("\nError Structure:\n")
-  print(summary.output$error.structure, ...)
-  cat("---\n")
-  cat("Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n")
+  if(ncol(summary.output$error.structure) > 1) printCoefmat(summary.output$error.structure) else print(summary.output$error.structure, ...)
+
 }
 
 #' @title Coefficients of Multivariate Ordinal Regression Models.
@@ -1221,81 +1245,124 @@ thresholds <- function(object, ...) UseMethod("thresholds")
 #' @export
 thresholds.mvord <- function(object, ...) object$theta
 
-#' @title Extracts Error Structure of Multivariate Ordinal Regression Models.
-#' @description
-#' \code{get.error.struct} is a generic function which extracts the estimated error structure parameters from objects of class \code{"mvord"}.
-#' @param object object of class \code{"mvord"}
-#' @param type choose type \code{c("sigmas", "alpha", "corr", "z")}
-#' @param ... further arguments passed to or from other methods.
-#' @details \itemize{
-#' \item{\code{sigmas}} {extracts the correlation/covariance matrices corresponding to each subject.
-#'             Applicable in line with \code{corGeneral, covGeneral, corEqui, corAR1}}
-#' \item{\code{alpha}} {extracts the parameters of covariate dependent error structure. Applicable in line with \code{corEqui, corAR1}}
-#' \item{\code{corr}} {extracts the subject-specific correlation parameters. Applicable in line with \code{corEqui, corAR1}}
-#' \item{\code{z}} {extracts the subject-specific Fisher-z score. Applicable in line with \code{corEqui, corAR1}}}
-#' @export
-get.error.struct <- function(object, type, ...) UseMethod("get.error.struct")
-#' @rdname get.error.struct
-#' @export
-get.error.struct.mvord <- function(object, type = NULL, ...){
-  if(is.null(type)){
-  if(object$rho$error.structure$type %in% c("corGeneral", "covGeneral")){
-    if(length(object$error.struct) == 1){
-      object$error.struct[[1]]
-    } else {
-      object$error.struct
-    }
-  } else object$alpha
-  } else{ #here for each i
-    if(type == "sigmas"){
-      #object$error.struct
-      if(object$rho$error.structure$type %in% c("corGeneral", "covGeneral")){
-      lev <- match(object$rho$error.structure$x, object$rho$error.structure$levels)
-      sigmas <- lapply(seq_len(object$rho$n), function(i) object$error.struct[[lev[i]]])
-      names(sigmas) <- rownames(object$rho$y)
-      sigmas
-      } else {sigmas <- r2sigma(object$r, object)
-      names(sigmas) <- rownames(object$rho$y)
-      sigmas
-        }
-    } else if(type == "corr"){
-      object$r
-    } else object[[type]]
-  }
-}
-
-
-#' @title CLAIC of Multivariate Ordinal Regression Models.
-#' @description
-#' \code{claic} is a generic function which extracts the composite likelihood AIC from objects of class \cr
-#' \code{"mvord"}.
-#' @param object object of class \code{"mvord"}
-#' @export
+# #' @title CLAIC of Multivariate Ordinal Regression Models.
+# #' @description
+# #' \code{claic} is a generic function which extracts the composite likelihood AIC from objects of class \cr
+# #' \code{"mvord"}.
+# #' @param object object of class \code{"mvord"}
+# #' @export
 claic <- function(object) UseMethod("claic")
-#' @rdname claic
-#' @export
+# #' @rdname claic
+# #' @export
 claic.mvord <- function(object) ifelse(object$rho$se, object$rho$claic, NA)
 
 
-#' @title CLBIC of Multivariate Ordinal Regression Models.
-#' @description
-#' \code{clbic} is a generic function which extracts the composite likelihood BIC from objects of class \cr
-#' \code{"mvord"}.
-#' @param object object of class \code{"mvord"}
-#' @export
+# #' @title CLBIC of Multivariate Ordinal Regression Models.
+# #' @description
+# #' \code{clbic} is a generic function which extracts the composite likelihood BIC from objects of class \cr
+# #' \code{"mvord"}.
+# #' @param object object of class \code{"mvord"}
+# #' @export
 clbic <- function(object) UseMethod("clbic")
-#' @rdname clbic
-#' @export
+# #' @rdname clbic
+# #' @export
 clbic.mvord <- function(object) ifelse(object$rho$se, object$rho$clbic, NA)
 
 
-#' @title logPL of Multivariate Ordinal Regression Models.
+# #' @title logPL of Multivariate Ordinal Regression Models.
+# #' @description
+# #' \code{logPL} is a generic function which extracts the log pairwise likelihood from objects of class \cr
+# #' \code{"mvord"}.
+# #' @param object object of class \code{"mvord"}
+# #' @export
+logPL <- function(object) UseMethod("logPL")
+# #' @rdname logPL
+# #' @export
+logPL.mvord <- function(object) as.numeric(-object$rho$objective)
+
+
+#object <- res_AR1_probit
+#' @title nobs of Multivariate Ordinal Regression Models.
 #' @description
-#' \code{logPL} is a generic function which extracts the log pairwise likelihood from objects of class \cr
+#' \code{nobs} is a generic function which extracts the number of observations from objects of class \cr
+#' \code{"mvord"}.
+#' @param object object of class \code{"mvord"}
+#' @param ... further arguments passed to or from other methods.
+#' @method nobs mvord
+#' @export
+nobs.mvord <- function(object, ...) object$rho$n
+
+#' @title vcov of Multivariate Ordinal Regression Models.
+#' @description
+#' \code{vcov} is a generic function which extracts the Godambe information matrix from objects of class \cr
+#' \code{"mvord"}.
+#' @param object object of class \code{"mvord"}
+#' @param ... further arguments passed to or from other methods.
+#' @method vcov mvord
+#' @export
+vcov.mvord <- function(object, ...) object$rho$varGamma
+
+#' @title terms of Multivariate Ordinal Regression Models.
+#' @description
+#' \code{terms} is a generic function which can be used to extract terms from objects of class \cr
+#' \code{"mvord"}.
+#' @param x object of class \code{"mvord"}
+#' @param ... further arguments passed to or from other methods.
+#' @method terms mvord
+#' @export
+terms.mvord <- function(x, ...) terms(x$rho$formula)
+
+#' @title model.matrix of Multivariate Ordinal Regression Models.
+#' @description
+#' \code{model.matrix} is a generic function which extracts the Godambe information matrix from objects of class \cr
+#' \code{"mvord"}.
+#' @param object object of class \code{"mvord"}
+#' @param ... further arguments passed to or from other methods.
+#' @method model.matrix mvord
+#' @export
+model.matrix.mvord <- function(object, ...) object$rho$x
+
+#' @title fitted of Multivariate Ordinal Regression Models.
+#' @description
+#' \code{fitted} is a generic function which extracts fitted probabilities for the observed categories from objects of class \cr
+#' \code{"mvord"}.
+#' @param object object of class \code{"mvord"}
+#' @param ... further arguments passed to or from other methods.
+#' @method fitted mvord
+#' @export
+fitted.mvord <- function(object, ...) predict(object)
+
+#' @title log Pairwise Likelihood of Multivariate Ordinal Regression Models.
+#' @description
+#' \code{logLik} is a generic function which extracts the log pairwise likelihood from objects of class \cr
+#' \code{"mvord"}.
+#' @param object object of class \code{"mvord"}
+#' @param ... further arguments passed to or from other methods.
+#' @method logLik mvord
+#' @export
+logLik.mvord <- function(object, ...) structure(-object$rho$objective,
+                                                df = sum(diag(object$rho$V %*% object$rho$H.inv)), class = "logLik")
+
+#' @title Regression constraints of Multivariate Ordinal Regression Models.
+#' @description
+#' \code{constraints} is a generic function which extracts the regression constraints from objects of class \cr
 #' \code{"mvord"}.
 #' @param object object of class \code{"mvord"}
 #' @export
-logPL <- function(object) UseMethod("logPL")
-#' @rdname logPL
+constraints <- function(object) UseMethod("constraints")
+#' @rdname constraints
 #' @export
-logPL.mvord <- function(object) as.numeric(-object$rho$objective)
+constraints.mvord <- function(object) object$constraints
+
+
+#' @title Names of regression coefficient constraints in mvord
+#' @description
+#' \code{names_constraints} is a function which extracts the names of the regression constraints based on the model \code{formula} and \code{data}.
+#' @param formula model formula
+#' @param data data set
+#' @export
+names_constraints <- function(formula, data){
+  intercept <- ifelse(attr(terms.formula(formula), "intercept") == 1, TRUE, FALSE)
+  nam <-  colnames(model.matrix(update(as.formula(paste0("~",deparse(formula[[3]]))), ~ . + 1), data))
+  if(intercept) nam else nam[-1]
+}

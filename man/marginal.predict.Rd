@@ -29,7 +29,7 @@ The following types can be chosen in \code{marginal.predict}:
   \code{"all.prob"} \tab fitted marginal probabilities for all ordered classes of each response
   }
 
-The current implemntation supports only in-sample predictions. 
+The current implementation supports only in-sample predictions.
 The rownames of the output correspond to the subjectIDs.
 }
 \seealso{

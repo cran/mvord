@@ -4,24 +4,25 @@
 \alias{mvord}
 \title{Multivariate Ordinal Regression Models.}
 \usage{
-mvord(formula, error.structure = corGeneral(~1), link = mvprobit(), data,
+mvord(formula, error.structure = cor_general(~1), link = mvprobit(), data,
   index = NULL, response.names = NULL, response.levels = NULL,
   coef.constraints = NULL, coef.values = NULL,
   threshold.constraints = NULL, threshold.values = NULL, weights = NULL,
-  se = TRUE, start.values = NULL, solver = "BFGS", PL.lag = NULL,
-  control = list(maxit = 2e+05, trace = 1, kkt = FALSE))
+  offset = NULL, scale = FALSE, se = TRUE, start.values = NULL,
+  solver = "newuoa", PL.lag = NULL, control = list(maxit = 2e+05, trace =
+  1, kkt = FALSE))
 }
 \arguments{
 \item{formula}{an object of class \code{\link{formula}} of the form \code{y ~ X1 + ... + Xp}.}
 
-\item{error.structure}{different \code{\link{error.structures}}: general correlation structure (default)\cr
-\code{corGeneral(~1)},
-general covariance structure \code{covGeneral(~1)}, factor dependent correlation structure \code{covGeneral(~f)},
-factor dependent covariance structure \code{covGeneral(~f)}, covariate dependent equicorrelation structure \cr
-\code{corEqui(~S)},
-AR(1) correlation structure \code{corAR1(~1)} or a covariate dependent \cr
-AR(1) correlation structure \code{corAR1(~S)}.
-See \code{\link{error.structures}} or 'Details'.}
+\item{error.structure}{different \code{error.structures}: general correlation structure (default)\cr
+\code{cor_general(~1)},
+general covariance structure \code{cov_general(~1)}, factor dependent correlation structure \code{cov_general(~f)},
+factor dependent covariance structure \code{cov_general(~f)}, covariate dependent equicorrelation structure \cr
+\code{cor_equi(~S)},
+AR(1) correlation structure \code{cor_ar1(~1)} or a covariate dependent \cr
+AR(1) correlation structure \code{cor_ar1(~S)}.
+See \code{\link{error_struct}} or 'Details'.}
 
 \item{link}{specifies the link function by \code{mvprobit()} (multivariate normally distributed errors)
 or \code{mvlogit(df = 8)} (multivariate logistically distributed errors), where \code{df} specifies the degrees of freedom of the t copula.}
@@ -54,11 +55,19 @@ in case of varying categories across multiple measurements}
 \item{weights}{(optional) column name of subject-specific weights in \code{data} which need to be
 constant across multiple measurements. Negative weights are not allowed.}
 
+\item{offset}{this can be used to specify an a priori known component to be included in the linear predictor during fitting.
+This should be NULL or a numeric vector of length equal to the number of cases. One or more offset terms can be included
+in the formula instead or as well, and if more than one is specified their sum is used. See model.offset.}
+
+\item{scale}{If \code{scale = TRUE}, the continuous covariates are standardized
+by substracting the mean and dividing by the standard deviation.
+This operation is performed for each repeated measurement before fitting.}
+
 \item{se}{logical, if \code{TRUE} standard errors are computed.}
 
 \item{start.values}{vector of (optional) starting values.}
 
-\item{solver}{character string containing the name of the applicable solver of \code{\link{optimx}} (default is \code{"BFGS"})
+\item{solver}{character string containing the name of the applicable solver of \code{\link{optimx}} (default is \code{"newuoa"})
 or wrapper function for user defined solver.}
 
 \item{PL.lag}{specifies the time lag of the pairs in the pairwise likelihood approach to be optimized.}
@@ -71,7 +80,7 @@ The function \code{mvord} returns an object of \code{\link{class}} \code{"mvord"
 The functions \code{summary} and \code{print} are used to display the results.
 The function \code{coef} extracts the regression coefficients, a function \code{thresholds} the threshold coefficients
 and the function \cr
-\code{get.error.struct} returns the estimated parameters of the corresponding error structure.
+\code{get_error_struct} returns the estimated parameters of the corresponding error structure.
 
 An object of \code{\link{class}} \code{"mvord"} is a list containing the following components:
 
@@ -84,9 +93,8 @@ An object of \code{\link{class}} \code{"mvord"} is a list containing the followi
  a named \code{\link{list}}{ of threshold parameters}
   \item{\code{error.struct}}{
 
-    a named \code{\link{list}} of correlation (covariance) matrices,
-  or a vector of coefficients in the \cr
-  \code{corEqui()} and \code{corAR1()} error structures}
+  an object of class \code{\link{error_struct}} containing the parameters of the error
+  structure}
   \item{\code{sebeta}}{
 
     a named \code{\link{matrix}} of the standard errors of the regression coefficients}
@@ -95,8 +103,7 @@ An object of \code{\link{class}} \code{"mvord"} is a list containing the followi
     a named \code{\link{list}} of the standard errors of the threshold parameters}
   \item{\code{seerror.struct}}{
 
-    a named \code{\link{list}} of the standard errors of the correlation (covariance) matrices,
-  or a vector of coefficients in the \code{error.structure = corEqui} setting}
+  a \code{vector} of standard errors for the parameters of the error structure}
   \item{\code{rho}}{
 
     a \code{\link{list}} of all objects that are used in \code{mvord()}}
@@ -104,7 +111,7 @@ An object of \code{\link{class}} \code{"mvord"} is a list containing the followi
 }
 \description{
 \code{mvord} is used to estimate multivariate ordinal regression models. Different model types are implemented and can be chosen by
-the use of different \code{\link{error.structures}}. Constraints on the threshold as well as on the regression parameters can be imposed.
+the use of different \code{error.structures}. Constraints on the threshold as well as on the regression parameters can be imposed.
 }
 \details{
 \describe{
@@ -174,10 +181,10 @@ or by
 \itemize{
   \item {Correlation:}
   \itemize{
-  \item \code{corGeneral}
+  \item \code{cor_general}
 The most common parameterization is the general correlation matrix.
 
- \code{error.structure = corGeneral(~ 1)}
+ \code{error.structure = cor_general(~ 1)}
 
 This parameterization can be extended by allowing a factor dependent
 correlation structure, where the correlation of each subject \eqn{i} depends
@@ -185,45 +192,67 @@ on a given subject-specific factor \code{f}. This factor \code{f} is not allowed
 across multiple measurements \eqn{j} for the same subject \eqn{i} and due to numerical
 constraints only up to maximum 30 levels are allowed.
 
-      \code{error.structure = corGeneral(~ f)}
+      \code{error.structure = cor_general(~ f)}
 
-  \item \code{corEqui}
+  \item \code{cor_equi}
 A covariate dependent equicorrelation structure, where the correlations
 are equal across all \eqn{J} dimensions and depend on subject-specific covariates \code{S1, ..., Sm}.
 It has to be noted that these covariates \code{S1, ..., Sm} are not allowed to vary across
  multiple measurements \eqn{j} for the same subject \eqn{i}.
 
-         \code{error.structure = corEqui(~ S1 + ... + Sm)}
+         \code{error.structure = cor_equi(~ S1 + ... + Sm)}
 
-  \item \code{corAR1}
+  \item \code{cor_ar1}
 In order to account for some heterogeneity the \eqn{AR(1)} error structure
 is allowed to depend on covariates \code{X1, ..., Xp} that are constant
 over time for each subject \eqn{i}.
 
-      \code{error.structure = corAR1(~ S1 + ... + Sm)}
+      \code{error.structure = cor_ar1(~ S1 + ... + Sm)}
 }
 
 
 \item {Covariance:}
 \itemize{
-\item \code{covGeneral}
+\item \code{cov_general}
 
 In case of a full variance-covariance parameterization the standard parameterization
  with a full variance-covariance is obtained by:
 
- \code{error.structure = covGeneral(~ 1)}
+ \code{error.structure = cov_general(~ 1)}
 
  This parameterization can be extended to the factor dependent covariance structure,
   where the covariance of each subject depends on a given factor \code{f}:
 
- \code{error.structure = covGeneral(~ f)}
+ \code{error.structure = cov_general(~ f)}
   }
   }
   }
 
   \item{\code{coef.constraints}}{
-  In order to achieve a more flexible framework we allow for constraints on the regression
-   coefficients. These constraints can be specified by a vector or a matrix \cr
+  The package supports
+  constraints on the regression coefficients. Firstly, the
+  user can specify whether the regression coefficients should be equal
+  across some or all response dimensions. Secondly, the values of some
+  of the regression coefficients can be fixed.
+
+  As there is no unanimous way to specify such constraints, we offer
+  two options. The first option is similar to the specification of constraints on the thresholds.
+   The constraints can be specified in this case as a vector or matrix of integers,
+    where coefficients getting same integer value are set equal.
+  Values of the regression coefficients can be fixed through a matrix.
+  Alternatively constraints on the regression coefficients can be specified
+  by using the design employed by the \pkg{VGAM} package.
+  The constraints in this setting are set through a named list,
+  where each element of the list contains a matrix full-column rank.
+  If the values of some regression coefficients should be fixed, offsets can be used.
+  This design has the advantage that it supports
+  constraints on outcome-specific as well as category-specific
+  regression coefficients. While the first option has the advantage of requiring a more concise input,
+   it does not support category-specific coefficients.
+  The second option offers a more flexible design in this respect. For further information
+  on the second option we refer to the vignette and to the documentation of \code{\link[VGAM]{vglm}}.
+
+Using the first option, constraints can be specified by a vector or a matrix \cr
    \code{coef.constraints}.
     First, a simple and less flexible way by specifying a vector \cr
     \code{coef.constraints}
@@ -333,14 +362,14 @@ res <- mvord(formula = Y ~ 0 + X1 + X2,
                link = mvprobit(),
                solver = "BFGS",
                se = TRUE,
-               error.structure = corGeneral(~1),
+               error.structure = cor_general(~1),
                threshold.constraints = c(1,1),
                coef.constraints = c(1,1))
 print(res)
 summary(res)
 thresholds(res)
 coefficients(res)
-get.error.struct(res)
+get_error_struct(res)
 
 ## examples
 #load data
@@ -348,7 +377,7 @@ data(data_mvord)
 head(data_mvord)
 
 #-------------
-# corGeneral
+# cor_general
 #-------------
 \donttest{
 # approx 1 min
@@ -365,7 +394,7 @@ res_cor <- mvord(formula = rating ~ 0 + X1 + X2 + X3 + X4 + X5,
                response.names = c("rater1", "rater2", "rater3"),
 # set if not all raters are used and specifies ordering
                link = mvprobit(), #mvprobit() or mvlogit()
-               error.structure = corGeneral(~1), #different error structures
+               error.structure = cor_general(~1), #different error structures
                coef.constraints = cbind(c(1,2,2),
                                         c(1,1,2),
                                         c(NA,1,2),
@@ -383,10 +412,10 @@ print(res_cor)
 summary(res_cor)
 thresholds(res_cor)
 coefficients(res_cor)
-get.error.struct(res_cor)
+get_error_struct(res_cor)
 
 #-------------
-# covGeneral
+# cov_general
 #-------------
 #approx 4 min
 res_cov <- mvord(formula = rating ~ 1 + X1 + X2 + X3 + X4 + X5,
@@ -402,7 +431,7 @@ res_cov <- mvord(formula = rating ~ 1 + X1 + X2 + X3 + X4 + X5,
             response.names = c("rater1", "rater2", "rater3"),
 # set if not all raters are used and specifies ordering
             link = mvprobit(), #mvprobit() or mvlogit()
-            error.structure = covGeneral(~1), #different error structures
+            error.structure = cov_general(~1), #different error structures
             threshold.constraints = NULL, #vector
             threshold.values = list(c(-4,NA,NA,NA,NA,4.5),
                                     c(-4,NA,NA,NA,NA,4),
@@ -413,11 +442,11 @@ print(res_cov)
 summary(res_cov)
 thresholds(res_cov)
 coefficients(res_cov)
-get.error.struct(res_cov)
+get_error_struct(res_cov)
 
 
 #-------------
-# corAR1
+# cor_ar1
 #-------------
 #approx 4min
 data(data_mvord_panel)
@@ -434,7 +463,7 @@ res_AR1 <- mvord(formula = rating ~ 0 + X1 + X2 + X3 + X4 + X5,
            response.names = c("year3", "year4", "year5", "year6", "year7"),
 # set if not all raters are used and specifies ordering
            link = mvprobit(), #mvprobit() or mvlogit()
-           error.structure = corAR1(~1), #different error structures
+           error.structure = cor_ar1(~1), #different error structures
            threshold.constraints = c(1,1,1,2,2),
            coef.constraints = c(1,1,1,2,2),
            solver = "BFGS")
@@ -442,16 +471,15 @@ print(res_AR1)
 summary(res_AR1)
 thresholds(res_AR1)
 coefficients(res_AR1)
-get.error.struct(res_AR1)
-get.error.struct(res_AR1, type = "corr")
+get_error_struct(res_AR1)
+get_error_struct(res_AR1, type = "corr")
 }
 
 }
 \seealso{
 %\code{\link{predict.mvord}},
 \code{\link{print.mvord}}, \code{\link{summary.mvord}}, \code{\link{coef.mvord}},
- \code{\link{thresholds.mvord}}, \code{\link{get.error.struct.mvord}}, \code{\link{logPL}},
- \code{\link{claic}}, \code{\link{clbic}},
+ \code{\link{thresholds.mvord}}, \code{\link{get_error_struct.mvord}},
  \code{\link{data_cr_panel}},\code{\link{data_cr_mvord}}, \code{\link{data_cr_mvord2}},
  \code{\link{data_mvord_panel}},\code{\link{data_mvord}}, \code{\link{data_mvord2}}
 }

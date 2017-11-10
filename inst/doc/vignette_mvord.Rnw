@@ -1,5 +1,6 @@
 %\documentclass[11pt,a4paper, oneside]{article}
 \documentclass[nojss]{jss}
+%\documentclass[article]{jss}
 \usepackage{thumbpdf,lmodern}
 \usepackage{Sweave}
 \usepackage{amsmath,amsfonts,enumerate}
@@ -15,6 +16,7 @@
 \newcolumntype{C}{>{\centering\arraybackslash}X}
 %%\VignetteIndexEntry{mvord: An R Package for Fitting Multivariate Ordinal Regression Models}
 %%\VignetteDepends{mvord}
+%% need no \usepackage{Sweave.sty}
 \author{Rainer Hirk\\
 WU Wirtschaftsuniversit\"at\\
 Wien
@@ -70,10 +72,10 @@ E-mail: \email{laura.vana@wu.ac.at}
   reduction of the parameter space is desired.
 }
 
-\Keywords{Composite likelihood, Cross-sectional data, Longitudinal
-  data, Multivariate ordinal regression model, \proglang{R}}
-\Plainkeywords{Composite likelihood, Cross-sectional data,
-  Longitudinal data, Multivariate ordinal regression model, R}
+\Keywords{composite likelihood, cross-sectional data, longitudinal
+  data, multivariate ordinal regression model, \proglang{R}}
+\Plainkeywords{composite likelihood, cross-sectional data,
+  longitudinal data, multivariate ordinal regression model, R}
 <<echo = FALSE, results = hide>>=
 options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
 @
@@ -132,12 +134,14 @@ continuation-ratio or adjacent-category models \cite[see][]{Agresti02, Agresti10
 model ordinal data are available in \proglang{R} \citep{RCoreTeam}:
 For univariate ordinal regression models with fixed effects the
 function \code{polr()} of the \pkg{MASS} package \citep{MASSpkg}, the
-function \code{clm()} of the \pkg{ordinal} package \citep{ordinalR}
+function \code{clm()} of the \pkg{ordinal} package \citep{ordinalR} which supports scale effects as well as nominal effects
 and the function \code{vglm()} of the \pkg{VGAM} package
-\citep{VGAMpkg}.  Ordinal regression models which can account for
-heteroskedasticity can be estimated using package \pkg{oglmx}
-\citep{oglmx}, while package \pkg{ordinalNet} \citep{ordinalNetpkg}
-offers tools for model selection by using an elastic net penalty.
+\citep{VGAMpkg}. Another package which accounts for
+heteroskedasticity is package \pkg{oglmx}
+\citep{oglmx}. The package \pkg{ordinalNet} \citep{ordinalNetpkg}
+offers tools for model selection by using an elastic net penalty. Moreover, ordinal logistic models can be fitted by the functions \code{lms()} and  \code{orm()} in package \pkg{rms} \citep{rmspkg} and the \code{MCMCoprobit()} function in package \pkg{MCMCpack} \citep{MCMCpackpkg} which uses Markov Chain Monte Carlo methods to fit ordinal probit regression models.
+
+An overview on ordinal regression models in other statistical software packages like \proglang{Stata} \citep{Stata}, \proglang{SAS} \citep{SAS} or \proglang{SPSS} \citep{SPSS} is provided by \cite{Liu09}. These software packages include the \proglang{Stata} procedure \code{OLOGIT}, the \proglang{SAS} procedure \code{PROC LOGISTIC} and the \proglang{SPSS} procedure \code{PLUM} which perform ordinal logistic regression models. The software procedure \code{PLUM} additionally includes other link functions like probit complementary log-log, cauchit abd negative log-log. Ordinal models for multinomial data are available in the \proglang{SAS} package \code{PROC GENMOD}, while another implementation of ordinal logistic regression is available in \proglang{JMP}. In \proglang{Python} \citep{Python}, package \pkg{mord} \citep{mordpkg} implements ordinal regression methods.
 
 While there are sufficient software tools in \proglang{R} which deal
 with the univariate case, the ready-to-use packages for dealing with
@@ -154,15 +158,17 @@ effects. Bayesian multilevel models for ordinal data are implemented
 in the package \pkg{brms} \citep{brmspkg}.  Multivariate ordered
 probit models, where the subject errors are assumed to follow a
 multivariate normal distribution with a general correlation matrix,
-can be estimated with package \pkg{PLordprob} \citep{PLordprob},
-which uses maximum composite likelihood methods estimation. This
-package works well for standard applications but lacks
-flexibility. For example, the number of levels of the ordinal
-responses needs to be equal across all dimensions, threshold and
-regression coefficients are the same for all multiple measurements and
-it does not account for missing observations in the outcome variable.
-None of these packages support at the time of writing covariate
-dependent error structures.
+can be estimated with package \pkg{PLordprob} \citep{PLordprob}, which
+uses maximum composite likelihood methods estimation. This package
+works well for standard applications but lacks flexibility. For
+example, the number of levels of the ordinal responses needs to be
+equal across all dimensions, threshold and regression coefficients are
+the same for all multiple measurements and it does not account for
+missing observations in the outcome variable.  None of these packages
+support at the time of writing covariate dependent error structures. A
+package which allows for different error structures in non-linear
+mixed effects models is package \pkg{nlme} \citep{nlme}, even
+though models dealing with ordinal data are not supported.
 
 % Motivation
 % ----------
@@ -289,17 +295,26 @@ $\bm{x}_{ij}$:
 where $\beta_{j0}$ is an intercept term, $\bm{\beta}_j = (\beta_{j1},\,
 \dots,\, \beta_{jp})^\top$ is a vector of regression coefficients, both
 corresponding to outcome~$j$, and $\epsilon_{ij}$ is a mean zero error
-term. Note that the number of ordered categories $K_j$ as well as the
+term. We further assume the $n$~subjects to be independent and that the error
+terms are uncorrelated with the covariates. Note that the number of ordered categories $K_j$ as well as the
 threshold parameters $\bm\theta_j$ and the regression coefficients
 $\bm\beta_j$ are allowed to vary across outcome dimensions $j \in J$
 to account for possible heterogeneity across the response variables.
-We further assume the $n$~subjects to be independent and that the error
-terms are uncorrelated with the covariates.
+
+% Partial Prop. Odds
+\paragraph{Category-specific regression coefficients}
+By employing one set of regression coefficients $\bm\beta_j$
+for all categories of the $j$-th outcome it is implied that the relationship
+between the covariates and the responses does not depend on the category.
+This assumption is called parallel regression or proportional odds
+assumption \citep{Mccullagh80} and can be relaxed for one or more covariates by
+allowing the corresponding regression coefficients to be category specific \citep[see e.g.,][]{Peterson90}.
 
 %% Links
+\paragraph{Link functions}
 The dependence among the different responses is accounted for by
-assuming that, for each subject~$i$, the vector of error terms $\bm{\epsilon}_i =
-[\epsilon_{ij}]_{j\in J_i}$ follows a suitable
+assuming that, for each subject~$i$, the vector of error terms
+$\bm{\epsilon}_i = [\epsilon_{ij}]_{j\in J_i}$ follows a suitable
 multivariate distribution. We consider two multivariate distributions
 which correspond to the multivariate probit and logit link
 functions. For the \emph{multivariate probit link} we assume that the
@@ -563,9 +578,9 @@ outcome~$j$, the coefficients can be interpreted in the same way as in
 univariate cumulative link models.  Let us assume without loss of
 generality that a higher latent score leads to better ratings on the
 ordinal scale. This implies that the first category is the worst and
-category $K_j$ is the best category.  The marginal cumulative probabilities
-implied by the model in Equation~\ref{eqn:model} are then given by the
-following relationship:
+category $K_j$ is the best category.  The marginal cumulative
+probabilities implied by the model in Equation~\ref{eqn:model} are
+then given by the following relationship:
 \begin{align*}
 \Prob(Y_{ij} \leq r_{ij}|\bm x_{ij}) = \Prob(\bm{x}_{ij}^\top \bm{\beta}_j +
 \epsilon_{ij} \leq \theta_{j,r_{ij}}) = \Prob(\epsilon_{ij} \leq \theta_{j,r_{ij}} -
@@ -672,26 +687,14 @@ The ratio is the required increase in the $base$ variable that is necessary to c
 \section{Implementation}\label{sect:implementation}
 Multivariate ordinal regression models in the \proglang{R} package
 \pkg{mvord} are fitted using the function \code{mvord()}:
-<<eval = FALSE>>=
-mvord(formula,
-      data,
-      error.structure = corGeneral(~ 1),
-      link = mvprobit(),
-      index = NULL,
-      response.names = NULL,
-      response.levels = NULL,
-      threshold.constraints = NULL,
-      threshold.values = NULL,
-      coef.constraints = NULL,
-      coef.values = NULL,
-      weights = NULL,
-      se = TRUE,
-      start.values = NULL,
-      solver = "BFGS",
-      PL.lag = NULL,
-      control = list(maxit=200000, trace = 1, kkt = FALSE)
-)
-@
+\begin{verbatim}
+mvord(formula, data, error.structure = cor_general(~ 1), link = mvprobit(),
+  index = NULL, response.names = NULL, response.levels = NULL,
+  threshold.constraints = NULL, threshold.values = NULL,
+  coef.constraints = NULL, coef.values = NULL, weights = NULL, se = TRUE,
+  offset = NULL, scale = FALSE, start.values = NULL, solver = "newuoa",
+  PL.lag = NULL, control = list(maxit=200000, trace = 1, kkt = FALSE))
+\end{verbatim}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Data structure}
 We use a long format for the input of \code{data}, where each row
@@ -706,10 +709,9 @@ the subject index~$i$ and the multiple measurement index~$j$ should be
 specified. This can be performed by an optional argument \code{index},
 a character vector of length two, specifying the column names of the
 subject index and the multiple measurement index in \code{data}.
-<<>>=
-index <- c("subject_index", "multiple_measurement_index")
-index
-@
+\begin{verbatim}
+index = c("subject_index", "multiple_measurement_index")
+\end{verbatim}
 The default value of \code{index} is \code{NULL} assuming that the
 first column of \code{data} contains the subject index~$i$ and the second
 column the multiple measurement index~$j$.
@@ -721,18 +723,23 @@ second dimension and so on. Hence, a well defined index $j \in J$ for
 the multiple measurements is needed. Therefore, a vector
 \code{response.names} is used to define the index number of the
 multiple measurement. If we assume to have $q=4$ outcomes \code{Y1} to \code{Y4}, the following \code{response.names} are set:
-<<>>=
-response.names <- c("Y1", "Y2", "Y3", "Y4")
-response.names
-@
+\begin{verbatim}
+response.names = c("Y1", "Y2", "Y3", "Y4")
+\end{verbatim}
 The default value of \code{response.names} is \code{NULL} giving the natural ordering of the levels of the factor variable for all the multiple measurements. The ordering of \code{response.names} always specifies the index of the multiple measurement unit $j \in J$. This ordering is essential when putting constraints on the parameters and when setting \code{response.levels}.
-<<>>=
-response.levels <-  list(Y1 = rev(LETTERS[1:6]),
-                         Y2 = rev(LETTERS[1:6]),
-                         Y3 = rev(LETTERS[7:13]),
-                         Y4 = c("O", "N"))
-response.levels
-@
+% #
+% # response.levels <-  list(Y1 = rev(LETTERS[1:6]),
+% #                          Y2 = rev(LETTERS[1:6]),
+% #                          Y3 = rev(LETTERS[7:13]),
+% #                          Y4 = c("O", "N"))
+% # response.levels
+% # @
+\begin{verbatim}
+response.levels = list(Y1 = c("F", "E", "D", "C", "B", "A"),
+                       Y2 = c("F", "E", "D", "C", "B", "A"),
+                       Y3 = c("M", "L", "K", "J", "I", "H", "G"),
+                       Y4 = c("O", "N"))
+\end{verbatim}
 If the categories differ across multiple measurements (either the number of categories and/or the category labels) one needs to specify the \code{response.levels} explicitly. This is performed by a list of length $q$, where each element contains the names of the levels of the ordered categories in ascending (or if desired descending) order.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
 \subsection{Formula}
@@ -743,44 +750,66 @@ ensure identifiability:
 \paragraph{Model without intercept}
 If the intercept should be removed, the \code{formula} has
 the following form:
-<<>>=
+\begin{verbatim}
 formula = Y ~ 0 + X1 + ... + Xp
-@
+\end{verbatim}
 \paragraph{Model with intercept}
 If one wants to include an intercept in the model, there are two
 equivalent possibilities to set the model \code{formula}. Either the
 intercept is included explicitly by:
-<<>>=
+\begin{verbatim}
 formula = Y ~ 1 + X1 + ... + Xp
-@
+\end{verbatim}
 or by
-<<>>=
+\begin{verbatim}
 formula = Y ~ X1 + ... + Xp
-@
+\end{verbatim}
+\paragraph{Note on intercept in formula}
+We differ in our approach of specifying the model \code{formula}
+from the formula objects in e.g., \code{MASS::polr()} or \code{ordinal::clm()}, in that we allow the user to specify models without intercept. This option is not supported in the \pkg{MASS} and \pkg{ordinal} packages, where an intercept is always specified in \code{formula} as the threshold parameters are treated as intercepts.
+We choose to allow for this option, in order to have a correspondence
+to the identifiability constraints presented in Section~\ref{subsect:ident}.
+
+Even so, the user should be aware that
+the threshold parameters are basically category and outcome specific intercepts.
+This implies that, even if the intercept is explicitly removed from the model
+through the \code{formula} object and hence set to zero, the rest of the
+covariates should be specified in such a way that multicolinearity does not arises (as if an intercept were specified). This is of primary importance when including categorical covariates, where one category will be taken as baseline by default.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Link functions}
-We allow for two different link functions, the multivariate probit
-link and a multivariate logit link.  For the multivariate probit
-link a multivariate normal distribution for the errors is applied. The
-normal bivariate probabilities which enter the pairwise log-likelihood
-are computed with package \pkg{pbivnorm} \citep{pbivnorm}. The
-multivariate probit link can be specified by:
-<<>>=
+The multivariate link functions are specified as objects of class
+\code{`mvlink'}.  An object of class \code{`mvlink'} is a list with
+elements specifying the distribution function of the errors, functions
+for computing the corresponding univariate and bivariate
+probabilities, as well as additional arguments specific to each
+link. If gradient functions passed on, these will be used in the
+computation of the standard errors.  This design has been inspired by
+the design of the \code{`family'} class in package \pkg{stats} and it
+facilitates the addition of new link functions to the package.
+
+We offer two different multivariate link functions, the
+multivariate probit link and a multivariate logit link.  For the
+multivariate probit link a multivariate normal distribution for the
+errors is applied. The normal bivariate probabilities which enter the
+pairwise log-likelihood are computed with package \pkg{pbivnorm}
+\citep{pbivnorm}. The multivariate probit link can be specified by:
+\begin{verbatim}
 link = mvprobit()
-@
+\end{verbatim}
 For the multivariate logit link a $t$~copula based multivariate
 distribution with logistic margins is used (as explained in
 Section~\ref{subsect:model}) and can be specified by:
-<<>>=
+\begin{verbatim}
 link = mvlogit(df = 8L)
-@
+\end{verbatim}
 The \code{mvlogit()} function has an optional integer valued argument
 \code{df} which specifies the degrees of freedom to be used for the
 $t$~copula.  The default value of the degrees of freedom parameter is
 8. When choosing $\nu \approx 8$, the multivariate logistic
 distribution in Equation~\ref{eqn:logistic} is well approximated by a
 multivariate $t$ distribution \citep{o2004bayesian}. This is also the
-value chosen by \cite{BIOM:BIOM12414} and \cite{epubwu5389} in their
+value chosen by \cite{BIOM:BIOM12414} in their
 analysis. We restrict the degrees of freedom to be integer valued
 because the most efficient routines for computing bivariate
 $t$~probabilities do not support non-integer degrees of freedom. We
@@ -793,29 +822,39 @@ user, who should then estimate a separate model for each value in the
 grid. The best model can be chosen by CLAIC or CLBIC.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Error structures}
-Depending on the model type different error structures are implemented in \pkg{mvord}:
+Different error structures are implemented in \pkg{mvord} and can be specified
+through the argument \code{error.structure}. The error structure objects are
+of class \code{`error_struct'}. This approach is slightly different than in package \pkg{nlme},
+where the error structure is defined by two classes: \code{`varFunc'} for the variance function
+and \code{`corStruct'} for the correlation structure.
+We also define the following subclasses for the error structures: \code{`cor_general'}
+(similar to  \pkg{nlme}'s \code{`corSymm'}),  \code{`cor_equi'} (similar to \code{`corCompSymm'}),
+\code{`cor_ar1'}  (similar to \code{`corAR1'}) and
+\code{`cov_general'} (similar to \code{`corSymm'} with variance function \code{`varIdent'}).
+
+The different error structures are chosen in the following way:
 \subsubsection{Basic model}
 \paragraph{Correlation}
 For the basic model specification the following correlation structures are implemented in \pkg{mvord}:
 \begin{itemize}
-  \item \code{corGeneral} -- A general error structure, where the
+  \item \code{cor_general()} -- A general error structure, where the
   correlation matrix of the error terms is unrestricted and constant
   across all subjects: $corr(\epsilon_{ik},
   \epsilon_{il})=\rho_{kl}$. This error structure is among the most
   common in the literature \citep[e.g.,][]{Scott02, Bhat10, Pagui15}.
-<<>>=
-error.structure = corGeneral(~ 1)
-@
-  \item \code{corEqui} -- An equicorrelation structure with
+\begin{verbatim}
+error.structure = cor_general(formula = ~ 1)
+\end{verbatim}
+  \item \code{cor_equi()} -- An equicorrelation structure with
     $corr(\epsilon_{ik}, \epsilon_{il})=\rho$ is used.
-<<>>=
-error.structure = corEqui(~ 1)
-@
-\item \code{corAR1} -- An autoregressive error structure of order one with
+\begin{verbatim}
+error.structure = cor_equi(formula = ~ 1)
+\end{verbatim}
+\item \code{cor_ar1()} -- An autoregressive error structure of order one with
   $corr(\epsilon_{ik}, \epsilon_{il}) = \rho^{|t_{k}-t_{l}|}$ is used.
-<<>>=
-error.structure = corAR1(~ 1)
-@
+\begin{verbatim}
+error.structure = cor_ar1(formula = ~ 1)
+\end{verbatim}
 \end{itemize}
 \paragraph{Variance}
 A model with variance parameters $\VAR(\epsilon_{ij})=\sigma^2_j$
@@ -826,9 +865,9 @@ are fulfilled, can be specified in the following way:
     combination with the general correlation structure. Hence, the
     unrestricted covariance matrix of the error terms can be estimated
     by:
-<<>>=
-error.structure = covGeneral(~ 1)
-@
+\begin{verbatim}
+error.structure = cov_general(formula = ~ 1)
+\end{verbatim}
 \end{itemize}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Extending the basic model}
@@ -841,19 +880,19 @@ error.structure = covGeneral(~ 1)
     vary across the multiple responses.  This implies that a
     correlation matrix will be estimated for each factor level.
     %% only up to maximum 30 levels are allowed.
-<<>>=
-error.structure = corGeneral(~ f)
-@
+\begin{verbatim}
+error.structure = cor_general(formula = ~ f)
+\end{verbatim}
 \item Estimating an equicorrelation structure depending on
   subject-specific covariates:
-<<>>=
-error.structure = corEqui(~ S1 + ... + Sm)
-@
+\begin{verbatim}
+error.structure = cor_equi(formula = ~ S1 + ... + Sm)
+\end{verbatim}
 \item Estimating an $AR(1)$ correlation structure depending on
   subject-specific covariates:
-<<>>=
-error.structure =  corAR1(~ S1 + ... + Sm)
-@
+\begin{verbatim}
+error.structure =  cor_ar1(formula = ~ S1 + ... + Sm)
+\end{verbatim}
 \end{itemize}
 \paragraph{Variance}
 \begin{itemize}
@@ -862,9 +901,9 @@ error.structure =  corAR1(~ S1 + ... + Sm)
   general correlation structure. A subject-specific factor
   \code{f} can be used as covariate in the log variance equation. This
   can be specified by:
-<<>>=
-error.structure = covGeneral(~ f)
-@
+\begin{verbatim}
+error.structure = cov_general(formula = ~ f)
+\end{verbatim}
 In addition to the correlation matrices, which are estimated for
 each factor level of \code{f}, a vector of dimension $q$ of variance
 parameters will be estimated for each factor level.
@@ -890,11 +929,14 @@ parameters get the same integer. When restricting two outcome
 dimensions to be equal, one has to be careful that the number of
 categories in the two outcome dimensions must be the same. In an example with $q=4$ different outcomes, if one wishes to restrict the
 threshold parameters of the first and second outcomes \code{Y1} and \code{Y2} to be equal ($\bm\theta_1 = \bm\theta_2$). These restrictions can be specified as:
-<<>>=
-threshold.constraints <- c(1, 1, 2, 3)
-names(threshold.constraints) <- paste0("Y", 1:4)
-threshold.constraints
-@
+% # <<
+% # threshold.constraints <- c(1, 1, 2, 3)
+% # names(threshold.constraints) <- paste0("Y", 1:4)
+% # threshold.constraints
+% # @
+\begin{verbatim}
+threshold.constraints = c(1, 1, 2, 3)
+\end{verbatim}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Fixing threshold values}
@@ -946,15 +988,17 @@ not specify any threshold values.
 \hline
 \end{tabularx}
 \caption{This table displays different model parameterizations in the presence of ordinal observations ($K_j > 2 \; \forall j \in J$). The
-  row \code{cor} includes error structures \code{corGeneral},
-  \code{corEqui} and \code{corAR1}, while row \code{cov} includes the
-  error structure \code{covGeneral}. The minimal restrictions (default) to
+  row \code{cor} includes error structures \code{cor\_general},
+  \code{cor\_equi} and \code{cor\_ar1}, while row \code{cov} includes the
+  error structure \code{cov\_general}. The minimal restrictions (default) to
   ensure identifiability are given in green. The default threshold values (in
   case \code{threshold.values = NULL}) are always $a_j = 0$ and $b_j = 1$.}
   \label{tab:Identifiability}
 \end{table}
 
-In the presence of binary observations ($K_j = 2$), if a \code{covGeneral} error structure is used, the intercept has always to be fixed to some value due to identifiability constraints. In a correlation structure setting no further restrictions are required.
+In the presence of binary observations ($K_j = 2$), if a \code{cov_general} error structure is used,
+the intercept has always to be fixed to some value due to identifiability constraints. In a correlation
+structure setting no further restrictions are required.
 
 For example, the following restrictions on the threshold parameters:
 \begin{itemize}
@@ -967,21 +1011,40 @@ For example, the following restrictions on the threshold parameters:
 \item $\theta_{41} = 0$,
 \end{itemize}
 are implemented as:
-<<>>=
-threshold.values <- list(c(-4, NA, NA, NA, NA, NA),
-                         c(-4, NA, NA, NA, NA, NA),
-                         c(-5, NA, NA, NA, NA, NA, NA),
-                         c(0))
-names(threshold.values) <- paste0("Y", 1:4)
-threshold.values
-@
+% # <<
+% # threshold.values <- list(c(-4, NA, NA, NA, NA, NA),
+% #                          c(-4, NA, NA, NA, NA, NA),
+% #                          c(-5, NA, NA, NA, NA, NA, NA),
+% #                          c(0))
+% # names(threshold.values) <- paste0("Y", 1:4)
+% # threshold.values
+% # @
+\begin{verbatim}
+threshold.values = list(c(-4, NA, NA, NA, NA, NA), c(-4, NA, NA, NA, NA, NA),
+  c(-5, NA, NA, NA, NA, NA, NA), c(0))
+\end{verbatim}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Constraints on coefficients}
-Similar to the threshold parameters, the package supports
+The package supports
 constraints on the regression coefficients. Firstly, the
 user can specify whether the regression coefficients should be equal
 across some or all response dimensions. Secondly, the values of some
 of the regression coefficients can be fixed.
+
+As there is no unanimous way to specify such constraints, we offer
+two options. The first option is similar to the specification of constraints on the thresholds.
+The constraints can be specified in this case as a vector or matrix of integers, where coefficients getting same integer value are set equal.
+Values of the regression coefficients can be fixed through a matrix.
+Alternatively constraints on the regression coefficients can be specified
+by using the design employed by the \pkg{VGAM} package.
+The constraints in this setting are set through a named list,
+where each element of the list contains a matrix full-column rank.
+If the values of some regression coefficients should be fixed, offsets can be used.
+This design has the advantage that it supports
+constraints on outcome-specific as well as category-specific
+regression coefficients. While the first option has the advantage of requiring a more concise input, it does not support category-specific coefficients.
+The second option offers a more flexible design in this respect.
+
 %
 \subsubsection{Coefficient constraints across responses}
 Such constraints can be specified by the argument
@@ -994,20 +1057,26 @@ of regression coefficients get the same integer. For example, for $q=4$, a model
 the first and second outcomes are equal ($\bm\beta_{1} =
 \bm\beta_{2}$), while the coefficients of outcomes three and four are
 unrestricted, can be specified as:
-<<>>=
-coef.constraints <- c(1, 1, 2, 3)
-names(coef.constraints) <- paste0("Y", 1:4)
-coef.constraints
-@
+% #
+% # coef.constraints <- c(1, 1, 2, 3)
+% # names(coef.constraints) <- paste0("Y", 1:4)
+% # coef.constraints
+% # @
+\begin{verbatim}
+coef.constraints = c(1, 1, 2, 3)
+\end{verbatim}
 A more flexible framework allows the user to specify such constraints
-for each of the regression coefficients of the $p$~covariates, not only for the whole
-vector. Such constraints will be specified by means of a matrix of
-dimension $q\times p$, where each column specifies constraints for one
-of the $p$~covariates in the same way as presented above. Moreover, a
-value of \code{NA} indicates that the corresponding coefficient is
-fixed (as we will show below) and should not be estimated.
+for each of the regression coefficients of the $p$~covariates, not
+only for the whole vector. Such constraints will be specified by means
+of a matrix of dimension $q\times p$, where each column specifies
+constraints for one of the $p$~covariates in the same way as presented
+above. Moreover, a value of \code{NA} indicates that the corresponding
+coefficient is fixed (as we will show below) and should not be
+estimated.
 
-Let us assume we are dealing with seven covariates and four outcomes (as in the example presented in Section~\ref{subsect:example1}) and the following constraints on the regression coefficients:
+Let us assume we are dealing with seven covariates and four outcomes
+(as in the example presented in Section~\ref{subsect:example1}) and
+the following constraints on the regression coefficients:
 \begin{itemize}
 \item[-] $\beta_{12} = \beta_{22} = \beta_{32}$;
 \item[-] $\beta_{13} = 0$, $\beta_{23} = 0$, $\beta_{33} = 0$;
@@ -1016,19 +1085,10 @@ Let us assume we are dealing with seven covariates and four outcomes (as in the 
 \end{itemize}
 
 These restrictions on the regression coefficients are imposed by:
-<<>>=
-coef.constraints <- cbind(c(1, 2, 3, 4),
-                          c(1, 1, 1, 2),
-                          c(NA, NA, NA, 1),
-                          c(1, 1, 1, NA),
-                          c(NA, NA, NA, NA),
-                          c(1, 2, 3, 4),
-                          c(1, 2, 3, 4))
-rownames(coef.constraints) <- paste0("Y", 1:4)
-colnames(coef.constraints) <- paste0("X", 1:7)
-coef.constraints
-@
-
+\begin{verbatim}
+coef.constraints = cbind(c(1, 2, 3, 4), c(1, 1, 1, 2), c(NA, NA, NA, 1),
+  c(1, 1, 1, NA), c(NA, NA, NA, NA), c(1, 2, 3, 4), c(1, 2, 3, 4))
+\end{verbatim}
 Specific values of coefficients can be fixed
 through the \code{coef.values} argument, as we will show in the
 following.
@@ -1046,18 +1106,22 @@ regression coefficients which receive an \code{NA} in
 \code{coef.values} matrix indicates the regression coefficient ought
 to be estimated.  Setting \code{coef.values} in accordance with the
 \code{coef.constraints} from above:
-<<>>=
-coef.values <- cbind(c(NA, NA, NA, NA),
-                     c(NA, NA, NA, NA),
-                     c(0, 0, 0, NA),
-                     c(NA, NA, NA, 0),
-                     c(2, 2, 2, 2),
-                     c(NA, NA, NA, NA),
-                     c(NA, NA, NA, NA))
-rownames(coef.values) <- paste0("Y", 1:4)
-colnames(coef.values) <- paste0("X", 1:7)
-coef.values
-@
+% # <<
+% # coef.values <- cbind(c(NA, NA, NA, NA),
+% #                      c(NA, NA, NA, NA),
+% #                      c(0, 0, 0, NA),
+% #                      c(NA, NA, NA, 0),
+% #                      c(2, 2, 2, 2),
+% #                      c(NA, NA, NA, NA),
+% #                      c(NA, NA, NA, NA))
+% # rownames(coef.values) <- paste0("Y", 1:4)
+% # colnames(coef.values) <- paste0("X", 1:7)
+% # coef.values
+% # @
+\begin{verbatim}
+coef.values = cbind(c(NA, NA, NA, NA), c(NA, NA, NA, NA), c(0, 0, 0, NA),
+  c(NA, NA, NA, 0), c(2, 2, 2, 2), c(NA, NA, NA, NA), c(NA, NA, NA, NA))
+\end{verbatim}
 gives the following equations for the latent scores:
 \begin{alignat*}{8}
 \widetilde Y_{i1} &= \beta_{11} x_{i1} &&+ \beta_{12} x_{i2} &&+ \beta_{14} x_{i4} &+ 2 x_{i5} &&+ \beta_{16} x_{i6} &&+ \beta_{17} x_{i7} ,\\
@@ -1065,22 +1129,91 @@ gives the following equations for the latent scores:
 \widetilde Y_{i3} &= \beta_{31} x_{i1} &&+ \beta_{12} x_{i2} &&+ \beta_{14}  x_{i4} &+ 2 x_{i5} &&+ \beta_{36} x_{i6} &&+ \beta_{37} x_{i7},\\
 \widetilde Y_{i4} &= \beta_{41} x_{i1} &&+ \beta_{42} x_{i2} &+ \beta_{43} x_{i3} &&+2 x_{i5} &&+ \beta_{46} x_{i6} &&+ \beta_{47} x_{i7}.
 \end{alignat*}
-\paragraph{Note on interaction terms and factor covariates}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Constraints on category-specific coefficients}
+If the parallel regression or proportional odds assumption ought to be relaxed,
+the constraint design of package \pkg{VGAM} can be employed.
+Let us consider the model from above and further assume outcome one, two and three are ordinal variables with 3 categories and outcome four has two categories. For illustration purposes we now relax the parallel regression assumption partially for covariates \code{X1} and \code{X3} in the following way:
+\begin{itemize}
+\item $\beta_{11,\text{cat}_1} = \beta_{11,\text{cat}_2} \neq \beta_{11, \text{cat}_3}$;
+
+\item $\beta_{43,\text{cat}_1} \neq \beta_{43,\text{cat}_2}$,
+\end{itemize}
+where $\beta_{jk, \text{cat}_r}$ denotes the regression coefficient for multiple measurement~$j$, covariate~$k$ and category~$r$. By the first restriction,  for the first outcome two regression coefficients are employed for covariate \code{X1}: one coefficient $\beta_{11, \text{cat}_1} = \beta_{11,\text{cat}_2}$ for the first two categories and one coefficient $\beta_{11, \text{cat}_3}$ for the third category. Covariate \code{X3} only appears the model for the fourth  outcome. For each of the two categories a different regression coefficient is estimated: $\beta_{43,\text{cat}_1}$ and $\beta_{43,\text{cat}_2}$. Note also that some of the coefficients are constant across outcomes. Moreover the coefficient of covariate \code{X5} is fixed to two by setting an offset in the model \code{formula}:
+\begin{verbatim}
+formula = 0 + X1 + X2 + X3 + X4 + offset(2 * X5) + X6 + X7
+\end{verbatim}
+
+The constraints are set up as a named list where the names correspond to the names of all covariates in the \code{model.matrix}. The number of rows is equal to the total number of classes of the ordered responses, in the example above $3+3+3+2=11$ rows. The number of columns represents the number of parameters to be estimated for each covariate.
+
+\begin{verbatim}
+coef.constraints = list(X1 = cbind(c(1, 1, rep(0, 9)), c(0, 0, 1, rep(0, 8)),
+  c(rep(0, 3), rep(1, 3), rep(0, 5)), c(rep(0, 9), rep(1, 2))),
+  X2 = cbind(c(rep(1, 9), rep(0, 2)), c(rep(0, 9), rep(0, 2))),
+  X3 = cbind(c(rep(0, 9), 1, 0), c(rep(0, 9), 0, 1)),
+  X4 = matrix(c(rep(1, 9), rep(0, 2))), X6 = cbind(c(rep(1, 3), rep(0, 8)),
+    c(rep(0, 3), rep(1, 3), rep(0, 5)), c(rep(0, 6), rep(1, 3), rep(0, 2)),
+    c(rep(0, 9), rep(1, 2))), X7 = cbind(c(rep(1, 3), rep(0, 8)),
+    c(rep(0, 3), rep(1, 3), rep(0, 5)), c(rep(0, 6), rep(1, 3), rep(0, 2)),
+    c(rep(0, 9), rep(1, 2))))
+\end{verbatim}
+For more details we refer the reader to the documentation of the \pkg{VGAM} package.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Interaction terms and categorical covariates}
 When constraints on the regression coefficients should be specified in
-models with interaction terms or factor covariates, the
+models with interaction terms or categorical covariates, the
 \code{coef.constraints} matrix has to be constructed appropriately. If
 the order of the terms in the covariate matrix is not clear to the
-user, it is helpful to call the function \code{model.matrix()}
+user, it is helpful to call the function \code{names_constraints()}
 before constructing the \code{coef.constraints} and \code{coef.values}
-matrices.
+matrices. Consider the following \code{data}:
 <<echo = FALSE>>=
-data_x <- cbind.data.frame("Y" = "A", X1 = 1, X2 = 2, X3 = 3, X4 =4, X5 = 5, X6 = 6, X7 = 7)
+n<-3
+data <- cbind.data.frame("Y" = ordered(c("A", "B", "A")),
+  X1 = rnorm(n), X2 = rnorm(n),
+  X3 = as.factor(c("c1", "c2", "c3")),
+  X4 = rnorm(n), X5 = rnorm(n))
+data
 @
+where \code{X3} is a categorical variable with three categories \code{c1}, \code{c2} and \code{c3}.
+The names of each column in the covariate matrix can be obtained by:
 <<>>=
-formula <- Y ~ 0 + X1 : X2 + X3 + X4 + X5 + X6 * X7
-colnames(model.matrix(formula, data = data_x))
+formula <- Y ~ 1 + X1 : X2 + X3 + X4 + X3 * X5
+names_constraints(formula, data)
 @
-This will provide the names of each column in the covariate matrix and should be used when setting up the coefficient constraints.
+or, without intercept:
+<<>>=
+formula <- Y ~ 0 + X1 : X2 + X3 + X4 + X3 * X5
+names_constraints(formula, data)
+@
+This should be used when setting up the coefficient constraints. Please note that category \code{c1} for \code{X3} is taken as baseline for both cases.
+%%
+%
+% \begin{alignat*}{7}
+% \widetilde Y^{(\text{cat}_1,\text{cat}_2)}_{i1} &= \beta^{(\text{cat}_1,\text{cat}_2)}_{11} x_{i1} &&+ \beta_{12} x_{i2} &&+ \beta_{14} x_{i4} &+ 2 x_{i5} &&+ \beta_{16} x_{i6}  ,\\
+% \widetilde Y^{(\text{cat}_3)}_{i1} &= \beta^{(\text{cat}_3)}_{11} x_{i1} &&+ \beta_{12} x_{i2} &&+ \beta_{14} x_{i4} &+ 2 x_{i5} &&+ \beta_{16} x_{i6},\\
+% \widetilde Y_{i2} &= \beta_{21} x_{i1} &&+ \beta_{12} x_{i2} &&+  \beta_{14} x_{i4} &+ 2 x_{i5} &&+ \beta_{26} x_{i6} ,\\
+% \widetilde Y^{(\text{cat}_1)}_{i3} &= \beta_{31} x_{i1} &&+ \beta_{32} x_{i2} &+ \beta^{(\text{cat}_1)}_{33} x_{i3} &&+2 x_{i5} &&+ \beta_{36} x_{i6} \\
+% \widetilde Y^{(\text{cat}_2)}_{i3} &= \beta_{31} x_{i1} &&+ \beta_{32} x_{i2} &+ \beta^{(\text{cat}_2)}_{33} x_{i3} &&+2 x_{i5} &&+ \beta_{36} x_{i6}.
+% \end{alignat*}
+% This is, for the first outcome, two regression coefficients are employed for covariate \code{X1}: one coefficient $\beta^{(\text{cat}_1,\text{cat}_2)}_{11}$ for the first two categories and one coefficient $\beta^{(\text{cat}_3)}_{11}$ for the third category. Covariate \code{X3} only appears the model for the third  outcome. For each of the two categories a different regression coefficient is estimated: $\beta^{(\text{cat}_1)}_{33}$ and $\beta^{(\text{cat}_2)}_{33}$. Note also that some of the coefficients are constant across outcomes. Moreover the coefficient of covariate \code{X5} is fixed to two.
+%
+% The constraints are set up as a named list where the names correspond to the names of the covariates. The number of rows is equal to the total number of classes of the ordered responses, in the example above $3+3+2=8$ rows. The number of columns represents the number of parameters to be estimated for each covariate.
+% <<eval = F>>=
+% coef.constraints = list(
+%   X1 = cbind(c(1, 1, rep(0, 6)), c(0, 0, 1, rep(0, 5)), c(0, 0, 0, 1, 1, 1, 0, 0),
+%     c(rep(0, 6),1,1)), X2 = cbind(c(rep(1, 6), 0, 0), c(rep(0, 6), 1, 1)),
+%   X3 = cbind(c(rep(0, 6), 1, 0), c(rep(0, 6), 0, 1)),
+%   X4 = matrix(c(rep(1, 6), rep(0, 2))),
+%   X6 = cbind(c(1,1,1,rep(0, 5)), c(0,0,0,1,1,1,0,0), c(rep(0,6), 1,1)))
+% @
+% The coefficient for covariate \code{X5} fixed to two can be specified in the formula as:
+% \begin{verbatim}
+% formula = 0 + X1 + X2 + X3 + X4 + offset(2 * X5) + X6
+% \end{verbatim}
+%
+% For more details we refer the reader to the documentation of the \pkg{VGAM} package.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
 \subsection{Additional arguments}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1091,21 +1224,26 @@ constant across multiple measurements. Weights should be stored in a column of
 \code{data}.  The column name of the weights in \code{data} should be
 passed to this argument \code{weights}. Negative weights are not allowed.
 %
+\subsubsection[offset]{\code{offset}}
+If offsets are not specified in the model \code{formula}, a list with a vector of offsets for each multiple measurement can be passed.
+%
+\subsubsection[scale]{\code{scale}}
+If \code{scale = TRUE}, the continuous covariates are standardized by substracting the mean and dividing by the standard deviation. This operation is performed for each repeated measurement before fitting.
+%
 \subsubsection[solver]{\code{solver}}
 All general purpose optimizers of the \proglang{R} package
 \pkg{optimx} \citep{optimx1, optimx2} can be used for maximization of the composite
 log-likelihood. These are \code{"Nelder-Mead", "BFGS", "CG",
   "L-BFGS-B", "nlm", "nlminb", "spg", "ucminf", "newuoa", "bobyqa",
-  "nmkb", "hjkb", "Rcgmin"} and \code{"Rvmmin"}. The default is the \code{"BFGS"} solver.
-  However, also the \code{"newuoa"} solver performed very well in terms of convergence in our experiments.
+  "nmkb", "hjkb", "Rcgmin"} and \code{"Rvmmin"}. The default is the \code{"newuoa"} solver.
+  The \code{"BFGS"} solver performs well in terms of computation time, but it suffers from convergence problems, especially for the \code{mvlogit()} link.
   Moreover, if the user desires a specific solver which is not implemented in the \proglang{R} package \pkg{optimx}, other applicable solvers can be used by using a wrapper function with arguments \code{starting.values}, \code{objFun}, \code{control} of the following form:
-<<eval = FALSE>>=
-solver = function(starting.values, objFun, control){
+\begin{verbatim}
+solver = function(starting.values, objFun, control) {
   optRes <- solver.function(...)
-  list(optpar = optRes$optpar,
-       objvalue = optRes$objvalue)
+  list(optpar = optRes$optpar, objvalue = optRes$objvalue)
 }
-@
+\end{verbatim}
 The \code{solver.function()} should return a list of two elements \code{optpar} and \code{objvalue}.
 The element \code{optpar} should be a vector of length equal to number of parameters to optimize containing the estimated parameters, while the element \code{objvalue} should contain the value of the objective function after the optimization procedure.
 %
@@ -1124,15 +1262,11 @@ dimension (e.g., \code{threshold.constraints = c(1,1,2,3)} or
 \code{coef.constraints = c(1,1,2,3)}), the element can be either
 skipped or a vector of length zero can be set. Starting values for
 Example 1 in Section~\ref{sect:examples} are for example:
-<<>>=
+\begin{verbatim}
 start.values = list(theta = list(c(-3, -1, 0, 0.5, 2.5),
-                                 c(-3, -1, 0, 0.5, 2, 3.5),
-                                 c(0)),
-                    beta = list(c(0.05, -0.05, -0.8, 1, 0.2),
-                                c(-0.5, 0.2),
-                                c(-0.3, 0.3),
-                                c(0.5, -1.1, 0.7, 0.3, -1.2)))
-@
+  c(-3, -1, 0, 0.5, 2, 3.5), c(0)), beta = list(c(0.05, -0.05, -0.8, 1, 0.2),
+    c(-0.5, 0.2), c(-0.3, 0.3), c(0.5, -1.1, 0.7, 0.3, -1.2)))
+\end{verbatim}
 Starting values for the error structure parameters cannot be specified
 by the user because of the complexity of the different error structure
 parameterizations and transformations.
@@ -1153,33 +1287,43 @@ k+1}^{q_i}\mathbbm{1}_{\{|t_{k}-t_{l}|\leq lag\}}  \log \Prob(Y_{ik} = r_{ik},
 Y_{il} = r_{il}) \right].
 \end{align*}
 The $lag$ can be fixed by the argument \code{PL.lag}
-and it can only be used along with \code{error.structure = corAR1()}. The use of this argument is however not recommended if there are missing observations in the time series, i.e., if the ordinal variables are not observed in consecutive years. Moreover, one should also proceed with care if the observations are not missing at random.
+and it can only be used along with \code{error.structure = cor_ar1()}. The use of this argument is however not recommended if there are missing observations in the time series, i.e., if the ordinal variables are not observed in consecutive years. Moreover, one should also proceed with care if the observations are not missing at random.
 %
 \subsubsection[Control]{\code{control}}
 A list of control arguments that are passed to the function \code{optimx()} or to the user-specific \code{solver.function()}. For further details see \cite{optimx1}.
 %
-\subsection[clearname]{Methods for class \code{"mvord"}}
-Several methods are implemented for the class \code{"mvord"}. These
+\subsection[clearname]{Methods for class \code{`mvord'}}
+Several methods are implemented for the class \code{`mvord'}. These
 methods include a \code{summary()} and a \code{print()} function to
 display the estimation results, a \code{coef()} function to extract
 the regression coefficients, a \code{thresholds()} function to extract
-the threshold coefficients and a function \code{get.error.struct()} to
-extract the estimated parameters of the correlation/covariance structure of the
-errors. In addition, the pairwise log-likelihood can be extracted by \code{logPL()} while functions \code{claic()} and \code{clbic()} can be used to extract the information criteria CLAIC and CLBIC. In addition, a \code{predict()} function, a \code{marginal.predict()} function and a \code{get.prob()} function are availabe to predict probabilities, cumulative probabilities and ordinal outcomes from the fitted model.
+the threshold coefficients and a function \code{get_error_struct()} to
+extract the estimated parameters of the correlation/covariance
+structure of the errors. The pairwise log-likelihood can be extracted
+by the function \code{logLik()}, function \code{vcov()} extracts the
+variance-covariance matrix of the parameters and \code{nobs()}
+provides the number of subjects. In addition, a \code{predict()}
+function, a \code{marginal.predict()} function and a \code{get.prob()}
+function are available to predict probabilities, cumulative
+probabilities, categories and linear predictors for the fitted model.
+Other standard methods such as \code{terms()}, \code{model.matrix()}
+and \code{fitted()} are also available. Functions \code{AIC()} and
+\code{BIC()} can be used to extract the information criteria CLAIC and
+CLBIC.
 %
 \subsection{Output}
 The function \code{mvord()} returns an object of class
-\code{"mvord"},
+\code{`mvord'},
 which is a list containing the following
 components:
 
 \begin{tabularx}{\textwidth}{lX}
    \code{beta} & a named \code{matrix} of regression coefficients\\
    \code{theta} & a named \code{list} of threshold parameters \\
-\code{error.struct} & a named \code{list} of correlation (covariance) matrices, or a vector of coefficients in the \code{corEqui} or \code{corAR1} setting\\
+\code{error.struct} & an object of class \code{`error\_struct'}\\
    \code{sebeta} & a named \code{matrix} of standard errors of the regression coefficients\\
    \code{setheta} & a named \code{list} of standard errors of the threshold parameters\\
-\code{seerror.struct} & a named \code{list} of standard errors of the correlation (covariance) matrices, or a vector of standard errors of the coefficients in the \code{corEqui} or \code{corAR1} setting\\
+\code{seerror.struct} & a \code{vector} of standard errors for the parameters of the error structure\\
    \code{rho} & a \code{list} of all objects that are used in \code{mvord()}
    \end{tabularx}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1187,31 +1331,23 @@ components:
 Additionally, a second function \code{mvord2()} is implemented, for the
 setting where the covariates do not vary between the multiple
 measurements ($\bm x_{i1}=\ldots= \bm x_{iq}$):
-<<eval = FALSE>>=
-mvord2(formula,
-       data,
-       error.structure = corGeneral(~ 1),
-       link = mvprobit(),
-       coef.constraints = NULL,
-       coef.values = NULL,
-       threshold.constraints = NULL,
-       threshold.values = NULL,
-       weights = NULL,
-       se = TRUE,
-       start.values = NULL,
-       solver = "BFGS",
-       PL.lag = NULL,
-       control = list(maxit = 200000, trace = 1, kkt = FALSE))
-@
+\begin{verbatim}
+mvord2(formula, data, error.structure = cor_general(~ 1), link = mvprobit()
+  coef.constraints = NULL, coef.values = NULL, threshold.constraints = NULL,
+  threshold.values = NULL, weights = NULL, se = TRUE, offset = NULL,
+  scale = FALSE, start.values = NULL, solver = "newuoa", PL.lag = NULL,
+  control = list(maxit = 200000, trace = 1, kkt = FALSE))
+\end{verbatim}
 This function uses a slightly simplified data structure, where the multiple ordinal observations as well as the covariates
 are stored as columns in a \code{data.frame}. Each subject~$i$ corresponds to one row of the data
-frame, where all outcomes $Y_{i1}, \dots, Y_{iq}$ (with missing observations set to \code{NA}) and all the covariates $x_{i1}, \dots, x_{ip}$ are stored in different columns.
-Each outcome must be of class ordered factor.
+frame, where all outcomes $Y_{i1}, \dots, Y_{iq}$ (with missing observations set to \code{NA})
+and all the covariates $x_{i1}, \dots, x_{ip}$ are stored in different columns.
+Each outcome must be an ordered factor.
 In order to specify the model we use a
-multivariate formula object of the form:
-<<>>=
-formula <- cbind(Y1, ..., Yq) ~ 0 + X1 + ... + Xp
-@
+multivariate \code{formula} object of the form:
+\begin{verbatim}
+formula = cbind(Y1, ..., Yq) ~ 0 + X1 + ... + Xp
+\end{verbatim}
 The \code{error.structure} and the constraints on the regression and
 threshold parameters are set in analogy to \code{mvord()}. However,
 the ordering of the responses is given by the ordering in the model
@@ -1417,7 +1553,7 @@ We use the credit risk data sets presented in Section~\ref{sect:data}
 to illustrate some of the features of package \pkg{mvord}.
 %
 \subsection{Example 1 -- Ratings assigned by multiple raters to a cross-section of firms}\label{subsect:example1}
-The first example presents a multivariate ordinal regression model with logit link and a general correlation error structure (\code{corGeneral(~ 1)}).
+The first example presents a multivariate ordinal regression model with logit link and a general correlation error structure (\code{cor_general(~ 1)}).
 The simulated data set contains the credit risk measure \code{rating} (ratings assigned by raters \code{R1}, \code{R2}, \code{R3} and \code{R4}) and 8 covariates for a cross-section of \Sexpr{length(unique(data_cr_mvord[,"firm_id"]))} firms.
 The number of firm-ratings is \Sexpr{NROW(data_cr_mvord)}.
 <<>>=
@@ -1429,69 +1565,44 @@ The distribution of the ratings classes for the four raters is:
 by(data_cr_mvord,  data_cr_mvord$rater_id,
     function(x) table(x$rating))
 @
-We include 7 financial ratios as covariates in a model without intercept by the formula:
-<<>>=
-formula <- rating ~ 0 + ICR + LR + LEV1 + LEV2 + PR + lRSIZE + lSYSR
-formula
-@
+We include 7 financial ratios as covariates in a model without intercept by the \code{formula}:
+\begin{verbatim}
+formula = rating ~ 0 + ICR + LR + LEV1 + LEV2 + PR + lRSIZE + lSYSR
+\end{verbatim}
 The subject index $i$ is stored in the column \code{firm_id} and the multiple measurement index $j$, which indicates the rater, is given by \code{rater_id}:
-<<>>=
-index <- c("firm_id", "rater_id")
-index
-@
+\begin{verbatim}
+index = c("firm_id", "rater_id")
+\end{verbatim}
 An optional vector \code{response.names} is used to specify all the raters to be included in the model. The ordering of this vector is essential when constraints on the parameter set want to be imposed:
-<<>>=
-response.names <- c("R1", "R2", "R3", "R4")
-response.names
-@
+\begin{verbatim}
+response.names = c("R1", "R2", "R3", "R4")
+\end{verbatim}
 Due to the fact that the categories differ across raters we specify the \code{response.levels} by:
-<<>>=
-response.levels <-  list(rev(LETTERS[1:6]),
-                         rev(LETTERS[1:6]),
-                         rev(LETTERS[7:13]),
-                         rev(LETTERS[14:15]))
-names(response.levels) <- response.names
-response.levels
-@
+\begin{verbatim}
+response.levels = list(rev(LETTERS[1:6]), rev(LETTERS[1:6]),
+  rev(LETTERS[7:13]), rev(LETTERS[14:15]))
+\end{verbatim}
 If no \code{response.levels} are passed, the natural ordering is used and could lead to an incorrect labeling.
 The rating classes assigned by the raters are here in order from worst to best indicating that lower values of the latent variables indicate lower creditworthiness or increased credit risk.
 
 We fit a model to these data with the following features:
 \begin{itemize}
  \item We assume that \code{R1} and \code{R2} use the same rating scale by setting the following constraints on the threshold parameters:
-<<>>=
- threshold.constraints <- c(1, 1, 2, 3)
- names(threshold.constraints) <- response.names
- threshold.constraints
-@
+\begin{verbatim}
+ threshold.constraints = c(1, 1, 2, 3)
+\end{verbatim}
 \item We assume that some covariates are equal for some raters. For example, we assume that the coefficient of \code{ICR} is equal for \code{R1} and \code{R3}, or that the coefficients of \code{LEV1} and \code{PR} are the same for the raters \code{R1}, \code{R2} and \code{R3}. In addition, some of the regression coefficients are set to zero like \code{ICR} for \code{R1} and \code{R3}, or \code{lSYSR} for the raters \code{R1}, \code{R2} and \code{R3}. All the constraints above and some additional constraints are performed by the following restrictions on the regression coefficients by using the more flexible method:
-<<>>=
-coef.constraints <- cbind(c(1, NA, 1, NA),
-                          c(NA, NA, NA, 1),
-                          c(1, 1, 1, NA),
-                          c(1, 2, 3, 4),
-                          c(1, 1, 1, 4),
-                          c(1, 2, 3, 4),
-                          c(NA, NA, NA, 1))
-rownames(coef.constraints) <- response.names
-colnames(coef.constraints) <- c("ICR", "LR", "LEV1", "LEV2",
-                           "PR", "lRSIZE", "lSYSR")
-coef.constraints
-@
+\begin{verbatim}
+coef.constraints = cbind(c(1, NA, 1, NA), c(NA, NA, NA, 1),
+  c(1, 1, 1, NA), c(1, 2, 3, 4), c(1, 1, 1, 4), c(1, 2, 3, 4),
+  c(NA, NA, NA, 1))
+\end{verbatim}
 The \code{NA}s in \code{coef.constraints} are fixed to specific values. If no matrix \code{coef.values} is provided, the coefficients are set by default to zero automatically. This automatically generated \code{coef.values} matrix, looks like:
-<<>>=
-coef.values <- cbind(c(NA, 0, NA, 0),
-                     c(0, 0, 0, NA),
-                     c(NA, NA, NA, 0),
-                     c(NA, NA, NA, NA),
-                     c(NA, NA, NA, NA),
-                     c(NA, NA, NA, NA),
-                     c(0, 0, 0, NA))
-rownames(coef.values) <- response.names
-colnames(coef.values) <- c("ICR", "LR", "LEV1", "LEV2",
-                           "PR", "lRSIZE", "lSYSR")
-coef.values
-@
+\begin{verbatim}
+coef.values = cbind(c(NA, 0, NA, 0), c(0, 0, 0, NA), c(NA, NA, NA, 0),
+  c(NA, NA, NA, NA), c(NA, NA, NA, NA), c(NA, NA, NA, NA),
+  c(0, 0, 0, NA))
+\end{verbatim}
 The specified \code{coef.constraints} together with \code{coef.values} give the following model:
 \begin{alignat*}{8}
 \widetilde Y_{1} &= \beta_{11} \text{\code{ICR}}+ && & \beta_{13}\text{\code{LEV1}}& + &\beta_{14} \text{\code{LEV2}} &+ \beta_{15}\text{\code{PR}}  &+ \beta_{16} \text{\code{lRSIZE}} ,\\
@@ -1502,14 +1613,13 @@ The specified \code{coef.constraints} together with \code{coef.values} give the 
 %\item allows for different correlation error structures depending on the business sector:
 \end{itemize}
 As a link function we choose the multivariate logit link:
-<<>>=
-link <- mvlogit()
-@
+\begin{verbatim}
+link = mvlogit()
+\end{verbatim}
 For simplicity, we use a general correlation structure which is constant for all subjects:
-<<>>=
-error.structure <- corGeneral(~ 1)
-error.structure
-@
+\begin{verbatim}
+error.structure = cor_general(~ 1)
+\end{verbatim}
 In order to avoid numerical instabilities, we standardize our data for each rater:
 <<>>=
 covar_names <- c("ICR", "LR", "LEV1", "LEV2", "PR", "lRSIZE", "lSYSR")
@@ -1521,23 +1631,14 @@ The estimation can now be performed by the function \code{mvord()}:
 <<eval = FALSE>>=
 res_cor_logit <- mvord(
   formula = rating ~ 0 + ICR + LR + LEV1 + LEV2 + PR + lRSIZE + lSYSR,
-  data = data_cr_mvord_scaled,
-  error.structure = corGeneral(~ 1),
-  link = mvlogit(),
-  index = c("firm_id", "rater_id"),
+  data = data_cr_mvord_scaled, error.structure = cor_general(~ 1),
+  link = mvlogit(), index = c("firm_id", "rater_id"),
   response.names = c("R1", "R2", "R3", "R4"),
-  response.levels = list(rev(LETTERS[1:6]),
-                         rev(LETTERS[1:6]),
-                         rev(LETTERS[7:13]),
-                         rev(LETTERS[14:15])),
-  coef.constraints = cbind(c(1, NA, 1, NA),
-                           c(NA, NA, NA, 1),
-                           c(1, 1, 1, NA),
-                           c(1, 2, 3, 4),
-                           c(1, 1, 1, 4),
-                           c(1, 2, 3, 4),
-                           c(NA, NA, NA, 1)),
-  threshold.constraints = c(1, 1, 2, 3),
+  response.levels = list(rev(LETTERS[1:6]), rev(LETTERS[1:6]),
+    rev(LETTERS[7:13]), rev(LETTERS[14:15])),
+  coef.constraints = cbind(c(1, NA, 1, NA), c(NA, NA, NA, 1),
+    c(1, 1, 1, NA), c(1, 2, 3, 4),  c(1, 1, 1, 4), c(1, 2, 3, 4),
+    c(NA, NA, NA, 1)), threshold.constraints = c(1, 1, 2, 3),
   solver = "newuoa")
 @
 %
@@ -1549,7 +1650,7 @@ if (cache & file.exists(FILE)) {
   if (cache) {
     res_cor_logit <- mvord(
       formula = rating ~ 0 + ICR + LR + LEV1 + LEV2 + PR + lRSIZE + lSYSR,
-      error.structure = corGeneral(~ 1),
+      error.structure = cor_general(~ 1),
       link = mvlogit(),
       data = data_cr_mvord_scaled,
       index = c("firm_id", "rater_id"),
@@ -1579,7 +1680,7 @@ The results are displayed by the function \code{summary()}:
 <<>>=
 summary(res_cor_logit, call = FALSE)
 @
-If the user fixes thresholds or coefficients to specific values, the $z$~values and the corresponding $p$~values as well as the significance codes are set to \code{NA}. Another option to display the results is the function \code{print()}:
+If the user fixes thresholds to specific values, the $z$~values and the corresponding $p$~values as well as the significance codes are set to \code{NA}. Another option to display the results is the function \code{print()}:
 <<>>=
 print(res_cor_logit, call = FALSE)
 @
@@ -1595,9 +1696,9 @@ The regression coefficients are obtained by the function \code{coef()}:
 <<>>=
 coef(res_cor_logit)
 @
-The error structure is displayed by the function \code{get.error.struct()}:
+The error structure for firm with \code{firm_id} 11 is displayed by the function \code{get_error_struct()}:
 <<>>=
-get.error.struct(res_cor_logit)
+get_error_struct(res_cor_logit)[["11"]]
 @
 %
 \subsubsection[clearname]{Fitting the model with the function \code{mvord2()}}
@@ -1619,17 +1720,10 @@ The estimation is performed by calling the function \code{mvord2()}:
 <<eval = FALSE>>=
 res_cor_logit <- mvord2(
   formula = cbind(R1, R2, R3, R4) ~ 0 + ICR + LR + LEV1 + LEV2 + PR +
-                                        lRSIZE + lSYSR,
-  error.structure = corGeneral(~ 1),
-  link = mvlogit(),
-  data = data_cr_mvord_scaled,
-  coef.constraints = cbind(c(1, NA, 1, NA),
-                           c(NA, NA, NA, 1),
-                           c(1, 1, 1, NA),
-                           c(1, 2, 3, 4),
-                           c(1, 1, 1, 4),
-                           c(1, 2, 3, 4),
-                           c(NA, NA, NA, 1)),
+    lRSIZE + lSYSR, error.structure = cor_general(~ 1), link = mvlogit(),
+  data = data_cr_mvord2, coef.constraints = cbind(c(1, NA, 1, NA),
+    c(NA, NA, NA, 1), c(1, 1, 1, NA), c(1, 2, 3, 4), c(1, 1, 1, 4),
+    c(1, 2, 3, 4), c(NA, NA, NA, 1)),
   threshold.constraints = c(1, 1, 2, 3))
 @
 yielding equivalent results to the fit of \code{mvord()}.
@@ -1650,54 +1744,44 @@ Per year the number of ratings in the data set decreases:
 with(data_cr_panel, table(year))
 @
 %% first discuss input
-We include the 7 financial ratios as covariates in a model without intercept by the formula:
-<<>>=
-formula <- rating ~ 0 + ICR + LR + LEV1 + LEV2 + PR + lRSIZE + lSYSR
-formula
-@
+We include the 7 financial ratios as covariates in a model without intercept by the \code{formula}:
+\begin{verbatim}
+formula = rating ~ 0 + ICR + LR + LEV1 + LEV2 + PR + lRSIZE + lSYSR
+\end{verbatim}
 The subject index~$i$ is stored in the column \code{firm_id} while the multiple measurement index~$j$ is given in the column \code{year}:
-<<>>=
-index <- c("firm_id", "year")
-index
-@
+\begin{verbatim}
+index = c("firm_id", "year")
+\end{verbatim}
 If we wish to estimate the model only for the last eight years of the sample, this can be done by
 specifying the names of each ordered response which should enter the model:
-<<>>=
-response.names <- paste0("year", 3:10)
-response.names
-@
+\begin{verbatim}
+response.names = paste0("year", 3:10)
+\end{verbatim}
 The rating classes assigned by rater \code{R1} are:
 <<>>=
 levels(data_cr_panel$rating)
 @
 with the sixth rating class \code{F} being the worst class and the first rating class \code{A} being the best rating class. We specify the response levels, in the order from worst to best, for each of the eight outcome dimensions through the \code{response.level} argument. Ordering the classes from worst to best indicates that lower values of the latent variables indicate lower creditworthiness or increased credit risk. The rating classes and labels do not change over the eight years:
-<<>>=
-response.levels <- rep(list(levels(data_cr_panel$rating)),
-                       length(response.names))
-names(response.levels) <- response.names
-response.levels
-@
+\begin{verbatim}
+response.levels = rep(list(levels(data_cr_panel$rating)),
+  length(response.names))
+\end{verbatim}
 Additionally, the model has the following features:
 \begin{itemize}
 \item We assume that the rating agencies do not change their methodology over the sample period. This means the threshold parameters are constant over the years. This can be specified through the argument \code{threshold.constraints}:
-<<>>=
-threshold.constraints <- rep(1, length(response.names))
-names(threshold.constraints) <- response.names
-threshold.constraints
-@
+\begin{verbatim}
+threshold.constraints = rep(1, length(response.names))
+\end{verbatim}
 \item We assume that there is a break-point in the regression coefficients after \code{year5} in the sample. This break-point could correspond to the beginning of a crisis in a real case application.
 Hence, we use one set of regression coefficients for years \code{year3}, \code{year4} and \code{year5} and a different set for \code{year6}, \code{year7}, \code{year8}, \code{year9}, \code{year10}.
 This can be specified through the argument \code{coef.constraints}:
-<<>>=
-coef.constraints <- c(rep(1, 3),  rep(2, 5))
-names(coef.constraints) <- response.names
-coef.constraints
-@
+\begin{verbatim}
+coef.constraints = c(rep(1, 3),  rep(2, 5))
+\end{verbatim}
 \item We allow for different correlation parameters in the $AR(1)$ structure for the different business sectors:
-<<>>=
-error.structure <- corAR1(~ BSEC)
-error.structure
-@
+\begin{verbatim}
+error.structure = cor_ar1(~ BSEC)
+\end{verbatim}
 \end{itemize}
 As before, we standardize our covariates on a yearly basis:
 <<>>=
@@ -1708,16 +1792,12 @@ data_cr_panel_scaled <- do.call("rbind.data.frame",
 The estimation is performed by calling the function \code{mvord()}:
 <<eval=F>>=
 res_AR1_probit <- mvord(
-    formula = rating ~ 0 + ICR + LR + LEV1 + LEV2 + PR + lRSIZE + lSYSR,
-    index = c("firm_id", "year"),
-    data = data_cr_panel_scaled,
-    response.levels = rep(list(levels(data_cr_panel$rating)), 8),
-    response.names = paste0("year", 3:10),
-    link = mvprobit(),
-    error.structure = corAR1(~ BSEC),
-    coef.constraints = c(rep(1, 3),  rep(2, 5)),
-    threshold.constraints = rep(1, 8),
-    solver = "BFGS")
+  formula = rating ~ 0 + ICR + LR + LEV1 + LEV2 + PR + lRSIZE + lSYSR,
+  error.structure = cor_ar1(~ BSEC), link = mvprobit(),
+  index = c("firm_id", "year"), data = data_cr_panel_scaled,
+  response.levels = rep(list(levels(data_cr_panel$rating)), 8),
+  response.names = paste0("year", 3:10), coef.constraints = c(rep(1, 3),
+    rep(2, 5)), threshold.constraints = rep(1, 8), solver = "BFGS")
 @
 <<echo = FALSE, results = hide>>=
 FILE <- "res_AR1_probit.rda"
@@ -1727,7 +1807,7 @@ if (cache & file.exists(FILE)) {
   if (cache) {
     res_AR1_probit <- mvord(
       formula = rating ~ 0 + ICR + LR + LEV1 + LEV2 + PR + lRSIZE + lSYSR,
-      error.structure = corAR1(~ BSEC),
+      error.structure = cor_ar1(~ BSEC),
       link = mvprobit(),
       data = data_cr_panel_scaled,
       index = c("firm_id", "year"),
@@ -1763,17 +1843,17 @@ The regression coefficients are obtained by the function \code{coef()}:
 <<>>=
 coef(res_AR1_probit)
 @
-The error structure is displayed by the function \code{get.error.struct()}:
+The error structure is displayed by the function \code{get_error_struct()}:
 <<>>=
-get.error.struct(res_AR1_probit)
+get_error_struct(res_AR1_probit)
 @
 In addition, the correlation parameters $\rho_i$ for each firm are obtained by:
 <<>>=
-head(get.error.struct(res_AR1_probit, type = "corr"), n = 3)
+head(get_error_struct(res_AR1_probit, type = "corr"), n = 3)
 @
 Moreover, the correlation matrices for each specific firm are obtained by:
 <<>>=
-head(get.error.struct(res_AR1_probit, type = "sigmas"), n = 1)
+head(get_error_struct(res_AR1_probit, type = "sigmas"), n = 1)
 @
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Conclusion
@@ -1786,9 +1866,13 @@ pairwise likelihood approach. Different error structures like a
 general correlation and covariance structures, a covariate dependent
 equicorrelation structure and an $AR(1)$ structure can be imposed. In
 addition, the flexible modeling framework allows imposing constraints
-on threshold as well as regression coefficients. Two different data formats can be used either by applying \code{mvord()} or \code{mvord2()} to estimate the model parameters.
+on threshold as well as regression coefficients. Two different data formats
+can be used either by applying \code{mvord()} or \code{mvord2()} to estimate the model parameters.
 
-Further research and possible extensions of \pkg{mvord} could be addressed to the implementation of variable selection procedures in multivariate ordinal regression models and the inclusion of multivariate semi- or nonparametric ordinal models.
+Further research and possible extensions of \pkg{mvord} could be addressed to the
+implementation of variable selection procedures in multivariate ordinal regression models
+and the inclusion of multivariate semi- or nonparametric ordinal models.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bibliography{mvord}
+\clearpage
 \end{document}

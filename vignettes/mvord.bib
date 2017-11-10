@@ -38,10 +38,10 @@ pages = {81-102},
   author =	 {Fahrmeir, Ludwig and Tutz, Gerhard},
   year =	 2001,
   edition =	 "2nd",
-  series={Springer Series in Statistics},
   publisher={Springer-Verlag}
 }
 % publisher={Springer New York}
+  %series={Springer-Verlag Series in Statistics},
 
 @Article{Bolker08,
 author = {B. M. Bolker and M. E. Brooks and C. J. Clark and S. W. Geange and J. R. Poulsen and M. H. H. Stevens and J. S. S. White},
@@ -165,19 +165,19 @@ pages = "356-378"
 @book{Tutz12,
    title = "Regression for Categorical Data",
    author = "G. Tutz",
-   series = "Cambridge Series in Statistical and Probabilistic Mathematics",
    publisher = "Cambridge University Press",
    year = 2012
 }
+%   series = "Cambridge Series in Statistical and Probabilistic Mathematics",
 
 @book{Agresti10,
    title = "Analysis of Ordinal Categorical Data",
    author = "Alan Agresti",
-   series = "Wiley Series in Probability and Statistics",
    publisher = "John Wiley \& Sons",
    year = "2010",
    edition = "2nd"
 }
+%   series = "Wiley Series in Probability and Statistics",
 
 @Article{Agresti05,
   author =       "I. Liu and A. Agresti",
@@ -456,10 +456,10 @@ Policy Options},
 author = {Alan Agresti},
 title = {Categorical Data Analysis},
 publisher = {John Wiley \& Sons},
-series = {Wiley Series in Probability and Mathematical Statistics},
 year = {2002},
 edition = {2nd}
 }
+%series = {Wiley Series in Probability and Mathematical Statistics},
 
 @Book{Hensher10,
 author = {William H. Greene and David A. Hensher},
@@ -1013,12 +1013,21 @@ url = {http://EconPapers.repec.org/RePEc:spr:alstar:v:90:y:2006:i:1:p:167-181}
 %% R & R packages
 @Manual{RCoreTeam,
     title = {\proglang{R}: A Language and Environment for Statistical Computing},
-    author = {{ \proglang{R} Core Team}},
-    organization = { \proglang{R} Foundation for Statistical Computing},
+    author = {\proglang{R} Core Team},
+    organization = {\proglang{R} Foundation for Statistical Computing},
     address = {Vienna, Austria},
     year = {2017},
     url = {https://www.R-project.org/},
   }
+@Manual{nlme,
+    title = {\pkg{nlme}: Linear and Nonlinear Mixed Effects Models},
+    author = {Jose Pinheiro and Douglas Bates and Saikat DebRoy and Deepayan Sarkar and {\proglang{R} Core Team}},
+    year = {2017},
+    note = {\proglang{R} package version 3.1-131},
+    url = {https://CRAN.R-project.org/package=nlme},
+  }
+
+
 @Misc{ordinalR,
     title = {\pkg{ordinal} -- Regression Models for Ordinal Data },
     author = {Rune H. B. Christensen},
@@ -1169,7 +1178,7 @@ doi = {10.18637/jss.v032.i10}
   }
 
 @article{brmspkg,
-    title = {\pkg{brms}: An \proglang{R} Package for Bayesian Multilevel Models Using {Stan}},
+    title = {\pkg{brms}: An \proglang{R} Package for Bayesian Multilevel Models Using \proglang{Stan}},
     author = {Paul-Christian B\"urkner},
     journal = {Journal of Statistical Software},
     year = {2017},
@@ -1219,4 +1228,98 @@ doi = {10.18637/jss.v032.i10}
     year = {2017},
     note = {\proglang{R} package version 0.1.0},
     url = {https://CRAN.R-project.org/package=mvord},
+  }
+
+@article{Liu09,
+  title={Ordinal Regression Analysis: Fitting the Proportional Odds Model Using \proglang{Stata}, \proglang{SAS} and \proglang{SPSS}},
+  author={Liu, Xing},
+  journal={Journal of Modern Applied Statistical Methods},
+  volume={8},
+  number={2},
+  pages={30},
+  year={2009},
+ doi ={10.22237/jmasm/1257035340}
+}
+
+  @Article{MCMCpackpkg,
+    title = {\pkg{MCMCpack}: Markov Chain Monte Carlo in \proglang{R}},
+    author = {Andrew D. Martin and Kevin M. Quinn and Jong Hee Park},
+    journal = {Journal of Statistical Software},
+    year = {2011},
+    volume = {42},
+    number = {9},
+    pages = {22},
+    doi = {10.18637/jss.v042.i09},
+  }
+
+  @Manual{rmspkg,
+    title = {\pkg{rms}: Regression Modeling Strategies},
+    author = {Frank E {Harrell Jr}},
+    year = {2017},
+    note = {\proglang{R} package version 5.1-1},
+    url = {https://CRAN.R-project.org/package=rms},
+  }
+
+@article{Peterson90,
+ author = {Bercedis Peterson and Frank E. Harrell},
+ journal = {Journal of the Royal Statistical Society. Series C (Applied Statistics)},
+ number = {2},
+ pages = {205-217},
+ publisher = {[Wiley, Royal Statistical Society]},
+ title = {Partial Proportional Odds Models for Ordinal Response Variables},
+ volume = {39},
+ year = {1990},
+doi = {10.2307/2347760 }
+}
+
+@Manual{SAS,
+    title = {\proglang{SAS/STAT} Software, Version 9.4},
+    author = { \proglang{SAS} Institute Inc.},
+    organization = {\proglang{SAS} Institute Inc.},
+    address = {Cary, NC},
+    year = {2017},
+    url = { http://www.sas.com/}
+  }
+
+@Manual{SPSS,
+    title = {IBM \proglang{SPSS} Statistics 24},
+    author = {\proglang{SPSS} Inc.},
+    organization = {\proglang{SPSS} Inc.},
+    address = {Chicago, IL},
+    year = {2017},
+    url = { http://www.spss.com/}
+  }
+
+@Manual{Stata,
+    title = {\proglang{Stata} Statistical Software: Release 15},
+    author = {StataCorp.},
+    organization = {StataCorp LLC},
+    address = {College Station, TX},
+    year = {2017},
+    url = {https://www.stata.com/}
+  }
+
+@Manual{Python,
+    title = {\proglang{Python} Language Reference, Version 2.7},
+    author = {\proglang{Python} Software Foundation},
+    address = {Wilmington, DE},
+    year = {2017},
+    url = {http://www.python.org/}
+  }
+
+@phdthesis{mordpkg,
+  TITLE = {{Feature Extraction and Supervised Learning on fMRI : From Practice to Theory}},
+  AUTHOR = {Pedregosa-Izquierdo, Fabian},
+  URL = {https://tel.archives-ouvertes.fr/tel-01100921},
+  SCHOOL = {{Universit{\'e} Pierre et Marie Curie - Paris VI}},
+  YEAR = {2015},
+}
+
+@Manual{JMP,
+    title = { Version 13.0},
+    author = {\proglang{JMP}},
+    organization = {\proglang{SAS} Institute Inc.},
+    address = {Cary, NC},
+    year = {2017},
+    url = {http://www.jmp.com/}
   }

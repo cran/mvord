@@ -1,12 +1,32 @@
 This file documents updates and changes in the package mvord
 
-2017-10-17
-- changed function name from multord to mvord
-- changed function name from multord2 to mvord2
-- implemented predict function
-- implemented predict.marginal function
-- implemented get.prob function
+changes in version 0.2.0 (2017-11-10)
+- implemented nobs.mvord()
+- implemented vcov.mvord()
+- implemented terms.mvord()
+- implemented model.matrix.mvord()
+- implemented fitted.mvord()
+- implemented logLik.mvord()
+- AIC() and BIC() are now available
+- additional argument scale
+- new (additional) design for coef.constraints in analogy to constraints in VGAM
+- category-specific regression parameters
+- additional argument offset
+- new class "mvlink"
+- implemented coef.constraints()
+- logPL(), claic() and clbic() are not exported anymore. use logLik(), AIC() and BIC() instead.
+- renamed cor_general, cor_ar1, cor_equi, cov_general
+- implemented names_constraints()
+
+
+changes in version 0.1.0 (2017-10-17)
+- changed function name from multord() to mvord()
+- changed function name from multord2() to mvord2()
+- implemented predict function()
+- implemented predict.marginal function()
+- implemented get.prob function()
 - changed link probit to mvprobit()
 - changed link logit to mvlogit(df = 8L); default value of degrees of freedom is 8
 - implemented a more flexible multivariate logistic distribution with logistic marginals and t copula (df are settable)
-- implemented PL.lag
+- additional argument PL.lag
+

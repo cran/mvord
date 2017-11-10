@@ -2,7 +2,7 @@ library(mvord)
 rho <- list()
 rho$ndim <- 5
 
-rho$error.structure$type <- "corGeneral"
+rho$error.structure$type <- "correlation"
 rho$intercept.type = "fixed"
 #rho$ntheta <- 1:5
 #rho$threshold.values <- lapply(1:rho$ndim, function(j) rep(NA,rho$ntheta[j]))
@@ -14,9 +14,9 @@ rho$threshold.values <- list(c(NA),
 rho$formula <- y ~ 0 + X1 + X2 + X3
 rho$intercept = FALSE
 rho$ntheta <- sapply(seq_len(rho$ndim), function(j) length(rho$threshold.values[[j]]))
-mvord:::check(identical(mvord:::set.threshold.type(rho), "flexible"))
+mvord:::check(identical(mvord:::set_threshold_type(rho), "flexible"))
 
-rho$error.structure$type <- "corGeneral"
+rho$error.structure$type <- "correlation"
 rho$threshold.values <- list(c(1),
                              c(2,NA),
                              c(3,NA,NA),
@@ -26,9 +26,9 @@ rho$formula <- y ~ X1 + X2 + X3
 rho$intercept = TRUE
 rho$intercept.type = "flexible"
 rho$ntheta <- sapply(seq_len(rho$ndim), function(j) length(rho$threshold.values[[j]]))
-mvord:::check(identical(mvord:::set.threshold.type(rho), "fix1first"))
+mvord:::check(identical(mvord:::set_threshold_type(rho), "fix1first"))
 
-rho$error.structure$type <- "corGeneral"
+rho$error.structure$type <- "correlation"
 rho$threshold.values <- list(c(1),
                              c(2,3),
                              c(3,4,NA),
@@ -38,9 +38,9 @@ rho$formula <- y ~ X1 + X2 + X3
 rho$intercept = TRUE
 rho$intercept.type = "flexible"
 rho$ntheta <- sapply(seq_len(rho$ndim), function(j) length(rho$threshold.values[[j]]))
-mvord:::check(identical(mvord:::set.threshold.type(rho), "fix2first"))
+mvord:::check(identical(mvord:::set_threshold_type(rho), "fix2first"))
 
-rho$error.structure$type <- "covGeneral"
+rho$error.structure$type <- "covariance"
 rho$threshold.values <- list(c(1),
                              c(2,3),
                              c(3,4,NA),
@@ -53,10 +53,10 @@ rho$ntheta <- sapply(seq_len(rho$ndim), function(j) length(rho$threshold.values[
 rho$binary <- TRUE
 #error here
 mvord:::check(!is.null(attr(try(
-  mvord:::set.threshold.type(rho)
+  mvord:::set_threshold_type(rho)
   , silent = TRUE), "condition")))
 
-rho$error.structure$type <- "covGeneral"
+rho$error.structure$type <- "covariance"
 rho$threshold.values <- list(c(1),
                              c(2,3),
                              c(3,NA,4),
@@ -67,12 +67,13 @@ rho$intercept = TRUE
 rho$intercept.type = "flexible"
 rho$ntheta <- sapply(seq_len(rho$ndim), function(j) length(rho$threshold.values[[j]]))
 #error here
-#check(identical(set.threshold.type(rho), "fix2firstlast"))
+#check(identical(set_threshold_type(rho), "fix2firstlast"))
 mvord:::check(!is.null(attr(try(
-  mvord:::set.threshold.type(rho)
+  mvord:::set_threshold_type(rho)
   , silent = TRUE), "condition")))
 
-rho$error.structure$type <- "corGeneral"
+
+rho$error.structure$type <- "correlation"
 rho$threshold.values <- list(c(1),
                              c(2,3),
                              c(3,NA,4),
@@ -82,9 +83,9 @@ rho$formula <- y ~ X1 + X2 + X3
 rho$intercept = TRUE
 rho$intercept.type = "flexible"
 rho$ntheta <- sapply(seq_len(rho$ndim), function(j) length(rho$threshold.values[[j]]))
-mvord:::check(identical(mvord:::set.threshold.type(rho), "fix2firstlast"))
+mvord:::check(identical(mvord:::set_threshold_type(rho), "fix2firstlast"))
 
-rho$error.structure$type <- "covGeneral"
+rho$error.structure$type <- "covariance"
 rho$threshold.values <- list(c(1),
                              c(2,NA),
                              c(3,NA,NA),
@@ -94,10 +95,10 @@ rho$formula <- y ~ 0 + X1 + X2 + X3
 rho$intercept = FALSE
 rho$intercept.type = "fixed"
 rho$ntheta <- sapply(seq_len(rho$ndim), function(j) length(rho$threshold.values[[j]]))
-mvord:::check(identical(mvord:::set.threshold.type(rho), "fix1first"))
+mvord:::check(identical(mvord:::set_threshold_type(rho), "fix1first"))
 #----------------------------------------------------------------------------------------------------
 #ERRORS
-rho$error.structure$type <- "covGeneral"
+rho$error.structure$type <- "covariance"
 rho$intercept.type = "fixed"
 rho$threshold.values <- list(c(NA),
                              c(NA,NA),
@@ -107,14 +108,14 @@ rho$threshold.values <- list(c(NA),
 rho$formula <- y ~ 0 + X1 + X2 + X3
 rho$intercept = FALSE
 rho$ntheta <- sapply(seq_len(rho$ndim), function(j) length(rho$threshold.values[[j]]))
-mvord:::check(!is.null(attr(try(mvord:::set.threshold.type(rho), silent = TRUE), "condition")))
+mvord:::check(!is.null(attr(try(mvord:::set_threshold_type(rho), silent = TRUE), "condition")))
 
-# e <- try(set.threshold.type(rho), silent = TRUE)
+# e <- try(set_threshold_type(rho), silent = TRUE)
 # e <- try(stop("throwing a try-error"))
 # !is.null(attr(e, "condition"))
-# !is.null(attr(try(set.threshold.type(rho), silent = TRUE), "condition"))
+# !is.null(attr(try(set_threshold_type(rho), silent = TRUE), "condition"))
 
-rho$error.structure$type <- "covGeneral"
+rho$error.structure$type <- "covariance"
 rho$intercept.type = "flexible"
 rho$threshold.values <- list(c(1),
                              c(2,NA),
@@ -124,9 +125,9 @@ rho$threshold.values <- list(c(1),
 rho$formula <- y ~ 1 + X1 + X2 + X3
 rho$intercept = TRUE
 rho$ntheta <- sapply(seq_len(rho$ndim), function(j) length(rho$threshold.values[[j]]))
-mvord:::check(!is.null(attr(try(mvord:::set.threshold.type(rho), silent = TRUE), "condition")))
+mvord:::check(!is.null(attr(try(mvord:::set_threshold_type(rho), silent = TRUE), "condition")))
 
-rho$error.structure$type <- "corGeneral"
+rho$error.structure$type <- "correlation"
 rho$intercept.type = "flexible"
 rho$threshold.values <- list(c(NA),
                              c(NA,NA),
@@ -136,9 +137,9 @@ rho$threshold.values <- list(c(NA),
 rho$formula <- y ~ 1 + X1 + X2 + X3
 rho$intercept = TRUE
 rho$ntheta <- sapply(seq_len(rho$ndim), function(j) length(rho$threshold.values[[j]]))
-mvord:::check(!is.null(attr(try(mvord:::set.threshold.type(rho), silent = TRUE), "condition")))
+mvord:::check(!is.null(attr(try(mvord:::set_threshold_type(rho), silent = TRUE), "condition")))
 
-rho$error.structure$type <- "corGeneral"
+rho$error.structure$type <- "correlation"
 rho$threshold.values <- list(c(1),
                              c(2,NA),
                              c(3,4,5),
@@ -148,4 +149,4 @@ rho$formula <- y ~ X1 + X2 + X3
 rho$intercept = TRUE
 rho$intercept.type = "flexible"
 rho$ntheta <- sapply(seq_len(rho$ndim), function(j) length(rho$threshold.values[[j]]))
-mvord:::check(!is.null(attr(try(mvord:::set.threshold.type(rho), silent = TRUE), "condition")))
+mvord:::check(!is.null(attr(try(mvord:::set_threshold_type(rho), silent = TRUE), "condition")))
