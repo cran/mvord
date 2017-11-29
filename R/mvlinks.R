@@ -100,6 +100,7 @@ mvlogit <- function(df = 8L){
   }
   mvlink <- list(name = "mvlogit",
     df = df,
+    sqrv = pi/sqrt(3),
     F_uni = plogis, # F_1(x)
     F_biv = function(x, y, r) {
       x <- qt(plogis(x), df = df)
@@ -128,10 +129,11 @@ mvlogit <- function(df = 8L){
                                            mean = rep(0, NCOL(U)),
                                            S = list_R[[i]]))},
 
-    deriv.fun = list(
+    deriv.fun =  list(
       dF1dx = dlogis,
       dF2dx = function(x, y, r) deriv_biv_t_copula(x, y, r, df = df) ,
-      dF2dr = function(x, y, r) deriv_corr_t_copula(x, y, r, df = df)))
+      dF2dr = function(x, y, r) deriv_corr_t_copula(x, y, r, df = df))
+      )
   class(mvlink) <- "mvlink"
   return(mvlink)
 }
@@ -175,12 +177,12 @@ deriv_biv_t_copula <- function(x, y, r, df){
   ## add transformation
   newx <- qt(plogis(x), df = df)
   newy <- qt(plogis(y), df = df)
-  inf.value <- sqrt(.Machine$double.xmax)/2
+  inf.value <- 10000#sqrt(.Machine$double.xmax)/2
   newx <- replace(newx, newx == Inf, inf.value)
-  newx <- replace(newx, newx == - Inf, inf.value)
+  newx <- replace(newx, newx == - Inf, -inf.value)
   newy <- replace(newy, newy == Inf, inf.value)
-  newy <- replace(newy, newy == - Inf, inf.value)
-  ## new parameters
+  newy <- replace(newy, newy == - Inf, -inf.value)
+  ## conditional parameters
   mu_c <- r * newx
   sigma_c <- sqrt((df + newx^2)/(df + 1) * (1 - r^2))
   df_c <- df + 1
@@ -191,11 +193,11 @@ deriv_corr_t_copula <- function(x, y, r, df){
   ## add transformation
   newx <- qt(plogis(x), df = df)
   newy <- qt(plogis(y), df = df)
-  inf.value <- sqrt(.Machine$double.xmax)/2
+  inf.value <- 10000#sqrt(.Machine$double.xmax)/2
   newx <- replace(newx, newx == Inf, inf.value)
-  newx <- replace(newx, newx == - Inf, inf.value)
+  newx <- replace(newx, newx == - Inf, -inf.value)
   newy <- replace(newy, newy == Inf, inf.value)
-  newy <- replace(newy, newy == - Inf, inf.value)
+  newy <- replace(newy, newy == - Inf, -inf.value)
   1/(2 * pi * sqrt(1 - r^2)) *
     (1 + (newx^2 - 2 * r * newx * newy + newy^2)/(df * (1 - r^2)))^(- df/2)
 }

@@ -5,20 +5,22 @@ mvord.fit <- function(rho){
   ## number of thresholds per outcome
   rho$ntheta <- sapply(1:rho$ndim, function(j) nlevels(rho$y[, j]) - 1) # no of categories - 1
 
-  rho$threshold.values <- if (is.null(rho$threshold.values)) {
-                              if ((rho$error.structure$type == "correlation") && (rho$intercept.type == "fixed")) {
-                              lapply(1:rho$ndim, function(j) rep(NA,rho$ntheta[j]))
-                          } else if((rho$error.structure$type %in% c("correlation")) && (rho$intercept.type == "flexible")){
-                              lapply(1:rho$ndim, function(j) if(rho$ntheta[j] == 1) 0 else c(0,rep(NA,max(rho$ntheta[j]-1,0))))
-                          } else if ((rho$error.structure$type %in% c("covariance")) && (rho$intercept.type == "flexible")) {
-                              lapply(1:rho$ndim, function(j) if(rho$ntheta[j] == 1) 0 else c(0,1,rep(NA,max(rho$ntheta[j]-2,0))))
-                          } else if ((rho$error.structure$type %in% c("covariance")) && (rho$intercept.type == "fixed")) {
-                              lapply(1:rho$ndim, function(j) if(rho$ntheta[j] == 1) 0 else c(0,rep(NA,max(rho$ntheta[j]-1,0))))
-                          }
-                        } else {
-                          if (length(rho$threshold.values) != rho$ndim) stop("Length of threshold values does not match number of outcomes")
-                          else rho$threshold.values
-                        }
+  if (is.null(rho$threshold.values)) {
+    if ((rho$error.structure$type == "correlation") && (rho$intercept.type == "fixed")) {
+      rho$threshold.values <- lapply(1:rho$ndim, function(j) rep(NA,rho$ntheta[j]))
+    } else if((rho$error.structure$type %in% c("correlation")) && (rho$intercept.type == "flexible")){
+      rho$threshold.values <- lapply(1:rho$ndim, function(j) if(rho$ntheta[j] == 1) 0 else c(0,rep(NA,max(rho$ntheta[j]-1,0))))
+      cat("Note: First threshold for each response is fixed to 0 in order to ensure identifiability!\n")
+    } else if ((rho$error.structure$type %in% c("covariance")) && (rho$intercept.type == "flexible")) {
+      rho$threshold.values <- lapply(1:rho$ndim, function(j) if(rho$ntheta[j] == 1) 0 else c(0,1,rep(NA,max(rho$ntheta[j]-2,0))))
+      cat("Note: First two thresholds for each response are fixed to 0 and 1 in order to ensure identifiability!\n")
+    } else if ((rho$error.structure$type %in% c("covariance")) && (rho$intercept.type == "fixed")) {
+      rho$threshold.values <- lapply(1:rho$ndim, function(j) if(rho$ntheta[j] == 1) 0 else c(0,rep(NA,max(rho$ntheta[j]-1,0))))
+      cat("Note: First threshold for each response is fixed to 0 in order to ensure identifiability!\n")
+    }
+  } else {
+    if (length(rho$threshold.values) != rho$ndim) stop("Length of threshold values does not match number of outcomes")
+  }
   #values of fixed (non-NA) threshold parameters
   rho$threshold.values.fixed <- lapply(rho$threshold.values, function(x) x[!is.na(x)])
   ## number of non-fixed thresholds per rater
@@ -30,37 +32,25 @@ mvord.fit <- function(rho){
   #roh$threshold.type
   rho$threshold <- set_threshold_type(rho)
 
-  #number of columns in the covariate matrix
-  rho$p <- ncol(rho$x[[1]])
-
-  rho$coef.names <- colnames(rho$x[[1]])
-
-  rho$ncat <- rho$ntheta + 1
+  rho$ncat <- rho$ntheta #+ 1
 
   rho$nthetas <- sum(rho$ntheta)
   rho$ncats <- sum(rho$ncat)
-  rho$ncat.first.ind <- cumsum(c(1,rho$ncat))[-(length(rho$ncat)+1)]
+  rho$ncat.first.ind <- cumsum(c(1,rho$ntheta))[- (rho$ndim + 1)]
+
+  #set offsets from coef.values and updates
+  rho <- set_offset_up(rho)
+
+
+  rho$coef.names <- colnames(rho$x[[1]])
+
 
   rho$constraints <- get_constraints(rho)
 
-  #vector of number of parameters for each coefficient
+  # vector of number of parameters for each coefficient
   rho$npar.beta <- sapply(rho$constraints, NCOL)
 
-  #names rho$constraints
-  rho$constraints <- lapply(1:length(rho$constraints), function(p){
-    if (NCOL(rho$constraints[[p]]) != 0) colnames(rho$constraints[[p]]) <- paste(names(rho$constraints)[p], 1:rho$npar.beta[p])
-    rownames(rho$constraints[[p]]) <- rho$rownames.constraints
-    rho$constraints[[p]]
-  })
-  names(rho$constraints) <- rho$coef.names
-
   check_args_constraints(rho)
-
-  #get indices of betas in par (only betas)
-  rho$coef.ind <- get_ind_coef(rho)
-
-  #set offsets from coef.values
-  rho$offset <- set_offset(rho)
 
   if(is.null(rho$threshold.constraints)) rho$threshold.constraints <- 1:rho$ndim
   #number of flexible threshold parameters (in optimizer)
@@ -69,10 +59,12 @@ mvord.fit <- function(rho){
   rho$n <- nrow(rho$y)
 
   #number of total coefficients
+
   rho$npar.betas <- sum(rho$npar.beta)
 
   ##INCLUDE CHECKS here
   check_args_thresholds(rho)
+
 ##############################################################################################
   rho$ind.thresholds <- get_ind_thresholds(rho$threshold.constraints,rho)
 
@@ -81,7 +73,7 @@ mvord.fit <- function(rho){
   rho$inf.value <- 10000
 
   ###############################
-  # error.structure
+  # starting values
   ###############################
   if (is.null(rho$start.values)) {
   rho$start <- c(get_start_values(rho),
@@ -122,7 +114,25 @@ mvord.fit <- function(rho){
   ## index for subjects containing pair c(k,l)
   rho$ind_kl <- lapply(rho$combis, function(kl)
     rowSums(!is.na(rho$y[, kl])) == 2)
+  #################################
+  ## alternative
+  #################################
+  rho$p <- NCOL(rho$x[[1]])
+  rho$inds.cat <- lapply(seq_len(rho$ndim), function(j)
+       seq_len(rho$ntheta[j]) +  rho$ncat.first.ind[j] - 1)
+  rho$nbeta.first <- unname(c(0, cumsum(rho$npar.beta)[-length(rho$npar.beta)]) + 1)
 
+  rho$XcatL <- list()
+  rho$XcatU <- list()
+  for (j in seq_len(rho$ndim)) {
+       ncat <- rho$ntheta[j] + 1
+       mm <- model.matrix(~ - 1 + rho$y[,j] : rho$x[[j]],
+              model.frame(~ - 1 + rho$y[,j] : rho$x[[j]],
+              na.action = function(x) x))
+       rho$XcatL[[j]] <- mm[,-(ncat * (seq_len(rho$p) - 1) + 1), drop = F]
+       rho$XcatU[[j]] <- mm[,-(ncat * seq_len(rho$p)), drop = F]
+
+  }
   ##############################################
   if(is.character(rho$solver)){
     rho$optRes <- suppressWarnings(optimx(rho$start, function(x) PLfun(x, rho),
@@ -171,8 +181,11 @@ mvord.fit <- function(rho){
   res$rho$pfun <- NULL
   res$rho$transf_thresholds <- NULL
   res$rho$get_ind_thresholds <- NULL
+  res$rho$XcatL <- NULL
+  res$rho$XcatU <- NULL
 
-  res$constraints <- rho$constraints[sapply(rho$constraints, NCOL) != 0]
+  res$constraints <- rho$constraints
+  attr(res, "contrasts") <- rho$contrasts
 
   class(res) <- "mvord"
 

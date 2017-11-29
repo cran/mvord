@@ -61,43 +61,69 @@ marginal.predict <- function(object, type = "prob", subjectID = NULL, ...){
 
   if(is.null(subjectID)) ind <- seq_len(NROW(y)) else ind <- match(subjectID, rownames(y))
 
-  ## getbetas
 
-  beta <- lapply(seq_len(object$rho$ndim), function(j){
-    sapply(seq_along(object$rho$coef.names), function(p) {
-      ifelse(is.na(object$rho$coef.ind[[j]][,p]), 0, object$beta[object$rho$coef.ind[[j]][,p]])
-    })
+  XcatL <- list()
+  XcatU <- list()
+  for (j in seq_len(object$rho$ndim)) {
+    ncat <- object$rho$ntheta[j] + 1
+    mm <- model.matrix(~ - 1 + y[ind,j] : x[[j]][ind,],
+                       model.frame(~ - 1 + y[ind,j] : x[[j]][ind,],
+                                   na.action = function(x) x))
+    XcatL[[j]] <- mm[,-(ncat * (seq_len(object$rho$p) - 1) + 1), drop = F]
+    XcatU[[j]] <- mm[,-(ncat * seq_len(object$rho$p)), drop = F]
+
+  }
+
+  pred.fixedU  <- sapply(1:object$rho$ndim, function(j) {
+     b <- lapply(seq_along(object$rho$constraints),function(i)
+       object$rho$constraints[[i]][object$rho$inds.cat[[j]],,drop=F] %*%
+     object$beta[object$rho$nbeta.first[i] + seq_len(object$rho$npar.beta[i]) - 1])
+     XcatU[[j]] %*% unlist(b) + object$rho$offset[[j]][ind]
+  })
+  pred.fixedL  <- sapply(1:object$rho$ndim, function(j) {
+     b <- lapply(seq_along(object$rho$constraints),function(i)
+       object$rho$constraints[[i]][object$rho$inds.cat[[j]],,drop=F] %*%
+     object$beta[object$rho$nbeta.first[i] + seq_len(object$rho$npar.beta[i]) - 1])
+     XcatL[[j]] %*% unlist(b) + object$rho$offset[[j]][ind]
   })
 
-  pred.fixed <- sapply(1:object$rho$ndim, function(j) (rowSums(object$rho$x[[j]] * beta[[j]]) + object$rho$offset[[j]])[ind] )
+  theta.lower <- sapply(1:object$rho$ndim, function(j) c(-object$rho$inf.value, object$theta[[j]])[y[ind, j]])
+  theta.upper <- sapply(1:object$rho$ndim, function(j) c(object$theta[[j]], object$rho$inf.value)[y[ind, j]])
+
   sigma <- get_error_struct(object, type = "sigmas")[ind]
   stddevs <- sqrt(t(sapply(sigma, diag)))
 
   if(type == "pred"){
-    colnames(pred.fixed) <- object$rho$y.names
-    rownames(pred.fixed) <- rownames(y)[ind]
-    return(pred.fixed)
-  } else if(type == "class"){
-    y.ord <- sapply(1:object$rho$ndim, function(j){
-      cut(pred.fixed[,j],c(-Inf,object$theta[[j]],Inf), labels= levels(object$rho$y[,j]))}, simplify = "array")
-    colnames(y.ord) <- object$rho$y.names
-    rownames(y.ord) <- rownames(y)[ind]
-    return(y.ord)
-  } else if(type %in% c("prob", "cum.prob", "all.prob")){
+    pred.lower <- (theta.lower - pred.fixedL) /stddevs
+    pred.upper <- (theta.upper - pred.fixedU) /stddevs
+
+    colnames(pred.lower) <- object$rho$y.names
+    rownames(pred.lower) <- rownames(y)[ind]
+    colnames(pred.upper) <- object$rho$y.names
+    rownames(pred.upper) <- rownames(y)[ind]
+    return(list(upper =  pred.upper, lower =  pred.lower))
+  } else if(type %in% c("class","prob", "cum.prob", "all.prob")){
     theta.lower <- lapply(1:object$rho$ndim, function(j) c(-object$rho$inf.value, object$theta[[j]]))
     theta.upper <- lapply(1:object$rho$ndim, function(j) c(object$theta[[j]], object$rho$inf.value))
 
     probs <- lapply(1:object$rho$ndim, function(j){
       pr <- sapply(1:length(theta.lower[[j]]), function(k){
-        pred.lower <- (theta.lower[[j]][k] - pred.fixed[,j])/stddevs[,j]
-        pred.upper <- (theta.upper[[j]][k] - pred.fixed[,j])/stddevs[,j]
+        pred.lower <- (theta.lower[[j]][k] - pred.fixedL[,j])/stddevs[,j]
+        pred.upper <- (theta.upper[[j]][k] - pred.fixedU[,j])/stddevs[,j]
         object$rho$link$F_uni(pred.upper) - object$rho$link$F_uni(pred.lower)
       })
       colnames(pr) <- levels(object$rho$y[, j])
       rownames(pr) <- rownames(y)[ind]
       pr
     })
-    if(type == "prob"){
+
+    if(type == "class"){
+      y.ord <- do.call("cbind.data.frame", lapply(1:object$rho$ndim, function(j) {
+        ordered(apply(probs[[j]], 1, function(i) object$rho$levels[[j]][which.max(i)]), levels = object$rho$levels[[j]])
+      }))
+      colnames(y.ord) <- object$rho$y.names
+      return(y.ord)
+    } else if(type == "prob"){
       prob <- sapply(1:object$rho$ndim, function(j) {
         ind2 <- cbind(1:nrow(probs[[j]]), match(y[ind, j],colnames(probs[[j]])))
         probs[[j]][ind2]})
@@ -185,20 +211,36 @@ predict.mvord <- function(object, type = "prob", subjectID = NULL, ...){
   ## get correlation/covariance matrices
   sigma <- get_error_struct(object$error.struct, type ="sigmas")
 
-  ## get betas
-  beta <- lapply(seq_len(object$rho$ndim), function(j){
-    sapply(seq_along(object$rho$coef.names), function(p) {
-      ifelse(is.na(object$rho$coef.ind[[j]][,p]), 0, object$beta[object$rho$coef.ind[[j]][,p]])
-    })
+  XcatL <- list()
+  XcatU <- list()
+  for (j in seq_len(object$rho$ndim)) {
+    ncat <- object$rho$ntheta[j] + 1
+    mm <- model.matrix(~ - 1 + y[ind,j] : x[[j]][ind,],
+                       model.frame(~ - 1 + y[ind,j] : x[[j]][ind,],
+                                   na.action = function(x) x))
+    XcatL[[j]] <- mm[,-(ncat * (seq_len(object$rho$p) - 1) + 1), drop = F]
+    XcatU[[j]] <- mm[,-(ncat * seq_len(object$rho$p)), drop = F]
+
+  }
+  pred.fixedU  <- sapply(1:object$rho$ndim, function(j) {
+    b <- lapply(seq_along(object$rho$constraints),function(i)
+      object$rho$constraints[[i]][object$rho$inds.cat[[j]],,drop=F] %*%
+        object$beta[object$rho$nbeta.first[i] + seq_len(object$rho$npar.beta[i]) - 1])
+    XcatU[[j]] %*% unlist(b) + object$rho$offset[[j]][ind]
+  })
+  pred.fixedL  <- sapply(1:object$rho$ndim, function(j) {
+    b <- lapply(seq_along(object$rho$constraints),function(i)
+      object$rho$constraints[[i]][object$rho$inds.cat[[j]],,drop=F] %*%
+        object$beta[object$rho$nbeta.first[i] + seq_len(object$rho$npar.beta[i]) - 1])
+    XcatL[[j]] %*% unlist(b) + object$rho$offset[[j]][ind]
   })
 
-  pred.fixed <- sapply(1:object$rho$ndim, function(j) (rowSums(object$rho$x[[j]] * beta[[j]]) + object$rho$offset[[j]])[ind] )
   theta.lower <- sapply(1:object$rho$ndim, function(j) c(-object$rho$inf.value, object$theta[[j]])[y[ind, j]])
   theta.upper <- sapply(1:object$rho$ndim, function(j) c(object$theta[[j]], object$rho$inf.value)[y[ind, j]])
   stddevs <- sqrt(t(sapply(sigma, diag)))[ind, ]
-  pred.lower <- (theta.lower - pred.fixed)/stddevs
+  pred.lower <- (theta.lower - pred.fixedL)/stddevs
   pred.lower[is.na(pred.lower)] <- -10000
-  pred.upper <- (theta.upper - pred.fixed)/stddevs
+  pred.upper <- (theta.upper - pred.fixedU)/stddevs
   pred.upper[is.na(pred.upper)] <- 10000
 
   if(type == "prob"){
@@ -222,20 +264,57 @@ predict.mvord <- function(object, type = "prob", subjectID = NULL, ...){
        stop("Number of class combinations over 1000000. Try get.prob() for desired class combinations.")
     } else {
     cmbn <- expand.grid(cats)
+    cmbn.labels <- expand.grid(object$rho$levels)
 
-    pred.fixed[is.na(pred.fixed)] <- 0
+    pred.fixedU[is.na(pred.fixedU)] <- 0
+    pred.fixedL[is.na(pred.fixedL)] <- 0
 
     probs <- sapply(seq_len(nrow(cmbn)), function(i){
       if (i %% 100 == 0)  cat('Computed probabilities for', i, 'out of', nrow(cmbn),'combinations\n')
-      theta.lower <- sapply(1:object$rho$ndim, function(j) theta.lower.all[[j]][cmbn[i,j]])
-      theta.upper <- sapply(1:object$rho$ndim, function(j) theta.upper.all[[j]][cmbn[i,j]])
-      pred.lower <- - sweep(pred.fixed, 2, theta.lower)/stddevs
-      pred.upper <- - sweep(pred.fixed, 2, theta.upper)/stddevs
+
+      ###############################################
+      response.cat <- sapply(1:object$rho$ndim, function(j) object$rho$levels[[j]][cmbn[i,j]])
+      response.cat <- matrix(response.cat, ncol = length(response.cat), nrow = length(ind), byrow = TRUE)#matrix(response.cat, nrow = 1)
+      response.cat <- lapply(1:object$rho$ndim, function(j){
+        if (!all(response.cat[,j] %in% c(NA, levels(y[,j]))))  stop("response.cat are different from the categories in the original data set")
+        else ordered(response.cat[,j], levels = levels(y[,j]))
+      })
+
+      XcatL <- list()
+      XcatU <- list()
+      for (j in seq_len(object$rho$ndim)) {
+        ncat <- object$rho$ntheta[j] + 1
+        mm <- model.matrix(~ - 1 + response.cat[[j]] : object$rho$x[[j]][ind,],
+                           model.frame(~ - 1 + response.cat[[j]] : object$rho$x[[j]][ind,],
+                                       na.action = function(x) x))
+        XcatL[[j]] <- mm[,-(ncat * (seq_len(object$rho$p) - 1) + 1), drop = F]
+        XcatU[[j]] <- mm[,-(ncat * seq_len(object$rho$p)), drop = F]
+      }
+
+      pred.fixedU  <- sapply(1:object$rho$ndim, function(j) {
+        b <- lapply(seq_along(object$rho$constraints),function(i)
+          object$rho$constraints[[i]][object$rho$inds.cat[[j]],,drop=F] %*%
+            object$beta[object$rho$nbeta.first[i] + seq_len(object$rho$npar.beta[i]) - 1])
+        XcatU[[j]] %*% unlist(b) + object$rho$offset[[j]][ind]
+      })
+      pred.fixedL  <- sapply(1:object$rho$ndim, function(j) {
+        b <- lapply(seq_along(object$rho$constraints),function(i)
+          object$rho$constraints[[i]][object$rho$inds.cat[[j]],,drop=F] %*%
+            object$beta[object$rho$nbeta.first[i] + seq_len(object$rho$npar.beta[i]) - 1])
+        XcatL[[j]] %*% unlist(b) + object$rho$offset[[j]][ind]
+      })
+      theta.lower <- sapply(1:object$rho$ndim, function(j) c(-object$rho$inf.value, object$theta[[j]])[response.cat[[j]]])
+      theta.upper <- sapply(1:object$rho$ndim, function(j) c(object$theta[[j]], object$rho$inf.value)[response.cat[[j]]])
+      pred.lower <- (theta.lower - pred.fixedL)/stddevs
+      pred.upper <- (theta.upper - pred.fixedU)/stddevs
+      pred.lower[is.na(pred.lower)] <- -10000
+      pred.upper[is.na(pred.upper)] <- 10000
+      ############################################
       object$rho$link$F_multi(U = pred.upper, L = pred.lower,
                        list_R = lapply(sigma, cov2cor))
     })
     ind.max <- apply(probs,1,which.max)
-    class.max <- cmbn[ind.max,]
+    class.max <- cmbn.labels[ind.max,]
     rownames(class.max) <- rownames(y)[ind]
     return(class.max)
    }
@@ -308,26 +387,51 @@ get.prob <- function(object, response.cat, subjectID = NULL, ...) {
   sigma <- get_error_struct(object$error.struct, type ="sigmas")
   stddevs <- sqrt(t(sapply(sigma, diag)))[ind, ]
 
-  if(is.vector(response.cat)) response.cat <- matrix(response.cat, nrow = 1)
+  if(is.vector(response.cat)) response.cat <- matrix(response.cat, ncol = length(response.cat), nrow = length(ind), byrow = TRUE)#matrix(response.cat, nrow = 1)
   response.cat <- lapply(1:object$rho$ndim, function(j){
-  	if (!all(response.cat[,j] %in% levels(y[,j])))  stop("response.cat are different from the categories in the original data set")
+  	if (!all(response.cat[,j] %in% c(NA, levels(y[,j]))))  stop("response.cat are different from the categories in the original data set")
     else ordered(response.cat[,j], levels = levels(y[,j]))
    })
-  beta <- lapply(seq_len(object$rho$ndim), function(j){
-    sapply(seq_along(object$rho$coef.names), function(p) {
-      ifelse(is.na(object$rho$coef.ind[[j]][,p]), 0, object$beta[object$rho$coef.ind[[j]][,p]])
-    })
-  })
 
-  pred.fixed <- sapply(1:object$rho$ndim, function(j) (rowSums(object$rho$x[[j]] * beta[[j]]) + object$rho$offset[[j]])[ind] )
-  if (is.null(dim(pred.fixed)))  dim(pred.fixed) <- c(1, length(pred.fixed))
+
+
+
+  XcatL <- list()
+  XcatU <- list()
+  for (j in seq_len(object$rho$ndim)) {
+    ncat <- object$rho$ntheta[j] + 1
+    mm <- model.matrix(~ - 1 + response.cat[[j]] : object$rho$x[[j]][ind,],
+                       model.frame(~ - 1 + response.cat[[j]] : object$rho$x[[j]][ind,],
+                                   na.action = function(x) x))
+    XcatL[[j]] <- mm[,-(ncat * (seq_len(object$rho$p) - 1) + 1), drop = F]
+    XcatU[[j]] <- mm[,-(ncat * seq_len(object$rho$p)), drop = F]
+
+  }
+
+  pred.fixedU  <- sapply(1:object$rho$ndim, function(j) {
+     b <- lapply(seq_along(object$rho$constraints),function(i)
+       object$rho$constraints[[i]][object$rho$inds.cat[[j]],,drop=F] %*%
+     object$beta[object$rho$nbeta.first[i] + seq_len(object$rho$npar.beta[i]) - 1])
+     XcatU[[j]] %*% unlist(b) + object$rho$offset[[j]][ind]
+  })
+  pred.fixedL  <- sapply(1:object$rho$ndim, function(j) {
+     b <- lapply(seq_along(object$rho$constraints),function(i)
+       object$rho$constraints[[i]][object$rho$inds.cat[[j]],,drop=F] %*%
+     object$beta[object$rho$nbeta.first[i] + seq_len(object$rho$npar.beta[i]) - 1])
+     XcatL[[j]] %*% unlist(b) + object$rho$offset[[j]][ind]
+  })
+  if (is.null(dim(pred.fixedU)))  dim(pred.fixedU) <- c(1, length(pred.fixedU))
+  if (is.null(dim(pred.fixedL)))  dim(pred.fixedL) <- c(1, length(pred.fixedL))
 
   theta.lower <- sapply(1:object$rho$ndim, function(j) c(-object$rho$inf.value, object$theta[[j]])[response.cat[[j]]])
   theta.upper <- sapply(1:object$rho$ndim, function(j) c(object$theta[[j]], object$rho$inf.value)[response.cat[[j]]])
-  pred.lower <- -sweep(pred.fixed, 2, theta.lower)/stddevs
+  pred.lower <- (theta.lower - pred.fixedL)/stddevs
+  pred.upper <- (theta.upper - pred.fixedU)/stddevs
   pred.lower[is.na(pred.lower)] <- -10000
-  pred.upper <- -sweep(pred.fixed, 2, theta.upper)/stddevs
   pred.upper[is.na(pred.upper)] <- 10000
+
+
+
   prob <- object$rho$link$F_multi(U = pred.upper, L = pred.lower,
                     list_R = lapply(sigma, cov2cor))
   names(prob) <- rownames(y)[ind]

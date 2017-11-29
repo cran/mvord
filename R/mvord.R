@@ -537,6 +537,7 @@ NULL
 #' @param solver character string containing the name of the applicable solver of \code{\link{optimx}} (default is \code{"newuoa"})
 #'  or wrapper function for user defined solver.
 #' @param PL.lag specifies the time lag of the pairs in the pairwise likelihood approach to be optimized.
+#' @param contrasts an optional list. See the \code{contrasts.arg} of \code{\link{model.matrix.default}}.
 #' @param control a list of control arguments. See \code{\link{optimx}}.
 # #' Only applicable with \code{error.structure = cor_ar1}.
 #'
@@ -693,6 +694,7 @@ mvord <- function(formula,
                   start.values = NULL,
                   solver = "newuoa",
                   PL.lag = NULL,
+                  contrasts = NULL,
                   control = list(maxit=200000, trace = 1, kkt = FALSE)
 ){
   #check arguments
@@ -716,12 +718,14 @@ mvord <- function(formula,
   rho$response.names <- response.names
   rho$scale <- scale
   rho$offset <- offset
+  rho$contrasts <- contrasts
   nm <- names(as.list(rho$mc))
 
   if(!"data" %in% nm) stop("Model needs formula, data and link.", call.=FALSE)
   if(!"link" %in% nm) stop("Model needs formula, data and link.", call.=FALSE)
   if(!"formula" %in% nm) stop("Model needs formula, data and link.", call.=FALSE)
 
+  ## Response
   rho$response.name <- all.vars(rho$formula[[2]])
   if(!is.null(rho$response.names)){
     if(is.null(rho$index)) rho$index[1:2] <- c(1,2)
@@ -729,6 +733,9 @@ mvord <- function(formula,
     warning("response.names do not all exist in data.", call.=FALSE)
     }}
   if(length(rho$response.name) > 1) stop("only one response needed", call.=FALSE)
+
+  rho$intercept <- ifelse(attr(terms.formula(rho$formula),
+  	"intercept") == 1, TRUE, FALSE)
   rho$x.names <- c(all.vars(rho$formula[[3]]),
                    all.vars(formula(error.structure)[[2]]))
   if(is.null(rho$index)) index <- colnames(data)[1:2]
@@ -742,20 +749,26 @@ mvord <- function(formula,
                                        function(x){x[, scale_names] <- scale(x[, scale_names]); x}))
   }
 
-  data.mvord <- mvord_data(data, rho$index, rho$response.name, unique(c(rho$x.names, rho$weights.name)),
-                               y.levels = rho$response.levels, response.names = rho$response.names)
+  data.mvord <- mvord_data(data, rho$index, rho$response.name,
+  	            unique(c(rho$x.names, rho$weights.name)),
+                           y.levels = rho$response.levels,
+                           response.names = rho$response.names,
+                           contrasts = contrasts)
 
-  rho$rownames.constraints <- unlist(data.mvord$ylevels)
-  rho$intercept <- ifelse(attr(terms.formula(rho$formula), "intercept") == 1, TRUE, FALSE)
+  rho$levels <-data.mvord$ylevels
+  rho$rownames.constraints <- unlist(rho$levels)
+
 
   rho$y <- data.mvord$y
   rho$y.names <- colnames(rho$y)
   rho$ndim <- ncol(rho$y)
+  rho$n <- nrow(rho$y)
   rho$x <- lapply(1:rho$ndim, function(j) {
   	rhs.form <- as.formula(paste0("~",deparse(rho$formula[[3]])))
   	new.rhs.form <- update(rhs.form, ~ . + 1)
-  	tmp <-  model.matrix(new.rhs.form, model.frame(new.rhs.form,  data.mvord$x[[j]],
-      na.action = function(x) x))
+  	tmp <-  suppressWarnings(model.matrix(new.rhs.form,
+  		model.frame(new.rhs.form,  data.mvord$x[[j]], na.action = function(x) x),
+  		contrasts.arg = contrasts))
 
     attribute <- attr(tmp, "assign")
 
@@ -763,20 +776,11 @@ mvord <- function(formula,
     attribute <- attribute[-1]
     tmp <- tmp[,-1, drop = F]
     }
-
-    tmp <- tmp[match(rownames(data.mvord$x[[j]]), rownames(tmp)), , drop = FALSE]
-    rownames(tmp) <- rownames(data.mvord$x[[j]])
+#    tmp <- tmp[match(rownames(data.mvord$x[[j]]), rownames(tmp)), , drop = FALSE]
+#    rownames(tmp) <- rownames(data.mvord$x[[j]])
     attr(tmp, "assign") <- attribute
     tmp
   })
-  if (is.null(rho$offset)) {
-    rho$offset <- lapply(1:rho$ndim, function(j) {
-      mf <- model.frame(as.formula(paste0("~",deparse(rho$formula[[3]]))), data.mvord$x[[j]],
-                        na.action = function(x) x)
-      mf[is.na(mf)] <- 0
-      model.offset(mf)
-  })
-  }
   if (is.null(rho$weights.name)) {
     rho$weights <- rep(1, nrow(rho$y))
   } else {
@@ -788,31 +792,39 @@ mvord <- function(formula,
   ## initialize error structure
   rho$error.structure <- init_fun(error.structure, data.mvord)
 
+  if (is.null(rho$offset)) {
+    rho$offset <- lapply(1:rho$ndim, function(j) {
+      mf <- model.frame(as.formula(paste0("~",deparse(rho$formula[[3]]))), data.mvord$x[[j]],
+                        na.action = function(x) x)
+      mf[is.na(mf)] <- 0
+      model.offset(mf)
+  })
+  }
 
-  if(!is.null(rho$PL.lag) && rho$error.structure$name != "cor_ar1") stop("Use PL.lag only with cor_ar1 error.structure", call.=FALSE)
-  if(!is.null(rho$PL.lag) && rho$PL.lag <= 0) stop("PL.lag must be greater than 0", call.=FALSE)
-
-
-  if(is.null(rho$coef.constraints)) rho$coef.constraints <- matrix(1:rho$ndim, ncol = ncol(rho$x[[1]]), nrow = rho$ndim)
+  if(is.null(rho$coef.constraints)) rho$coef.constraints <- matrix(1:rho$ndim, ncol = NCOL(rho$x[[1]]), nrow = rho$ndim)
 
   if(is.list(rho$coef.constraints) && !is.null(rho$coef.values)) stop("This coef.constraints design requires offsets instead of coef.values.", call.=FALSE)
 
   if(!is.list(rho$coef.constraints)){
-  if(is.vector(rho$coef.constraints)) rho$coef.constraints <- matrix(rho$coef.constraints,
-                                                                     ncol = ncol(rho$x[[1]]),
-                                                                     nrow = rho$ndim)
-
-  if(is.null(rho$coef.values)){
-    rho$coef.values <- matrix(NA, ncol = ncol(rho$coef.constraints), nrow = nrow(rho$coef.constraints))
-    rho$coef.values[is.na(rho$coef.constraints)] <- 0 #default 0
+    if(is.vector(rho$coef.constraints)) rho$coef.constraints <- matrix(rho$coef.constraints,
+                                                                       ncol = NCOL(rho$x[[1]]),
+                                                                       nrow = rho$ndim)
+    if(is.null(rho$coef.values)){
+      rho$coef.values <- matrix(NA, ncol = ncol(rho$coef.constraints), nrow = nrow(rho$coef.constraints))
+      rho$coef.values[is.na(rho$coef.constraints)] <- 0 #default 0
+    }
+    #check if coef.values fit to coef.constraints
+    check_args_coef(rho)
+    # set coef.constraints NA  coef.values are set
+    rho$coef.constraints[!is.na(rho$coef.values)] <- NA
+    rho$intercept.type <- ifelse(rho$intercept == FALSE, "fixed",
+    	ifelse(any(is.na(rho$coef.values[,1])), "flexible", "fixed"))
+    #rho$intercept.type <- ifelse(rho$intercept == FALSE, "flexible", ifelse(any(is.na(rho$coef.values[,1])), "flexible", "fixed"))
+  } else {
+  	rho$intercept.type <- ifelse(rho$intercept == FALSE, "fixed", "flexible")
   }
-  #check if coef.values fit to coef.constraints
-  check_args_coef(rho)
-  # set coef.constraints NA where coef.values are set
-  rho$coef.constraints[!is.na(rho$coef.values)] <- NA
-  rho$intercept.type <- ifelse(rho$intercept == FALSE, "fixed", ifelse(any(is.na(rho$coef.values[,1])), "flexible", "fixed"))
-  } else rho$intercept.type <- "fixed" #TODO ?
-
+  if(!is.null(rho$PL.lag) && rho$error.structure$name != "cor_ar1") stop("Use PL.lag only with cor_ar1 error.structure", call.=FALSE)
+  if(!is.null(rho$PL.lag) && rho$PL.lag <= 0) stop("PL.lag must be greater than 0", call.=FALSE)
   mvord.fit(rho)
 }
 #-----------------------------------------------------------------------------------------------------------------
@@ -853,6 +865,7 @@ mvord <- function(formula,
 #' @param solver character string containing the name of the applicable solver of \code{\link{optimx}} (default is \code{"newuoa"})
 #' or wrapper function for user defined solver.
 #' @param PL.lag specifies the time lag of the pairs in the pairwise likelihood approach to be optimized.
+#' @param contrasts an optional list. See the \code{contrasts.arg} of \code{\link{model.matrix.default}}.
 #' @param control a list of control arguments. See \code{\link{optimx}}.
 #' @details see vignette or \code{\link{mvord}}
 #' @examples
@@ -926,6 +939,7 @@ mvord2 <- function(formula,
                    start.values = NULL,
                    solver = "newuoa",
                    PL.lag = NULL,
+                   contrasts = NULL,
                    control = list(maxit = 200000, trace = 1, kkt = FALSE)){
   #check arguments
   rho <- list()
@@ -946,7 +960,7 @@ mvord2 <- function(formula,
   rho$weights.name <- weights
   rho$scale <- scale
   rho$offset <- offset
-
+  rho$contrasts <- contrasts
   if(!"data" %in% nm) stop("Model needs formula, data and link.", call.=FALSE)
   if(!"link" %in% nm) stop("Model needs formula, data and link.", call.=FALSE)
   if(!"formula" %in% nm) stop("Model needs formula, data and link.", call.=FALSE)
@@ -954,6 +968,7 @@ mvord2 <- function(formula,
   rho$y.names <- all.vars(rho$formula[[2]])
   rho$y <- data[,rho$y.names]
   rho$ndim <- ncol(rho$y)
+  rho$n <- nrow(rho$y)
 
   rho$x.names <- c(all.vars(rho$formula[[3]]), all.vars(formula(error.structure)[[2]]))
 
@@ -963,35 +978,24 @@ mvord2 <- function(formula,
     data[, scale_names] <- scale(data[, scale_names])
   }
 
+  rho$levels <- lapply(seq_len(rho$ndim), function(j) levels(rho$y[,j]))
+  rho$rownames.constraints <- unlist(rho$levels)
   rho$intercept <- ifelse(attr(terms.formula(rho$formula), "intercept") == 1, TRUE, FALSE)
   rho$x <- lapply(1:rho$ndim, function(j) {
   	rhs.form <- as.formula(paste0("~",deparse(rho$formula[[3]])))
   	new.rhs.form <- update(rhs.form, ~ . + 1)
-  	tmp <-  model.matrix(new.rhs.form,
-  		model.frame(new.rhs.form,  data, na.action = function(x) x))
+  	tmp <-  suppressWarnings(model.matrix(new.rhs.form,
+  		model.frame(new.rhs.form,  data, na.action = function(x) x),
+  		contrasts.arg = contrasts))
     attribute <- attr(tmp, "assign")
 
     if(rho$intercept == FALSE){
     attribute <- attribute[-1]
     tmp <- tmp[,-1, drop = F]
     }
-
-    tmp <- tmp[match(rownames(data), rownames(tmp)), , drop = FALSE]
-    rownames(tmp) <- rownames(data)
     attr(tmp, "assign") <- attribute
     tmp
   })
-
- #  if(rho$intercept){
-  #  rho$x <- lapply(1:rho$ndim, function(j) model.matrix(rho$formula,
-#	    model.frame(rho$formula, data, na.action=function(x)x)))
-#  } else {
- #   rho$x <- lapply(1:rho$ndim, function(j){
- #   	tmp <- model.matrix(update(rho$formula, ~ . + 1),
- #         model.frame(rho$formula, data, na.action=function(x)x))[,-1, drop = F]
- #
- #   })
- # }
 
   if (is.null(rho$offset)) {
     rho$offset <- lapply(1:rho$ndim, function(j) {
@@ -1016,7 +1020,8 @@ mvord2 <- function(formula,
                                                                    ncol = ncol(rho$x[[1]]),
                                                                    nrow = rho$ndim)
 
-  if(is.list(rho$coef.constraints) && !is.null(rho$coef.values)) stop("This coef.constraints design requires offsets instead of coef.values.", call.=FALSE)
+  if(is.list(rho$coef.constraints) && !is.null(rho$coef.values)) stop("This coef.constraints design requires
+                                                                      offsets instead of coef.values.", call.=FALSE)
 
   if(!is.list(rho$coef.constraints)){
     if(is.vector(rho$coef.constraints)) rho$coef.constraints <- matrix(rho$coef.constraints,
@@ -1032,8 +1037,8 @@ mvord2 <- function(formula,
     # set coef.constraints NA  coef.values are set
     rho$coef.constraints[!is.na(rho$coef.values)] <- NA
     rho$intercept.type <- ifelse(rho$intercept == FALSE, "fixed", ifelse(any(is.na(rho$coef.values[,1])), "flexible", "fixed"))
-  } else rho$intercept.type <- "fixed" #TODO ?
 
+  } else rho$intercept.type <- ifelse(rho$intercept == FALSE, "fixed", "flexible")
   mvord.fit(rho)
 }
 #-----------------------------------------------------------------------------------------------------------------
@@ -1057,26 +1062,21 @@ mvord_finalize <- function(rho){
   est$error.struct <- finalize(rho$error.structure, tparsigma)
 
   if (rho$se) {
-  est$setheta <- lapply(1:rho$ndim, function(j){
-      if(rho$threshold.constraints[j] %in% rho$threshold.constraints[seq_len(j-1)]){#check threshold.constraints
-        tmp[[j]][!is.na(tmp[[j-1]])] <- 0
-        tmp[[j]][is.na(tmp[[j-1]])] <- rho$seGamma[rho$ind.thresholds[[j-1]]]
-      } else{
-        tmp[[j]][!is.na(tmp[[j]])] <- 0
-        tmp[[j]][is.na(tmp[[j]])] <- rho$seGamma[rho$ind.thresholds[[j]]]
-      }
-      tmp[[j]]
-    })
-
-  names(est$setheta) <- rho$y.names
-    for(j in 1:rho$ndim){
-    names(est$setheta[[j]]) <- get_labels_theta(rho,j)
-  }
-
-  est$sebeta <- rho$seGamma[rho$npar.thetas + seq_len(rho$npar.betas)]
-  names(est$sebeta) <- unlist(lapply(1:length(rho$constraints), function(p) colnames(rho$constraints[[p]])))
-
-  est$seerror.struct <- rho$seGamma[rho$npar.thetas + rho$npar.betas +  seq_len(attr(rho$error.structure, "npar"))]
+	  est$setheta <- lapply(1:rho$ndim, function(j){
+	      if(rho$threshold.constraints[j] %in% rho$threshold.constraints[seq_len(j-1)]){#check threshold.constraints
+	        tmp[[j]][!is.na(tmp[[j-1]])] <- 0
+	        tmp[[j]][is.na(tmp[[j-1]])] <- rho$seGamma[rho$ind.thresholds[[j-1]]]
+	      } else {
+	        tmp[[j]][!is.na(tmp[[j]])] <- 0
+	        tmp[[j]][is.na(tmp[[j]])] <- rho$seGamma[rho$ind.thresholds[[j]]]
+	      }
+	      tmp[[j]]
+	    })
+	  names(est$setheta) <- rho$y.names
+	  for (j in 1:rho$ndim) names(est$setheta[[j]]) <- get_labels_theta(rho,j)
+   	  est$sebeta <- rho$seGamma[rho$npar.thetas + seq_len(rho$npar.betas)]
+      names(est$sebeta) <- unlist(lapply(rho$constraints, function(x) colnames(x)))
+      est$seerror.struct <- rho$seGamma[rho$npar.thetas + rho$npar.betas +  seq_len(attr(rho$error.structure, "npar"))]
   }
   est
 }
@@ -1360,9 +1360,10 @@ constraints.mvord <- function(object) object$constraints
 #' \code{names_constraints} is a function which extracts the names of the regression constraints based on the model \code{formula} and \code{data}.
 #' @param formula model formula
 #' @param data data set
+#' @param contrasts an optional list. See the \code{contrasts.arg} of \code{\link{model.matrix.default}}.
 #' @export
-names_constraints <- function(formula, data){
+names_constraints <- function(formula, data, contrasts = NULL){
   intercept <- ifelse(attr(terms.formula(formula), "intercept") == 1, TRUE, FALSE)
-  nam <-  colnames(model.matrix(update(as.formula(paste0("~",deparse(formula[[3]]))), ~ . + 1), data))
+  nam <-  colnames(model.matrix(update(as.formula(paste0("~",deparse(formula[[3]]))), ~ . + 1), data, contrasts.arg = contrasts))
   if(intercept) nam else nam[-1]
 }

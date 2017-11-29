@@ -6,7 +6,9 @@ tolerance <- 1e-6
 df <- cbind.data.frame("i" = rep(1:100,2), "j" = rep(1:2,each = 100),
                        "Y" = c(data_toy_example$Y1,data_toy_example$Y2),
                        "X1" = rep(data_toy_example$X1,2),
-                       "X2" = rep(data_toy_example$X2,2))
+                       "X2" = rep(data_toy_example$X2,2),
+                       "f1" = factor(sample(rep(data_toy_example$Y2,2)), ordered =F),
+                       "f2" = factor(rep(data_toy_example$Y1,2), ordered=F))
 res <- mvord:::mvord(formula = Y ~ 0 + X1 + X2,
                      data = df,
                      index = c("i", "j"),
@@ -15,10 +17,12 @@ res <- mvord:::mvord(formula = Y ~ 0 + X1 + X2,
                      se = T,
                      error.structure = cor_general(~1),
                      threshold.constraints = c(1,1),
-                     coef.constraints = c(1,1))
+                     coef.constraints = c(1,1),
+                     contrasts = list(f1 = function(x)
+                      contr.treatment(nlevels(df$f1), base = 1),
+                      f2 = "contr.sum"))
 
 res.summary <- summary(res, short = FALSE)
-
 # paste(format(res.summary$thresholds$Estimate), collapse = ",")
 # paste(format(res.summary$coefficients$Estimate), collapse = ",")
 # paste(format(res.summary$error.structure$Estimate), collapse = ",")
@@ -32,19 +36,55 @@ mvord:::check(all.equal(logLik(res)[[1]], -134.90867383218699, tolerance = toler
 mvord:::check(all.equal(AIC(res), 280.34366345384768, tolerance = tolerance))
 mvord:::check(all.equal(BIC(res), 294.05508548536392, tolerance = tolerance))
 
+
 res2 <- mvord:::mvord(formula = Y ~ 0 + X1 + X2,
                      data = df,
                      index = c("i", "j"),
                      link = mvprobit(),
                      solver = "BFGS",
-                     se = TRUE,
+                     se = T,
                      error.structure = cor_general(~1),
                      threshold.constraints = c(1,1),
-                     coef.constraints = list(matrix(rep(1,6), ncol = 1), matrix(rep(1,6), ncol = 1)))
+                     coef.constraints = list(matrix(rep(1,4), ncol = 1), matrix(rep(1,4), ncol = 1)))
 
 mvord:::check(all.equal(res$beta, res2$beta, tolerance = tolerance))
 mvord:::check(all.equal(res$sebeta, res2$sebeta, tolerance = tolerance))
 
+#######################################################################
+## cor_general(~factor)
+res <- mvord:::mvord(formula = Y ~ 0 + X1 + X2,
+                     data = df,
+                     index = c("i", "j"),
+                     link = mvprobit(),
+                     solver = "BFGS",
+                     se = T,
+                     error.structure = cor_general(~f2),
+                     threshold.constraints = c(1,1),
+                     coef.constraints = c(1,1),
+                     contrasts = list(f2 = "contr.sum"))
+
+res.summary <- summary(res, short = FALSE)
+
+# paste(format(res.summary$thresholds$Estimate), collapse = ",")
+# paste(format(res.summary$coefficients$Estimate), collapse = ",")
+# paste(format(res.summary$error.structure$Estimate), collapse = ",")
+mvord:::check(all.equal(res.summary$thresholds$Estimate,
+  c(-0.905536238229823,1.00422647477676,-0.905536238229823,1.00422647477676)))
+
+mvord:::check(all.equal(res.summary$coefficients$Estimate,
+  c(0.647946752758975,-0.428945695428613), tolerance = tolerance))
+mvord:::check(all.equal(res.summary$error.structure$Estimate,
+  c(0.736674877333851,0.918294104589989,0.837114099387819), tolerance = tolerance))
+mvord:::check(all.equal(res.summary$thresholds$`Std. Error`,
+  c(0.182656232144459,0.174670667614416,0.182656232144459,0.174670667614416)))
+
+mvord:::check(all.equal(res.summary$coefficients$`Std. Error`,
+  c(0.141534034219262,0.139898136273291), tolerance = tolerance))
+mvord:::check(all.equal(res.summary$error.structure$`Std. Error`,
+  c(0.178240140406125,0.0688621486547878,0.131030217690603), tolerance = tolerance))
+mvord:::check(all.equal(logLik(res)[[1]], -134.1704617831153427687, tolerance = tolerance))
+mvord:::check(all.equal(AIC(res), 283.3946870070909085371, tolerance = tolerance))
+mvord:::check(all.equal(BIC(res), 303.0034948586141467786, tolerance = tolerance))
 
 ##################################################################################
 res <- mvord:::mvord(formula = Y ~ 0 + X1 + X2,
@@ -138,7 +178,8 @@ res2 <- mvord:::mvord(formula = Y ~ 0 + X1 + X2,
                       se = TRUE,
                       error.structure = cor_equi(~1),
                       threshold.constraints = c(1,1),
-                      coef.constraints = list(X2 = cbind(c(1,1,1,0,0,0), c(0,0,0,1,1,1)), X1 = matrix(rep(1,6), ncol = 1)))
+                      coef.constraints = list(X2 = cbind(c(1,1,0,0), c(0,0,1,1)), 
+                        X1 = matrix(rep(1,4), ncol = 1)))
 
 mvord:::check(all.equal(res$beta, res2$beta, tolerance = tolerance))
 mvord:::check(all.equal(res$sebeta, res2$sebeta, tolerance = tolerance))
@@ -179,7 +220,8 @@ res2 <- mvord:::mvord(formula = Y ~ 0 + X1 + X2,
                       se = TRUE,
                       error.structure = cor_ar1(~1 + X1),
                       threshold.constraints = c(1,1),
-                      coef.constraints = list(matrix(rep(1,6), ncol = 1), matrix(rep(1,6), ncol = 1)))
+                      coef.constraints = list(matrix(rep(1,4), ncol = 1), matrix(rep(1,4), 
+                        ncol = 1)))
 
 mvord:::check(all.equal(res$beta, res2$beta, tolerance = tolerance))
 mvord:::check(all.equal(res$sebeta, res2$sebeta, tolerance = tolerance))
@@ -219,7 +261,8 @@ res2 <- mvord:::mvord2(formula = cbind(Y1,Y2) ~ 0 + X1 + X2,
                        se = TRUE,
                        error.structure = cor_general(~1),
                        threshold.constraints = c(1,1),
-                      coef.constraints = list(X1 = cbind(c(1,1,1,0,0,0), c(0,0,0,1,1,1)), X2 = matrix(c(rep(0,3),rep(1,3)), ncol = 1)))
+                      coef.constraints = list(X1 = cbind(c(1,1,0,0), c(0,0,1,1)), 
+                        X2 = matrix(c(rep(0,2),rep(1,2)), ncol = 1)))
 
 mvord:::check(all.equal(res$beta, res2$beta, tolerance = tolerance))
 mvord:::check(all.equal(res$sebeta, res2$sebeta, tolerance = tolerance))
@@ -233,7 +276,7 @@ res <- mvord:::mvord(formula = Y ~ 0 + X1 + offset(X2),
                       se = TRUE,
                       error.structure = cor_general(~1),
                       threshold.constraints = c(1,2),
-                      coef.constraints = list(X1 = cbind(c(1,1,1,0,0,0), c(0,0,0,1,1,1))))
+                      coef.constraints = list(X1 = cbind(c(1,1,0,0), c(0,0,1,1))))
 
 res.summary <- summary(res, short = FALSE)
 
@@ -261,7 +304,7 @@ res2 <- mvord:::mvord(formula = Y ~ 0 + X1,
                      se = TRUE,
                      error.structure = cor_general(~1),
                      threshold.constraints = c(1,2),
-                     coef.constraints = list(X1 = cbind(c(1,1,1,0,0,0), c(0,0,0,1,1,1))))
+                     coef.constraints = list(X1 = cbind(c(1,1,0,0), c(0,0,1,1))))
 
 mvord:::check(all.equal(res$beta, res2$beta, tolerance = tolerance))
 mvord:::check(all.equal(res$sebeta, res2$sebeta, tolerance = tolerance))
@@ -273,7 +316,7 @@ res3 <- mvord:::mvord2(formula = cbind(Y1,Y2) ~ 0 + X1 + offset(X2),
                        se = TRUE,
                        error.structure = cor_general(~1),
                        threshold.constraints = c(1,2),
-                       coef.constraints = list(X1 = cbind(c(1,1,1,0,0,0), c(0,0,0,1,1,1))))
+                       coef.constraints = list(X1 = cbind(c(1,1,0,0), c(0,0,1,1))))
 mvord:::check(all.equal(res$beta, res3$beta, tolerance = tolerance))
 mvord:::check(all.equal(res$sebeta, res3$sebeta, tolerance = tolerance))
 
@@ -288,6 +331,9 @@ res <- mvord:::mvord(formula = Y ~ 0 + X1 + X2,
               threshold.constraints = c(1,1),
               coef.constraints = cbind(c(NA, NA), c(1,2)),
               coef.values = cbind(c(1, 1), c(NA,NA)))
+#rho <- res$rho
+
+
 res.summary <- summary(res, short = FALSE)
 
 options(digits = 22)
@@ -295,14 +341,13 @@ options(digits = 22)
 mvord:::check(all.equal(res.summary$thresholds$Estimate, c(-1.5832887068318791, 1.7586425059282578,-1.5832887068318791, 1.7586425059282578), tolerance = tolerance))
 mvord:::check(all.equal(res.summary$coefficients$Estimate, c(-0.77306090515002379,-0.72430328395818655), tolerance = tolerance))
 mvord:::check(all.equal(res.summary$error.structure$Estimate, c(0.85589444067598619), tolerance = tolerance))
-mvord:::check(all.equal(res.summary$thresholds$`Std. Error`, c(0.15747061394267914, 0.13847727110011718, 0.15747061394267914, 0.13847727110011718), tolerance = tolerance))
-mvord:::check(all.equal(res.summary$coefficients$`Std. Error`, c(0.16867230982308812, 0.14273286641753360), tolerance = tolerance))
-mvord:::check(all.equal(res.summary$error.structure$`Std. Error`, c(0.093373979677277799), tolerance = tolerance))
+mvord:::check(all.equal(res.summary$thresholds$`Std. Error`, c(0.25851084470435, 0.242515931175915, 0.25851084470435, 0.242515931175915), tolerance = tolerance))
+mvord:::check(all.equal(res.summary$coefficients$`Std. Error`, c(0.267328102851796, 0.244039846158968), tolerance = tolerance))
+mvord:::check(all.equal(res.summary$error.structure$`Std. Error`, c(0.0605992051275919), tolerance = 0.00001))
 mvord:::check(all.equal(logLik(res)[[1]], -135.52109964954849, tolerance = tolerance))
 mvord:::check(all.equal(AIC(res), 281.56851508857068, tolerance = tolerance))
 mvord:::check(all.equal(BIC(res), 295.27993712008691, tolerance = tolerance))
 
-########################################################################################
 # res1 <- mvord:::mvord(formula = Y ~ 1 + X1 + X2,
 #                       data = df,
 #                       index = c("i", "j"),
@@ -374,7 +419,7 @@ res <- mvord:::mvord(formula = Y ~ 0 + X1 + X2,
                      index = c("i", "j"),
                      link = mvprobit(),
                      solver = "BFGS",
-                     se = TRUE,
+                     se = T,
                      error.structure = cor_general(~1),
                      threshold.constraints = c(1,2)
                      #coef.constraints = list(X1 = cbind(c(1,1,1,0,0,0), c(0,0,0,1,1,1)))
@@ -387,7 +432,7 @@ options(digits = 22)
 # paste(format(res.summary$thresholds$Estimate), collapse = ",")
 # paste(format(res.summary$coefficients$Estimate), collapse = ",")
 # paste(format(res.summary$error.structure$Estimate), collapse = ",")
-mvord:::check(all.equal(res.summary$thresholds$Estimate, 
+mvord:::check(all.equal(res.summary$thresholds$Estimate,
   c(-1.0201257709778766002984,  1.1417947563798713783711,-0.9066208754867860486470,  0.9994625771009618686591), tolerance = tolerance))
 mvord:::check(all.equal(res.summary$coefficients$Estimate, c(  0.8373293289440481013131,  0.4982163010003868297559, -0.4474052843372895438279, -0.3539081075852134050663),
  tolerance = tolerance))

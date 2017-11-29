@@ -62,6 +62,20 @@ cor_equi <-
   class(value) <- c("cor_equi", "error_struct")
   value
 }
+#' @rdname error_struct
+#' @export
+cor_ident <-
+  ## Constructor for the cor_ident class
+  function(formula = ~ 1)
+{
+  value <- list(name = "cor_ident",
+                formula = formula,
+                type = "correlation")
+  attr(value, "formula") <- formula
+  class(value) <- c("cor_ident", "error_struct")
+  value
+}
+########################################
 
 build_error_struct <-
   ## extractor for correlation matrix
@@ -91,11 +105,12 @@ formula.error_struct <-
   function(x, ...) eval(attr(x, "formula"))
 
 get_covariate.error_struct <-
-  function(object, data.x)
+  function(object, data.x, contrasts)
 {
   covar_mat <- lapply(data.x, function(x)
-    model.matrix(formula(object), model.frame(formula(object), x,
-      na.action = function(x) x)))
+    suppressWarnings(model.matrix(formula(object),
+      model.frame(formula(object), x, na.action = function(x) x),
+      contrasts.arg = contrasts)))
   ## check if covariate matrices are equal
   if (!all(sapply(1:(length(covar_mat) - 1), function(i)
     all(covar_mat[[i]] == covar_mat[[i+1]], na.rm = T)))) {
@@ -117,19 +132,21 @@ initialize.error_struct <-
   ## takes as data the output on mvord.data
   function(object, data)
 {
+
+  contr <- attr(data, "contrasts")
   attr(object, "ynames") <- colnames(data$y)
   attr(object, "subjnames") <- rownames(data$y)
 
   attr(object, "ndim") <- length(data$x)
   attr(object, "nobs") <- nrow(data$x[[1]])
   attr(object, "covariate") <-
-    get_covariate(object, data.x = data$x)
+    get_covariate(object, data.x = data$x, contrasts = contr)
   object
 }
 
-#########################################
-### Methods for cov_general
-
+###############################
+### Methods for cov_general ###
+###############################
 init_fun.cov_general <-
 function(object,  data)
 {
@@ -278,8 +295,7 @@ function(object, tpar)
     sigma <- crossprod(tLmat)
     sigma[lower.tri(sigma)]
   })
- # if (is.null(ncol(corr_pars)))
- # 	dim(corr_pars) <- c(1, nlev)
+  if (npar1 == 1) dim(corr_pars) <- c(1, nlev)
   rVec <- tcrossprod(covar, corr_pars)
   sd <- rep(1, ndim)
   return(list(rVec = rVec, sdVec = sd))
@@ -413,6 +429,43 @@ function(object, tpar)
   attr(object, "parnames") <- colnames(covar)
   object
 }
+#############################
+### Methods for cor_ident ###
+#############################
+
+init_fun.cor_ident <-
+function(object,  data)
+{
+  ## initializes some attributes of cor_equi objects
+  form <- formula(object)
+  object <- initialize(object, data)
+  attr(object, "npar") <- 0
+  object
+}
+
+build_error_struct.cor_ident <-
+function(object, tpar)
+{
+  ## tpar argument: transformed parameters (from optimizer)
+  ## builds the correlation and standard deviation parameters for cor_ident objects
+  ndim <- attr(object, "ndim")
+  sdVec <- rep(1, ndim)
+  list(rVec = matrix(0, nrow = attr(object, "nobs"),
+    ncol = ndim * (ndim - 1)/2), sdVec=sdVec)
+}
+
+finalize.cor_ident <-
+function(object, tpar)
+{
+  ## finalizes some attributes of cor_equi objects
+  ndim <- attr(object, "ndim")
+  covar <- attr(object, "covariate")
+ # names(tpar) <- colnames(covar)
+  attr(object, "par") <- NULL
+  attr(object, "parnames") <- NULL
+  object
+}
+
 ########################################################
 #' @title Extracts Error Structure of Multivariate Ordinal Regression Models.
 #' @description
@@ -539,6 +592,18 @@ get_error_struct.cor_ar1 <- function(object, type, ...){
            z = z)
   }
   return(par)
+}
+
+get_error_struct.cor_ident <- function(object, type, ...){
+  npar <- attr(object, "npar")
+  par <- attr(object, "par")
+  ndim <- attr(object, "ndim")
+  covar <- attr(object, "covariate")
+  ynames <- attr(object, "ynames")
+  nobs <- attr(object, "nobs")
+  corr <- diag(ndim)
+  rownames(corr) <- colnames(corr) <- ynames
+  rep(list(corr), nobs)
 }
 
 ##########################################

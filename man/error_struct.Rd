@@ -6,6 +6,7 @@
 \alias{cor_general}
 \alias{cor_ar1}
 \alias{cor_equi}
+\alias{cor_ident}
 \title{Error Structures in mvord}
 \usage{
 cov_general(formula = ~1)
@@ -15,6 +16,8 @@ cor_general(formula = ~1)
 cor_ar1(formula = ~1)
 
 cor_equi(formula = ~1)
+
+cor_ident(formula = ~1)
 }
 \arguments{
 \item{formula}{\code{\link{formula}} object}

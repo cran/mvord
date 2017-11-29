@@ -8,8 +8,8 @@ mvord2(formula, data, error.structure = cor_general(~1), link = mvprobit(),
   coef.constraints = NULL, coef.values = NULL,
   threshold.constraints = NULL, threshold.values = NULL, weights = NULL,
   offset = NULL, scale = FALSE, se = TRUE, start.values = NULL,
-  solver = "newuoa", PL.lag = NULL, control = list(maxit = 2e+05, trace =
-  1, kkt = FALSE))
+  solver = "newuoa", PL.lag = NULL, contrasts = NULL,
+  control = list(maxit = 2e+05, trace = 1, kkt = FALSE))
 }
 \arguments{
 \item{formula}{a \code{\link{formula}} object for multivariate responses in the form of\cr
@@ -56,6 +56,8 @@ This operation is performed for each repeated measurement before fitting.}
 or wrapper function for user defined solver.}
 
 \item{PL.lag}{specifies the time lag of the pairs in the pairwise likelihood approach to be optimized.}
+
+\item{contrasts}{an optional list. See the \code{contrasts.arg} of \code{\link{model.matrix.default}}.}
 
 \item{control}{a list of control arguments. See \code{\link{optimx}}.}
 }

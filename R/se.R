@@ -16,7 +16,7 @@ PL_se <- function(rho){
     }
     cat("\n")
     rho$Vi_num <-  Vi_num %*% J.inv
-    rho$V <- rho$n/(rho$n - length(par)) * crossprod(rho$Vi) # original variability matrix
+    rho$V <- rho$n/(rho$n - length(par)) * crossprod(rho$Vi_num) # original variability matrix
     cat("\nComputing Hessian numerically ... \n")
     Ht <-  hessian(function(par) PLfun(par, rho), par,
                    method = "Richardson",
@@ -41,7 +41,7 @@ deriv_corr_rect <- function(Uk, Ul, Lk, Ll, r, deriv_corr_fun) {
       deriv_corr_fun(Lk, Ul, r) + deriv_corr_fun(Lk, Ll, r))
 }
 
-deriv_theta_rect <- function(Uk, Ul, Lk, Ll, 
+deriv_theta_rect <- function(Uk, Ul, Lk, Ll,
                              r,
                              Umatk, Lmatk,
                              deriv_biv_fun, sdfack) {
@@ -52,16 +52,16 @@ deriv_theta_rect <- function(Uk, Ul, Lk, Ll,
     LL <-  deriv_biv_fun(Lk, Ll, r)
     - 1/sdfack * ((UU - UL) * Umatk  - (LU - LL) * Lmatk)
 }
-deriv_beta_rect <- function(Uk, Ul, Lk, Ll, 
+deriv_beta_rect <- function(Uk, Ul, Lk, Ll,
                             r,
-                            Xmatk,
+                            XmatkU, XmatkL,
                             deriv_biv_fun, sdfack) {
     ## derivatives of the rectangle probabilities wrt to thresholds
     UU <-  deriv_biv_fun(Uk, Ul, r)
     UL <-  deriv_biv_fun(Uk, Ll, r)
     LU <-  deriv_biv_fun(Lk, Ul, r)
     LL <-  deriv_biv_fun(Lk, Ll, r)
-    1/sdfack * (UU - UL - LU + LL) * Xmatk
+    1/sdfack * ((UU - UL) * XmatkU - (LU - LL) * XmatkL)
 }
 deriv_stddev_rect <- function(Uk, Ul, Lk, Ll, r, deriv_biv_fun){
     UU <- deriv_biv_fun(Uk, Ul, r)
@@ -84,6 +84,7 @@ derivs_ana <- function(rho){
   rho$B2 <- lapply(1:rho$ndim, function(j)
     1 * (col(matrix(0, rho$n, rho$ntheta[j] + 1)) ==
            c(unclass(rho$y[, j]))))
+
   rho$B1 <- lapply(1:rho$ndim, function(i) as.matrix(rho$B2[[i]][,-(rho$ntheta[i] + 1), drop = FALSE]))
   rho$B2 <- lapply(1:rho$ndim, function(i) as.matrix(rho$B2[[i]][,-1, drop = FALSE]))
 
@@ -106,11 +107,11 @@ derivs_ana <- function(rho){
   })))
 
   ## First take care of the univariate case (q_i = 1)
-  #pr <- rho$link$F_uni(pred.upper[rho$ind_univ]) -  
+  #pr <- rho$link$F_uni(pred.upper[rho$ind_univ]) -
   #rho$link$F_uni(pred.lower[rho$ind_univ])
   #pr[pr < .Machine$double.eps] <- .Machine$double.eps
-  
-  
+
+
   if (length(contrast_uni) > 0) {
    h_list <- lapply(contrast_uni, function(k) {
     indk <-  !is.na(rho$y[, k]) & (rowSums(!is.na(rho$y)) == 1)
@@ -135,16 +136,20 @@ derivs_ana <- function(rho){
 
     # dbeta
     dbeta <- matrix(0, nrow = rho$n, ncol = rho$npar.betas)
-    ## quick n dirty, put zero in the deriv matrix when NA in the coef.ind
-    array.ind.k <- do.call("rbind", lapply(seq_len(NCOL(rho$coef.ind[[k]])),
-      function(i) cbind(which(indk), rho$coef.ind[[k]][indk, i])))
-    array.ind.k <- na.omit(array.ind.k)
-    ## indx gives the columns of x[[k]] which are not offsets.
-    indx <- apply(rho$coef.ind[[k]], 2, function(x) !all(is.na(x)))
 
-    dbeta[array.ind.k] <-
-     1/std.dev.mat[indk, k] *
-      (rho$link$deriv.fun$dF1dx(U[indk, k]) - rho$link$deriv.fun$dF1dx(L[indk, k])) * rho$x[[k]][indk, indx]
+    XtmpUk <- do.call("cbind", lapply(seq_along(rho$constraints), function(p) {
+     sapply(seq_len(NCOL(rho$constraints[[p]])), function(s){
+          bb<- rho$XcatU[[k]][indk, (p -1)*rho$ntheta[k] + seq_len(rho$ntheta[k])]
+          bb %*% rho$constraints[[p]][rho$inds.cat[[k]],s]
+    })}))
+    XtmpLk <- do.call("cbind", lapply(seq_along(rho$constraints), function(p) {
+     sapply(seq_len(NCOL(rho$constraints[[p]])), function(s){
+          bb<- rho$XcatL[[k]][indk, (p -1)*rho$ntheta[k] + seq_len(rho$ntheta[k])]
+          bb %*% rho$constraints[[p]][rho$inds.cat[[k]],s]
+    })}))
+   dbeta[indk, ] <-
+       1/std.dev.mat[indk, k] *
+      (rho$link$deriv.fun$dF1dx(U[indk, k]) * XtmpUk - rho$link$deriv.fun$dF1dx(L[indk, k]) * XtmpLk)
     # dcorr -- no correlation for univ case
     dcorr <- matrix(0, nrow = rho$n, ncol = npar.err)
 
@@ -152,7 +157,7 @@ derivs_ana <- function(rho){
     if (rho$error.structure$type == "covariance"){
       dstddev <- matrix(0, nrow = rho$n, ncol = rho$ndim * NCOL(covar))
       arr.ind.k <- cbind(which(indk), (lev - 1) * rho$ndim + k)
-      dstddev[arr.ind.k] <-  1/std.dev.mat[indk, k] *
+      dstddev[arr.ind.k] <-   1/std.dev.mat[indk, k] *
              (rho$link$deriv.fun$dF1dx(U[indk, k]) * U[indk, k] -
               rho$link$deriv.fun$dF1dx(L[indk, k]) * L[indk, k])
       dcorr[, (NCOL(dcorr) - rho$ndim * max(lev) + 1):NCOL(dcorr)] <- dstddev
@@ -203,7 +208,7 @@ derivs_ana <- function(rho){
      Lk <- L[indkl, k]
      Ll <- L[indkl, l]
      return(deriv_theta_rect(
-                      Uk = Uk, Ul = Ul, 
+                      Uk = Uk, Ul = Ul,
                       Lk = Lk, Ll = Ll,
                       r = r,
                       Umatk = rho$B1[[k]][indkl, pick.col.theta, drop = F],
@@ -235,50 +240,92 @@ derivs_ana <- function(rho){
    ## dbeta
    dbeta <- matrix(0, ncol = rho$npar.betas, nrow = rho$n)
    ## for which covariates are there betas to be estimated
-   deriv_beta_rect_klp <- function(k, l, p, ind) {
+   # deriv_beta_rect_klp <- function(k, l, p, ind) {
+   #   Uk <- U[ind, k]
+   #   Ul <- U[ind, l]
+   #   Lk <- L[ind, k]
+   #   Ll <- L[ind, l]
+   #   return(
+   #   deriv_beta_rect(Uk = Uk, Ul = Ul,
+   #                   Lk = Lk, Ll = Ll, r = r,
+   #                    Xmatk =rho$x[[k]][ind,p],
+   #                    deriv_biv_fun = rho$link$deriv.fun$dF2dx,
+   #                    sdfack = std.dev.mat[ind, k]))
+   # }
+  deriv_beta_rect_klp2 <- function(k, l, p,s, ind) {
      Uk <- U[ind, k]
      Ul <- U[ind, l]
      Lk <- L[ind, k]
      Ll <- L[ind, l]
+     bb<- rho$XcatL[[k]][ind, (p -1)*rho$ntheta[k] + seq_len(rho$ntheta[k])]
+     bbbL<- bb %*% rho$constraints[[p]][rho$inds.cat[[k]],s]
+     bb<- rho$XcatU[[k]][ind, (p -1)*rho$ntheta[k] + seq_len(rho$ntheta[k])]
+     bbbU<- bb %*% rho$constraints[[p]][rho$inds.cat[[k]],s]
      return(
-     deriv_beta_rect(Uk = Uk, Ul = Ul, 
+     deriv_beta_rect(Uk = Uk, Ul = Ul,
                      Lk = Lk, Ll = Ll, r = r,
-                      Xmatk = rho$x[[k]][ind, p],
-                      deriv_biv_fun = rho$link$deriv.fun$dF2dx,
-                      sdfack = std.dev.mat[ind, k]))
+                     XmatkU =bbbU, XmatkL =bbbL,
+                     deriv_biv_fun = rho$link$deriv.fun$dF2dx,
+                     sdfack = std.dev.mat[ind, k]))
    }
-   for (p in seq_len(NCOL(rho$coef.ind[[1]]))) {
-      betaskl <- sapply(rho$coef.ind[c(k,l)], function(x) x[indkl, p])
-      indx <- apply(betaskl, 2, function(x) !all(is.na(x)))
-      if (sum(indx) == 1) {
-        arr.ind.single <- cbind(which(indkl), betaskl[,indx])
-        dbeta[arr.ind.single] <- deriv_beta_rect_klp(c(k, l)[indx],
-          c(k, l)[!indx], p, which(indkl))
 
-      } else {
-         if (sum(indx) == 2) {
-          ind.double <- betaskl[,1] == betaskl[,2]
-          ind.single <- betaskl[,1] != betaskl[,2]
-          arr.ind.double <- cbind(which(indkl)[ind.double],
-            betaskl[ind.double,1])
-          dbeta[arr.ind.double] <-
-            deriv_beta_rect_klp(k, l, p, which(indkl)[ind.double]) +
-            deriv_beta_rect_klp(l, k, p, which(indkl)[ind.double])
+   #rho$npar.betas
+   inds.cats.kl <- rho$inds.cat[c(k,l)]
+   #for X1
+   inddouble<-lapply(rho$constraints, function(x){
+   indx <- rep(0, NCOL(x))
+   for (s in seq_len(NCOL(x))){
+   if (all(x[inds.cats.kl[[1]], s] == 0))  indx[s] <- 2 ## code for only l
+    if (all(x[inds.cats.kl[[2]], s] == 0))  indx[s] <- 1   ## code for only k
 
-      arr.ind.single.k <- cbind(which(indkl)[ind.single], betaskl[ind.single,1])
-      arr.ind.single.l <- cbind(which(indkl)[ind.single], betaskl[ind.single,2])
+    }
+   as.character(indx)
+   })
 
-      dbeta[arr.ind.single.k] <-
-        deriv_beta_rect_klp(k, l, p,which(indkl)[ind.single])
+   dbeta[indkl, ] <- do.call("cbind", lapply(seq_along(rho$constraints), function(p) {
+     sapply(seq_len(NCOL(rho$constraints[[p]])), function(s)
+      switch(inddouble[[p]][s],
+        "0" = deriv_beta_rect_klp2(k,l,p=p,s=s, indkl) +
+              deriv_beta_rect_klp2(l,k,p=p,s=s, indkl),
+        "1" =  deriv_beta_rect_klp2(k,l,p=p,s=s, indkl),
+        "2" = deriv_beta_rect_klp2(l,k,p=p,s=s, indkl) ))
+   } ))
 
-      dbeta[arr.ind.single.l] <-
-        deriv_beta_rect_klp(l, k, p, which(indkl)[ind.single])
-      }
-   }
-   }
+   # for (p in seq_len(NCOL(rho$coef.ind[[1]]))) {
+
+   #    betaskl <- sapply(rho$coef.ind[c(k,l)], function(x)
+   #      x[indkl, p])
+   #    indx <- apply(betaskl, 2, function(x) !all(is.na(x)))
+   #    if (sum(indx) == 1) {
+   #      arr.ind.single <- cbind(which(indkl), betaskl[,indx])
+   #      dbeta[arr.ind.single] <- deriv_beta_rect_klp(c(k, l)[indx],
+   #        c(k, l)[!indx], p, which(indkl))
+
+   #    } else {
+   #       if (sum(indx) == 2) {
+   #        ind.double <- betaskl[,1] == betaskl[,2]
+   #        ind.single <- betaskl[,1] != betaskl[,2]
+   #        arr.ind.double <- cbind(which(indkl)[ind.double],
+   #          betaskl[ind.double,1])
+   #        dbeta[arr.ind.double] <-
+   #          deriv_beta_rect_klp(k, l, p, which(indkl)[ind.double]) +
+   #          deriv_beta_rect_klp(l, k, p, which(indkl)[ind.double])
+
+   #    arr.ind.single.k <- cbind(which(indkl)[ind.single], betaskl[ind.single,1])
+   #    arr.ind.single.l <- cbind(which(indkl)[ind.single], betaskl[ind.single,2])
+
+   #    dbeta[arr.ind.single.k] <-
+   #      deriv_beta_rect_klp(k, l, p,which(indkl)[ind.single])
+
+   #    dbeta[arr.ind.single.l] <-
+   #      deriv_beta_rect_klp(l, k, p, which(indkl)[ind.single])
+   #    }
+   # }
+   # }
 
   ## dcorr
   dcorr <- matrix(0, ncol = npar.err, nrow = rho$n)
+  if (npar.err > 0){
   covar <- attr(rho$error.structure, "covariate")
   dLdr <- deriv_corr_rect(Uk = U[indkl, k], Ul = U[indkl, l],
     Lk = L[indkl, k], Ll = L[indkl, l], r = r,
@@ -305,17 +352,18 @@ derivs_ana <- function(rho){
     poslevl <- (lev[indkl] - 1) * rho$ndim + l
     arr.ind.k <- cbind(which(indkl), poslevk)
     arr.ind.l <- cbind(which(indkl), poslevl)
-    dstddev[arr.ind.k] <- 1/std.dev.mat[indkl, k] *
+    dstddev[arr.ind.k] <-  1/std.dev.mat[indkl, k] *
       deriv_stddev_rect(Uk = U[indkl, k], Ul = U[indkl, l],
         Lk = L[indkl, k], Ll = L[indkl, l], r,
         deriv_biv_fun = rho$link$deriv.fun$dF2dx)
 
-    dstddev[arr.ind.l] <-  1/std.dev.mat[indkl, l] *
+    dstddev[arr.ind.l] <-    1/std.dev.mat[indkl, l] *
       deriv_stddev_rect(Uk = U[indkl, l], Ul = U[indkl, k],
         Lk = L[indkl, l], Ll = L[indkl, k], r,
         deriv_biv_fun = rho$link$deriv.fun$dF2dx)
    dcorr[, (NCOL(dcorr) - rho$ndim * max(lev) + 1):NCOL(dcorr)] <- dstddev
   }
+}
   h_list[[it]] <- rho$weights * 1/pr * cbind(dtheta, dbeta, dcorr)
   }
   ## matrix containing the gradients for each subject
@@ -324,7 +372,7 @@ derivs_ana <- function(rho){
   V <- crossprod(Vi)
   ## Hessian matrix
   H <- Reduce("+", lapply(h_list, crossprod))
-  list(V = V, H = H)
+  list(V=V, H = H)
 }
 #############################################################
 ###### neg loglikelihood component for each subject i #######
@@ -333,22 +381,38 @@ derivs_ana <- function(rho){
 transf_par_i <- function(par, rho, i) {
   tparsigma <- par[rho$npar.thetas + rho$npar.betas + seq_len(attr(rho$error.structure, "npar"))]
   sigmas <- build_error_struct(rho$error.structure, tparsigma)
-  if (is.null(dim(sigmas$sdVec))) sdi <- sigmas$sdVec
-  else sdi <- sigmas$sdVec[i, ]
+  if (is.null(dim(sigmas$sdVec))){ 
+    sdi <- sigmas$sdVec
+  } else {
+    sdi <- sigmas$sdVec[i, ]
+  }
   theta <- rho$transf_thresholds(par[seq_len(rho$npar.thetas)], rho)   #transform thresholds due to monotonicity
   par_beta <- par[rho$npar.thetas + seq(rho$npar.betas)]
-  beta <- lapply(seq_len(rho$ndim), function(j){
-    sapply(seq_along(rho$coef.names), function(p) {
-      ifelse(is.na(rho$coef.ind[[j]][,p]), 0, par_beta[rho$coef.ind[[j]][,p]]) #TODO: ?ifelse
+  pred.fixedU  <- sapply(1:rho$ndim, function(j) {
+     b <- lapply(seq_along(rho$constraints),function(p)
+     rho$constraints[[p]][rho$inds.cat[[j]],,drop=F] %*%
+     par_beta[rho$nbeta.first[p] + seq_len(rho$npar.beta[p]) - 1])
+      (sum(rho$XcatU[[j]][i, ] * unlist(b)) + rho$offset[[j]])[i]
     })
-  })
-  pred.fixed <- sapply(1:rho$ndim, function(j)
-    (rowSums(rho$x[[j]] * beta[[j]]) + rho$offset[[j]])[i])
+  pred.fixedL  <- sapply(1:rho$ndim, function(j) {
+     b <- lapply(seq_along(rho$constraints),function(p)
+     rho$constraints[[p]][rho$inds.cat[[j]],,drop=F] %*%
+     par_beta[rho$nbeta.first[p] + seq_len(rho$npar.beta[p]) - 1])
+      sum(rho$XcatL[[j]][i, ] * unlist(b)) + rho$offset[[j]][i]
+    })
+
+ # beta <- lapply(seq_len(rho$ndim), function(j){
+ #   sapply(seq_along(rho$coef.names), function(p) {
+ #     ifelse(is.na(rho$coef.ind[[j]][,p]), 0, par_beta[rho$coef.ind[[j]][,p]]) #TODO: ?ifelse
+ #   })
+ # })
+ # pred.fixed <- sapply(1:rho$ndim, function(j)
+ #   (rowSums(rho$x[[j]] * beta[[j]]) + rho$offset[[j]])[i])
 #  pred.fixed <- sapply(1:rho$ndim, function(j) rho$x[[j]][i, ] %*% beta[[j]])
   theta.lower <- sapply(1:rho$ndim, function(j) c(-rho$inf.value, theta[[j]])[rho$y[i, j]])
   theta.upper <- sapply(1:rho$ndim, function(j) c(theta[[j]], rho$inf.value)[rho$y[i, j]])
-  pred.lower <- (theta.lower - pred.fixed)/sdi
-  pred.upper <- (theta.upper - pred.fixed)/sdi
+  pred.lower <- (theta.lower - pred.fixedL)/sdi
+  pred.upper <- (theta.upper - pred.fixedU)/sdi
   list(U = pred.upper, L = pred.lower,
        corr_par = sigmas$rVec[i, , drop=F])
 }

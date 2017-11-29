@@ -1,5 +1,11 @@
 This file documents updates and changes in the package mvord
 
+changes in version 0.2.1 (2017-11-29)
+- adapted predict(), get.prob(), marginal.predict()
+- added contrasts as argument to mvord() and mvord2()
+- fixed bug in VGAM design of coef.constraints
+- changed internal design matrices
+
 changes in version 0.2.0 (2017-11-10)
 - implemented nobs.mvord()
 - implemented vcov.mvord()

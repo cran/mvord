@@ -4,12 +4,14 @@
 \alias{names_constraints}
 \title{Names of regression coefficient constraints in mvord}
 \usage{
-names_constraints(formula, data)
+names_constraints(formula, data, contrasts = NULL)
 }
 \arguments{
 \item{formula}{model formula}
 
 \item{data}{data set}
+
+\item{contrasts}{an optional list. See the \code{contrasts.arg} of \code{\link{model.matrix.default}}.}
 }
 \description{
 \code{names_constraints} is a function which extracts the names of the regression constraints based on the model \code{formula} and \code{data}.
