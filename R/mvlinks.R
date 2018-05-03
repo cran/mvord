@@ -13,12 +13,12 @@
 #' \code{df} which specifies the degrees of freedom to be used for the
 #' \eqn{t} copula.  The default value of the degrees of freedom parameter is
 #' 8. We restrict the degrees of freedom to be integer valued because the
-#' most efficient routines for computing bivariate \eqn{t}~probabilities do
+#' most efficient routines for computing bivariate \eqn{t} probabilities do
 #' not support non-integer degrees of freedom. For further details see vignette.
 #' @param df integer specifying the degrees of freedom of the t copula
 #' @return The functions \code{mvlogit()} and \code{mvprobit()} returns an object
-#' of \code{\link{class}} \code{"mvlink"}.
-#' An object of \code{\link{class}} \code{"mvlink"} is a list containing the following components:
+#' of \code{\link{class}} \code{'mvlink'}.
+#' An object of \code{\link{class}} \code{'mvlink'} is a list containing the following components:
 #'
 #' \itemize{
 #'  \item{\code{name}}{
@@ -47,7 +47,7 @@
 #'   \code{U} and \code{L} both have two columns, first corresponding to the bounds of x,
 #'   second to the bounds of y; the number of rows corresponds to the number of observations;
 #'   the rectangle probabilities are defined as
-#'   \eqn{Pr(L[,1]\leq X\leq U[,1], L[,2]\leq Y \leq U[,2]|r) = F_2(U[,1], U[,2]) - F_2(U[,1], L[,2])- F_2(L[,1], U[,2]) + F_2(L[,1], L[,2])}
+#'   \eqn{Pr(L[,1]\leq X\leq U[,1], L[,2]\leq Y \leq U[,2]|r) = F_2(U[,1], U[,2],r) - F_2(U[,1], L[,2],r)- F_2(L[,1], U[,2],r) + F_2(L[,1], L[,2],r)}
 #'   }
 #'   \item{\code{F_multi}}{
 #'
@@ -60,11 +60,11 @@
 #'
 #'   (needed for computation of analytic standard errors) a list containing the following gradient functions:
 #'         \itemize{
-#'            \item{\code{dF1dx}}{ derivative \eqn{dF_1(x)/dx} function}
-#'            \item{\code{dF2dx}}{ derivative \eqn{dF_2(x,y,r)/dx} function}
-#'            \item{\code{dF2dr}}{ derivative \eqn{dF_2(x,y,r)/dr } function}
+#'            \item{\code{dF1dx}}{ derivative \eqn{dF_1(x)/dx} function,}
+#'            \item{\code{dF2dx}}{ derivative \eqn{dF_2(x,y,r)/dx} function,}
+#'            \item{\code{dF2dr}}{ derivative \eqn{dF_2(x,y,r)/dr } function.}
 #'          }
-#'   if \code{deriv.fun = NULL} numeric standard errors will be computed
+#'   If \code{deriv.fun = NULL} numeric standard errors will be computed.
 #'   }
 #' }
 #' @name mvlinks

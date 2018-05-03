@@ -25,13 +25,14 @@ cor_ident(formula = ~1)
 \description{
 Different \code{error.structures} are available in \pkg{mvord}:
 \itemize{
-\item general correlation structure (default) \code{cor_general(~1)},
-\item general covariance structure \code{cov_general(~1)},
-\item factor dependent correlation structure \code{cor_general(~f)},
-\item factor dependent covariance structure \code{cov_general(~f)},
-\item covariate dependent equicorrelation structure \code{cor_equi(~S)},
-\item AR(1) correlation structure \code{cor_ar1(~1)}, or
-\item covariate dependent AR(1) correlation structure \code{cor_ar1(~S)}.
+\item general correlation structure (default) \code{cor_general(~ 1)},
+\item general covariance structure \code{cov_general(~ 1)},
+\item factor dependent correlation structure \code{cor_general(~ f)},
+\item factor dependent covariance structure \code{cov_general(~ f)},
+\item equicorrelation structure \code{cor_equi(~ 1)},
+\item covariate dependent equicorrelation structure \code{cor_equi(~ S)},
+\item AR(1) correlation structure \code{cor_ar1(~ 1)}, or
+\item covariate dependent AR(1) correlation structure \code{cor_ar1(~ S)}.
 }
 See \code{\link{error_struct}} or vignette.
 }

@@ -10,11 +10,11 @@ thresholds(object, ...)
 \method{thresholds}{mvord}(object, ...)
 }
 \arguments{
-\item{object}{object of class \code{"mvord"}}
+\item{object}{an object of class \code{'mvord'}.}
 
 \item{...}{further arguments passed to or from other methods.}
 }
 \description{
 \code{thresholds} is a generic function which extracts threshold coefficients from objects of class \cr
-\code{"mvord"}.
+\code{'mvord'}.
 }

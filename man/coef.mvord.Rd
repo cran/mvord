@@ -7,11 +7,11 @@
 \method{coef}{mvord}(object, ...)
 }
 \arguments{
-\item{object}{object of class \code{"mvord"}}
+\item{object}{an object of class \code{'mvord'}.}
 
 \item{...}{further arguments passed to or from other methods.}
 }
 \description{
 \code{coef} is a generic function which extracts
- regression coefficients from objects of class \code{"mvord"}.
+ regression coefficients from objects of class \code{'mvord'}.
 }

@@ -56,6 +56,22 @@ set_threshold_type <- function(rho){
   }
   type
 }
+check_args_optimizer <- function(rho){
+  allmeth <- c("Nelder-Mead",  "BFGS",  "CG",  "L-BFGS-B", "nlm",
+    "nlminb", "spg", "ucminf", "newuoa", "bobyqa", "nmkb", "hjkb", "Rcgmin", "Rvmmin")
+  if (is.character(rho$solver) && !(rho$solver %in% allmeth)) stop("Solver name not among the allowed methods in optimx.")
+}
+
+check_args_error.structure <- function(error.structure, data){
+  allmeth <- c("cor_general",  "cov_general",  "cor_ar1",
+   "cor_equi", "cor_ident", "cor_rel_var")
+  if (!(as.character(error.structure[[1]]) %in% allmeth)) stop("error.structure not among allowed methods in mvord.")
+
+  if(!class(error.structure[[2]]) == "formula") stop("formula in error.structure has to be of class formula.", call. = FALSE)
+
+  if(any(!(all.vars(error.structure[[2]]) %in% colnames(data)))) stop("All variables in error.structure have to exist in data.", call. = FALSE)
+
+}
 
 check_args_thresholds <- function(rho){
   #CHECK if treshold.values is in line with threshold.constraints
@@ -72,9 +88,11 @@ check_args_thresholds <- function(rho){
 }
 
 check_args_coef <- function(rho){
-    if (nrow(rho$coef.constraints) != rho$ndim) stop("row dimension of coef.constraints and outcome dimension do not match", call. = FALSE)
+  if (nrow(rho$coef.constraints) != rho$ndim) stop("Row dimension of coef.constraints and outcome dimension do not match.", call. = FALSE)
+  if (NCOL(rho$coef.constraints) != NCOL(rho$x[[1]])) stop("Column dimension of coef.constraints and number of columns in model matrix do not match.
+                                                           Maybe (Intercept) is included or specify constraints for factors or interaction terms accordingly.", call. = FALSE)
 
-  for (j in 1:ncol(rho$coef.constraints)){
+  for (j in seq_len(NCOL(rho$coef.constraints))){
     indj <- unique(rho$coef.constraints[,j])
     indj <- indj[!is.na(indj)]
     lapply(seq_along(indj), function(k) {
@@ -85,9 +103,25 @@ check_args_coef <- function(rho){
     })
   }
 }
+#
+# check_args_coef2 <- function(rho){
+#   if (nrow(rho$coef.constraints) != rho$ndim) stop("Row dimension of coef.constraints and outcome dimension do not match.", call. = FALSE)
+#   tmp <- sum(apply(apply(rho$coef.constraints, 2, is.na),2,all) * apply(!apply(rho$coef.values, 2, is.na),2,all))
+#   if ((NCOL(rho$coef.constraints)-tmp) != NCOL(rho$x[[1]])) stop("Column dimension of coef.constraints and number of columns in model matrix do not match.
+#                                                                  Maybe (Intercept) is included or specify constraints for factors or interaction terms accordingly.", call. = FALSE)
+#
+#   for (j in seq_len(NCOL(rho$coef.constraints))){
+#     indj <- unique(rho$coef.constraints[,j])
+#     indj <- indj[!is.na(indj)]
+#     lapply(seq_along(indj), function(k) {
+#       tmpind <- which(rho$coef.constraints[,j] == indj[k])
+#       tmp <- rho$coef.values[tmpind,j]
+#       if(length(unique(tmp)) != 1) stop("If constraints are set on the coefficients (by coef.constraints),
+#                                         coef.values need to be specified accordingly for these outcome dimensions.", call. = FALSE)
+#     })
+#     }
+#   }
 
-
-#TODO
 check_args_constraints <- function(rho){
   if (!all(rho$coef.names %in% names(rho$constraints)))
     stop("coef.constraints need to be specified for all covariates.", call. = FALSE)
@@ -95,12 +129,113 @@ check_args_constraints <- function(rho){
   if(any(sapply(rho$constraints, NROW) != rho$nthetas)) stop("coef.constraints need to have number of total categories rows
                                                            (sum of number of categories for all dimensions).", call. = FALSE)
 
-
 }
 
+check_args_input1 <- function(rho, data){
+  #data
+  if(any(!(all.vars(rho$formula) %in% colnames(data)))) stop("All variables in formula have to exist in data.", call. = FALSE)
+  ## index
+  if(!all(rho$index %in% colnames(data))) stop("index names do not match with column names of data", call.=FALSE)
+  if (any(duplicated(data[, rho$index]))) stop("Duplicated indexes: Observation(s) have the same subject and measurement index", call. = FALSE)
+  # PL.lag
+  if(!is.null(rho$PL.lag)) {
+    if (rho$PL.lag <= 0) stop("PL.lag must be greater than 0", call. = FALSE)
+  }
+  # weights
+  if(!is.null(rho$weights.name) && !is.character(rho$weights.name)) stop("argument weights has to be of type character.", call. = FALSE)
+  }
+
+check_args_input2 <- function(rho, data){
+  #dim == 1
+  if (rho$ndim == 1) stop("The outcome dimension of the model is 1. Better use e.g., MASS::polr() or ordinal::clm() instead.", call. = FALSE)
+  #offset
+  if(!is.null(rho$offset) && length(rho$offset) != rho$ndim) stop("offset has to be of length of the dimension of the model.", call. = FALSE)
+  #PL.lag
+  if(!is.null(rho$PL.lag)) {
+    if (rho$error.structure$name != "cor_ar1") stop("Use PL.lag only with cor_ar1 error.structure", call. = FALSE)
+    #  && !is.integer(rho$PL.lag)) stop("PL.lag must be positive and of type integer.", call. = FALSE)
+    if (rho$PL.lag > rho$ndim) stop("PL.lag exceeds dimension of the model.", call. = FALSE)
+  }
+}
+
+set_args_other <- function(rho) {
+  ## coef contraints
+  ## can be null, matrix, vector, list
+  ## if null set to matrix
+  if(is.null(rho$coef.constraints)){
+    if(NCOL(rho$x[[1]]) > 0){
+      rho$coef.constraints <- matrix(1:rho$ndim, ncol = NCOL(rho$x[[1]]), nrow = rho$ndim)
+    } else {
+      rho$coef.constraints <- matrix(integer(), ncol = 0, nrow = rho$ndim)
+    }
+  }
+  ## list and coef values can't be used 
+  if(is.list(rho$coef.constraints) && !is.null(rho$coef.values)) stop("This coef.constraints design requires offsets instead of coef.values.", call.=FALSE)
+  if(!is.list(rho$coef.constraints) & NCOL(rho$coef.constraints) > 0){
+      if(is.vector(rho$coef.constraints)) {
+        if(NCOL(rho$x[[1]]) > 0){
+          rho$coef.constraints <- matrix(rho$coef.constraints, ncol = NCOL(rho$x[[1]]), nrow = rho$ndim)
+        } else {
+          rho$coef.constraints <- matrix(integer(), ncol = 0, nrow = rho$ndim)
+        }
+      }
+    if(is.null(rho$coef.values)){
+    rho$coef.values <- matrix(NA, ncol = ncol(rho$coef.constraints),
+      nrow = nrow(rho$coef.constraints))
+    rho$coef.values[is.na(rho$coef.constraints)] <- 0 #default 0
+    }
+    #check if coef.values fit to coef.constraints
+    check_args_coef(rho)
+    # set coef.constraints NA  coef.values are set
+    rho$coef.constraints[!is.na(rho$coef.values)] <- NA 
+    rho$intercept.type <- ifelse(rho$intercept == FALSE, "fixed",
+       ifelse(any(is.na(rho$coef.values[,1])), "flexible", "fixed"))
+  } else {
+    rho$intercept.type <- ifelse(rho$intercept == FALSE, "fixed", "flexible")
+  } 
+  ## threshold.contraints
+  if(is.null(rho$threshold.constraints)) rho$threshold.constraints <- 1:rho$ndim
+  ## PL.lag
+  if (is.null(rho$PL.lag)) rho$PL.lag <- rho$ndim
+  if (rho$PL.lag != round(rho$PL.lag)) {
+    cat("PL.lag represents number of time units and must be a positive integer.
+      Rounding to closest integer.\n")
+    rho$PL.lag <- round(rho$PL.lag)
+  }
+  rho
+}
 ##########################################
 ###### AUXILIARY FUNCTIONS ##############
 ##########################################
+check_rank <- function(j,rho){
+  y <- rho$y[,j]
+  ind <- !is.na(y)
+  y <- y[ind]
+  lev <- levels(y)
+  llev <- length(lev)
+  y <- unclass(y)
+  q <- llev %/% 2L
+  y1 <- (y > q)
+
+  if(rho$intercept == TRUE) x <- rho$x[[j]][ind,] else x <- cbind(Intercept = rep(1, rho$n), rho$x[[j]])[ind,]
+
+  offset <- rho$offset[[j]][ind]
+  method <- rho$link$name
+suppressWarnings(
+  if(method == "mvlogit") fit <- glm.fit(x, y1, family = binomial(), offset = offset) else{
+    fit <- glm.fit(x, y1, family = binomial("probit"), offset = offset)
+  }
+)
+
+  coefs <- fit$coefficients
+  if(any(is.na(coefs))) {
+    warning("Design appears to be rank-deficient, dropping some coefficients may help.")
+  }
+}
+
+
+
+
 get_start_values <- function(rho){
  gammas <- sapply(1:rho$ndim, function(j) {
    if (rho$npar.theta.opt[j] != 0){
@@ -112,90 +247,119 @@ get_start_values <- function(rho){
 c(unlist(gammas), rep(0, rho$npar.betas))
 }
 
-## par <- rho$optpar
+build_correction_thold_fun <- function(k, rho) {
+    ..l.. <- match(rho$threshold.constraints[k],
+                   rho$threshold.constraints)
+    f <- function(beta, k, rho)  {
+        betatildemu <-  beta * rho$mat_center_scale
+        br <- drop(crossprod(rho$contr_theta, betatildemu[,1]))
+        - br[rho$inds.cat[[k]]] + br[rho$inds.cat[[..l..]]]
+    }
+    f
+}
+
+build_correction_thold_fun0 <- function(j, rho) {
+  ..j.. <- j
+  f <- function(beta, k, rho)  {
+    rep(0L, rho$ntheta[..j..])
+  }
+  f
+}
+
 transf_par <- function(par, rho) {
-  tparsigma <- par[rho$npar.thetas + rho$npar.betas +
+  par_sigma <- par[rho$npar.thetas + rho$npar.betas +
     seq_len(attr(rho$error.structure, "npar"))]
-  sigmas <- build_error_struct(rho$error.structure, tparsigma)
-  theta <- rho$transf_thresholds(par[seq_len(rho$npar.thetas)], rho)
+  sigmas <- build_error_struct(rho$error.structure, par_sigma)
   par_beta <- par[rho$npar.thetas + seq_len(rho$npar.betas)]
-  pred.fixedU  <- sapply(1:rho$ndim, function(j) {
-     b <- lapply(seq_along(rho$constraints),function(i)
-     rho$constraints[[i]][rho$inds.cat[[j]],,drop=F] %*%
-     par_beta[rho$nbeta.first[i] + seq_len(rho$npar.beta[i]) - 1])
-      rho$XcatU[[j]] %*% unlist(b) + rho$offset[[j]]
-    })
-  pred.fixedL  <- sapply(1:rho$ndim, function(j) {
-     b <- lapply(seq_along(rho$constraints),function(i)
-     rho$constraints[[i]][rho$inds.cat[[j]],,drop=F] %*%
-     par_beta[rho$nbeta.first[i] + seq_len(rho$npar.beta[i]) - 1])
-      rho$XcatL[[j]] %*% unlist(b) + rho$offset[[j]]
-    })
-  theta.lower <- sapply(1:rho$ndim, function(j) c(-rho$inf.value, theta[[j]])[rho$y[, j]])
-  theta.upper <- sapply(1:rho$ndim, function(j) c(theta[[j]], rho$inf.value)[rho$y[, j]])
-  pred.lower <- (theta.lower - pred.fixedL)/sigmas$sdVec
-  pred.upper <- (theta.upper - pred.fixedU)/sigmas$sdVec
-  list(U = pred.upper,
-       L = pred.lower,
-       corr_par = sigmas$rVec,
-       sd_mat = sigmas$sdVec)
+  betatilde <- rho$constraints_mat %*% par_beta
+  par_theta <- rho$transf_thresholds(par[seq_len(rho$npar.thetas)], rho, betatilde)
+
+  thetatilde <- lapply(seq_len(rho$ndim), function(j)
+    par_theta[[j]] + rho$thold_correction[[j]](betatilde, k = j, rho = rho))
+
+  pred.upper  <- sapply(seq_len(rho$ndim), function(j) {
+   th_u <- c(thetatilde[[j]], rho$inf.value)[rho$y[, j]]
+   xbeta_u <- c(rho$XcatU[[j]] %*% betatilde[rho$indjbeta[[j]]])
+   th_u - xbeta_u - rho$offset[[j]]
+  })/sigmas$sdVec
+  pred.lower  <- sapply(seq_len(rho$ndim), function(j) {
+    th_l <- c(-rho$inf.value, thetatilde[[j]])[rho$y[, j]]
+    xbeta_l <- c(rho$XcatL[[j]] %*% betatilde[rho$indjbeta[[j]]])
+    th_l - xbeta_l - rho$offset[[j]]
+  })/sigmas$sdVec
+  list(U = pred.upper, L = pred.lower,
+       corr_par = sigmas$rVec, sd_mat = sigmas$sdVec)
 }
 #########################################################################
 ## transformation of the threshold parameters (to ensure monotonicity) ##
 #########################################################################
-transf_thresholds_fixall <- function(gamma, rho){
-  rho$threshold.values
-}
-
-transf_thresholds_fix1_first <- function(gamma, rho){
-  ## \theta_j = a + exp(gamma_1) + .. + exp(gamma_j)
+transf_thresholds_fixall <- function(gamma, rho, betatilde){
+  betatildemu <- betatilde * rho$mat_center_scale
+  br <- drop(crossprod(rho$contr_theta, betatildemu[,1]))
   lapply(seq_len(rho$ndim), function(j) {
-    cumsum(c(rho$threshold.values.fixed[[j]][1], exp(gamma[rho$ind.thresholds[[j]]])))
+    ..l.. <- match(rho$threshold.constraints[j],
+                   rho$threshold.constraints)
+    rho$threshold.values[[j]] - br[rho$inds.cat[[..l..]]]
   })
 }
 
-transf_thresholds_fix2_first <- function(gamma, rho){
-  ## \theta_j = a + b + exp(gamma_1) + .. + exp(gamma_j)
-     lapply(seq_len(rho$ndim), function(j) {
-       a <- rho$threshold.values.fixed[[j]][1] ## a bounds
-       b <- rho$threshold.values.fixed[[j]][2] ## b bounds
-       if (is.na(b)) b <- NULL ## it implies one can have binary with fix2first
-       c(a, cumsum(c(b, exp(gamma[rho$ind.thresholds[[j]]]))))
-     })
+transf_thresholds_fix1_first <- function(gamma, rho, betatilde){
+  ## \theta_j = a + exp(gamma_1) + .. + exp(gamma_j)
+  betatildemu <- betatilde * rho$mat_center_scale
+  br <- drop(crossprod(rho$contr_theta, betatildemu[,1]))
+  lapply(seq_len(rho$ndim), function(j) {
+    ## TODO make nicer
+    correction <- rho$thold_correction[[j]](betatilde, k = j, rho)[1]
+    a <- rho$threshold.values.fixed[[j]][1] - br[rho$inds.cat[[j]][1]] - correction
+    cumsum(c(a, exp(gamma[rho$ind.thresholds[[j]]])))
+  })
 }
 
-transf_thresholds_fix2_firstlast <- function(gamma, rho){
+transf_thresholds_fix2_first <- function(gamma, rho, betatilde){
+  ## \theta_j = a + b + exp(gamma_1) + .. + exp(gamma_j)
+  betatildemu <- betatilde * rho$mat_center_scale
+  br <- drop(crossprod(rho$contr_theta, betatildemu[,1]))
+  lapply(seq_len(rho$ndim), function(j) {
+    correction <- rho$thold_correction[[j]](betatilde, k = j, rho)[1:2]
+    a <- rho$threshold.values.fixed[[j]][1] - br[rho$inds.cat[[j]][1]] - correction[1]
+    b <- rho$threshold.values.fixed[[j]][2] - br[rho$inds.cat[[j]][2]] - correction[2]
+        if (is.na(b)) b <- NULL ## it implies one can have binary with fix2first
+        c(a, cumsum(c(b, exp(gamma[rho$ind.thresholds[[j]]]))))
+    })
+}
+
+transf_thresholds_fix2_firstlast <- function(gamma, rho, betatilde){
   ## (theta_j - theta_{j-1})/(1 - theta_j) = exp(gamma_j)/(1 + exp(gamma_j))
+  betatildemu <- betatilde * rho$mat_center_scale
+  br <- drop(crossprod(rho$contr_theta, betatildemu[,1]))
   lapply(seq_len(rho$ndim), function(j){
+    correction <- rho$thold_correction[[j]](betatilde, k = j, rho)[c(1, rho$ntheta[j])]
     gamma1  <- gamma[rho$ind.thresholds[[j]]]
-    a <- rho$threshold.values.fixed[[j]][1]
-    b <- rho$threshold.values.fixed[[j]][2]
+    a <- rho$threshold.values.fixed[[j]][1] - br[rho$inds.cat[[j]][1]] - correction[1]
+    b <- rho$threshold.values.fixed[[j]][2] - br[rho$inds.cat[[j]][rho$ntheta[j]]] - correction[2]
     if (!is.na(b)) {
-    recursive.theta <- function(i) {
-      if (i == 0) 0
-      else return ((exp(gamma1[i]) + recursive.theta(i - 1))/(1 + exp(gamma1[i])))
-    }
-    theta <- unlist(sapply(seq_along(gamma1), function(i) recursive.theta(i)))
-    c(0, theta, 1) * (b - a) + a
+      recursive.theta <- function(i) {
+        if (i == 0) 0
+        else return ((exp(gamma1[i]) + recursive.theta(i - 1))/(1 + exp(gamma1[i])))
+      }
+      theta <- unlist(sapply(seq_along(gamma1), function(i) recursive.theta(i)))
+      c(0, theta, 1) * (b - a) + a
     } else a
     })
 }
 
-transf_thresholds_flexible <- function(gamma, rho){
-  lapply(1:rho$ndim, function(j)
+transf_thresholds_flexible <- function(gamma, rho, betatilde = NULL){
+  lapply(1L:rho$ndim, function(j)
     if (anyNA(rho$threshold.values[[j]])){
-      if (rho$ntheta[j] > 1) {
+      if (rho$ntheta[j] > 1L) {
         cumsum(c(gamma[rho$ind.thresholds[[j]][1]],
-                 exp(gamma[rho$ind.thresholds[[j]][2:rho$ntheta[j]]])))
-      } else if (rho$ntheta[j] == 1) gamma[rho$ind.thresholds[[j]]] else NULL
+                 exp(gamma[rho$ind.thresholds[[j]][2L:rho$ntheta[j]]])))
+      } else if (rho$ntheta[j] == 1L) gamma[rho$ind.thresholds[[j]]] else NULL
     } else rho$threshold.values[[j]]
   )
 }
-
 ##############################################################################
 get_ind_thresholds <- function(threshold.constraints,rho){
-  rho$npar.theta.opt <- rho$npar.theta
-  rho$npar.theta.opt[duplicated(threshold.constraints)] <- 0
   cs <- c(0, cumsum(rho$npar.theta.opt)[-length(rho$npar.theta.opt)])
   lapply(seq_len(rho$ndim), function(j){
     if (!duplicated(threshold.constraints)[j]) {
@@ -251,69 +415,59 @@ backtransf_sigmas <- function(R){
 # #' @param response.names (optional) vector of names of the repeated measurements in \code{data}
 # #' which specifies the ordering of the repeated measurements.
 # #' @export
+
 mvord_data <- function(data, index, y.names, x.names,
-                         y.levels = NULL, response.names = NULL, contrasts) {
-  df <- list()
-  if (any(duplicated(data[,index]))) stop("duplicated observation(s) for one index", call. = FALSE)
-  index.levels <- levels(as.factor(data[, index[2]]))
-  data.split <- split(data[,c(y.names, index[1])], data[, index[2]])
-  data.split.y <- lapply(seq_along(data.split), function(j) {
-    colnames(data.split[[j]]) <- c(index.levels[j],index[1])
-    data.split[[j]]})
-  df$y <- Reduce(function(...) merge(..., by = index[1], all = TRUE), data.split.y )
-  df$y <- df$y[, - match(index[1], colnames(df$y)), drop = FALSE]
-  response.names.NA <- c()
-  if (!is.null(response.names)) {
-    response.names.NA <- response.names[!response.names %in% colnames(df$y)]
-    df$y <- cbind(df$y, matrix(NA, ncol = length(response.names.NA), nrow = nrow(df$y), dimnames = list(c(),response.names.NA)))
-    df$y <- df$y[,as.character(response.names)]
+      y.levels, response.names) {
+  ## check if response is ordered factor. Set response levels accordingly
+  if (is.null(y.levels) & is.ordered(data[,y.names])){
+    y.levels <- rep(list(levels(data[,y.names])), length(response.names))
   }
-  colnames.y <- colnames(df$y)
+  df <- list()
+  data.split.y <- split(data[,c(y.names, index[1])],
+    factor(data[, index[2]], levels = response.names))
+  data.split.x <- split(data[, c(x.names, index[1])],
+        factor(data[, index[2]], levels = response.names))
+  #set colnames (otherwise warning due to identical colnames in reduce)
+  for (j in seq_along(data.split.y)) {
+      colnames(data.split.y[[j]])[1] <- response.names[j]
+      colnames(data.split.x[[j]]) <- c(paste(x.names,j, sep = "."), index[1])
+  }
+
+
+  df$y <- Reduce(function(...) merge(..., by = index[1], all = TRUE),
+    data.split.y)
+  subject_id_names <- df$y[,index[1]]
+  df$y <- df$y[, - match(index[1], colnames(df$y)), drop = FALSE]
   if (is.null(y.levels)) {
-    df$y <- do.call(cbind.data.frame, lapply(1:ncol(df$y), function(j) ordered(df$y[, j])))
+    df$y <- cbind.data.frame(lapply(df$y, ordered))
     df$ylevels <- lapply(seq_len(ncol(df$y)), function(j) levels(df$y[,j]))
   } else {
     df$ylevels <- y.levels
-    df$y <- do.call(cbind.data.frame, lapply(1:ncol(df$y), function(j) {
-      if (!all(unique(df$y[!is.na(df$y[, j]), j]) %in% y.levels[[j]])) stop("levels of response do not match with y.levels", call. = FALSE)
-      ordered(df$y[, j], levels = y.levels[[j]])}
-      ))
+    for (j in seq_along(y.levels)) {
+      ## check levels for each response
+      if (!all(levels(df$y[, j]) %in% df$ylevels[[j]]))
+        warning("levels of response do not all match with response levels", call. = FALSE)
+      if (!all(y.levels[[j]] %in% unique(df$y[, j])))
+        warning(sprintf("For response %i, not all response
+          levels are observed. Model might be non-identifiable if
+          the thresholds for this response are not restricted.", j),
+        call.=FALSE)
+      df$y[, j] <- ordered(df$y[, j], levels = y.levels[[j]])
+    }
   }
-  colnames(df$y) <- colnames.y
-  #X
-  data.split.x <- split(data[, c(x.names, index[1])], data[, index[2]])
-  names.x <- names(data.split.x)
-  #set colnames (otherwise warning due to identical colnames in reduce)
-  data.split.x <- lapply(seq_along(data.split.x), function(j) {
-    colnames(data.split.x[[j]]) <- c(paste(x.names,j, sep = "."), index[1])
-    data.split.x[[j]]})
-
+  rownames(df$y) <- subject_id_names
 
   xdatadf <- Reduce(function(...) merge(...,by = index[1], all = TRUE), data.split.x)
-  subject_id_names <- xdatadf[,index[1]]
   rownames(xdatadf) <- subject_id_names
   xdatadf <- xdatadf[, -match(index[1], colnames(xdatadf)), drop = FALSE]
-  xdatadf <- cbind(xdatadf, matrix(NA, ncol = length(response.names.NA) * length(x.names),
-                                   nrow = nrow(xdatadf)))
-  df$x <- lapply(1:(length(index.levels) + length(response.names.NA)), function(i) {
+  df$x <- lapply(1:length(response.names), function(i) {
     tmp <- xdatadf[,(i - 1) * length(x.names) + seq_along(x.names), drop = FALSE]
     names(tmp) <- x.names
     tmp
   })
-
-  names(df$x) <- c(names.x, response.names.NA)
-  if (!is.null(response.names)) df$x <- df$x[as.character(response.names)]
-
-  rownames(df$y) <- subject_id_names
-  indallNA <- which(rowSums(is.na(df$y)) == NCOL(df$y))
-  if (length(indallNA) != 0) {
-    df$y <- df$y[-indallNA, ]
-    df$x <- lapply(df$x, function(a) {a <- a[-indallNA, ]; a})
-  }
-  attr(df, "contrasts") <- contrasts
+  names(df$x) <- response.names
   df
 }
-
 check <- function(...){
   stopifnot(...)
 }
@@ -361,7 +515,7 @@ if(is.list(rho$coef.constraints)){
     }
     tmp
   })
-  constraints<-constraints[sapply(constraints,NCOL)!=0]
+  constraints <- constraints[sapply(constraints,NCOL)!=0]
   }
   constraints <- lapply(seq_along(constraints), function(p) {
     colnames(constraints[[p]]) <- paste(rho$coef.names[p], seq_len(NCOL(constraints[[p]])))
@@ -369,6 +523,7 @@ if(is.list(rho$coef.constraints)){
       get_labels_theta(rho, j)))
     constraints[[p]]
   })
+  if(NCOL(rho$coef.constraints) == 0) constraints <- NULL
   names(constraints) <- rho$coef.names
   constraints
 }
@@ -423,19 +578,136 @@ if (all(sapply(rho$offset, is.null))) {
   }
 }
   if (!is.null(rho$coef.values)){
-  wh_fix <- which(colSums(is.na(rho$coef.values)) == 0)
-  if (length(wh_fix) != 0){
+  rho$wh_fix <- which(colSums(is.na(rho$coef.values)) == 0)
+  if (length(rho$wh_fix) != 0){
   for (j in 1:rho$ndim) {
-     rho$x[[j]] <-  rho$x[[j]][, -wh_fix, drop = F]
+     attribute <- attr(rho$x[[j]], "assign")
+     rho$x[[j]] <-  rho$x[[j]][, -rho$wh_fix, drop = F]
+     attr(rho$x[[j]], "assign") <- attribute[-rho$wh_fix]
   }
   }
 }
   rho
 }
 
-#is.partial_prop_odds <- function(x, ncat, first.ind){
-#  inds <- lapply(seq_len(length(ncat)), function(j) seq_len(ncat[j]) + first.ind[j] - 1)
-#  sapply(seq_len(length(ncat)), function(j){
-#    if (all(apply(x[inds[[j]], ,drop = FALSE] == 1, 2, all) | apply(x[inds[[j]], ,drop = FALSE] == 0, 2, all))) FALSE else TRUE
-#  })
-#}
+
+#' @title Control functions for mvord()
+#' @description Control arguments are set for \code{mvord()}.
+#' @param se logical, if \code{TRUE} standard errors are computed.
+#' @param start.values vector of (optional) starting values.
+#' @param solver character string containing the name of the applicable solver of \code{\link{optimx}} (default is \code{"newuoa"})
+#'  or wrapper function for user defined solver.
+#' @param solver.optimx.control a list of control arguments to be passed to \code{\link{optimx}}. See \code{\link{optimx}}.
+# #' @param scale If \code{scale = TRUE}, then for each response the corresponding covariates of \code{\link{class}} \code{"numeric"} are standardized before fitting,
+# #'  i.e., by substracting the mean and dividing by the standard deviation.
+#' @seealso \code{\link{mvord}}
+#' @export
+mvord.control <- function(se = TRUE,
+                          start.values = NULL,
+                          solver = "newuoa",
+                          solver.optimx.control = list(maxit=200000, trace = 0, kkt = FALSE)){
+  if (is.null(solver.optimx.control$maxit)) solver.optimx.control$maxit <- 200000
+  if (is.null(solver.optimx.control$kkt)) solver.optimx.control$kkt <- FALSE
+  if (is.null(solver.optimx.control$trace)) solver.optimx.control$trace <- 0
+  list(se = se, start.values = start.values, solver = solver,
+    solver.optimx.control = solver.optimx.control)
+}
+
+
+# residuals.mvord <- function(object){
+#   probs <- marginal.predict(object, type = "all.prob")
+#   cum.probs <- lapply(probs, function(x) t(apply(x,1,cumsum)))
+#   y <- object$rho$y
+#
+#   residuals <- lapply(1:object$rho$ndim, function(j){
+#     p1 <- cbind(0,cum.probs[[j]])[cbind(1:nobs(object),as.integer(y[,j]))]
+#     p2 <- 1 - cum.probs[[j]][cbind(1:nobs(object),as.integer(y[,j]))]
+#     out <- p1 - p2
+#     names(out) <- rownames(y)
+#     out
+#   })
+#   names(residuals) <- object$rho$y.names
+#   return(residuals)
+# }
+
+
+#Mc Fadden's Pseudo R^2
+#' @title Pseudo \eqn{R^2} for objects of class 'mvord'
+#' @description This function computes Mc Fadden's Pseudo \eqn{R^2} for objects of class \code{'mvord'}.
+#' @param object an object of class \code{'mvord'}.
+#' @param adjusted if \code{TRUE}, then adjusted Mc Fadden's Pseudo \eqn{R^2} is computed.
+#' @seealso \code{\link{mvord}}
+#' @export
+pseudo.R.squared <- function(object, adjusted = FALSE){
+  #fit model ~ 1
+  formula <- object$rho$formula
+  formula[[3]] <- 1
+
+  model0 <- mvord(formula = formula,
+                  data = object$rho$y,
+                  error.structure = cor_ident(~1))
+  if (adjusted){
+    1 - (logLik(object) - length(object$rho$optpar)) / logLik(model0)
+  } else{
+    1 - logLik(object) / logLik(model0)
+  }
+}
+
+
+scale_mvord <- function(df){
+  if(NCOL(df) == 0) list(x = df, mu = 0, sc = 1)else{
+  mu <- apply(df, 2, mean, na.rm = TRUE)
+  sc <- apply(df, 2, sd, na.rm = TRUE)
+  sc[sc == 0] <- 1
+
+  x <- sapply(seq_len(NCOL(df)), function(p){
+    (df[,p] - mu[p])/sc[p]
+  })
+  rownames(x) <- rownames(df)
+  list(x = x, mu = mu, sc = sc)
+  }
+}
+
+reduce_size.mvord <- function(object){
+  out <- object
+  out$rho$x <- NULL
+  out$rho$y <- NULL
+  out$rho$error.structure <- NULL
+  out$rho$weights <- NULL
+  out$rho$offset <- NULL
+  out$rho$ind_kl <- NULL
+  tmp <- out$rho$link$name
+  out$rho$link <- NULL
+  out$rho$link$name <- tmp
+  out$rho$constraints_scaled <- NULL
+  out$rho$constraints_mat <- NULL
+  out$rho$thold_correction <- NULL
+  #out$rho$V <- NULL
+  #out$rho$H.inv <- NULL
+  out$rho$varGamma <- NULL
+  out$rho$contr_theta <- NULL
+  attributes(out$error.struct)$subjnames <- NULL
+  out
+}
+
+reduce_size2.mvord <- function(object){
+  out <- object
+  #out$rho$x <- NULL
+  #out$rho$y <- NULL
+  out$rho$error.structure <- NULL
+  out$rho$weights <- NULL
+  #out$rho$offset <- NULL
+  out$rho$ind_kl <- NULL
+  #tmp <- out$rho$link$name
+  #out$rho$link <- NULL
+  #out$rho$link$name <- tmp
+  out$rho$constraints_scaled <- NULL
+  out$rho$constraints_mat <- NULL
+  out$rho$thold_correction <- NULL
+  #out$rho$V <- NULL
+  #out$rho$H.inv <- NULL
+  out$rho$varGamma <- NULL
+  out$rho$contr_theta <- NULL
+  attributes(out$error.struct)$subjnames <- NULL
+  out
+}

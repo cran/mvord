@@ -9,7 +9,7 @@ names_constraints(formula, data, contrasts = NULL)
 \arguments{
 \item{formula}{model formula}
 
-\item{data}{data set}
+\item{data}{a given data set.}
 
 \item{contrasts}{an optional list. See the \code{contrasts.arg} of \code{\link{model.matrix.default}}.}
 }

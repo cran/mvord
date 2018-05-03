@@ -4,7 +4,7 @@
 \name{data_cr_panel}
 \alias{data_cr_panel}
 \title{Simulated panel of credit ratings}
-\format{A data frame with 11431 rows and 11 variables}
+\format{A data frame with 11320 rows and 9 variables}
 \usage{
 data(data_cr_panel)
 }
@@ -12,17 +12,14 @@ data(data_cr_panel)
 A data set containing simulated credit ratings assigned by one rater and simulated perfomance measures for firms in different years.
 
 \itemize{
-  \item \code{year} year index
   \item \code{rating} credit ratings
   \item \code{firm_id} firm index
-  \item \code{ICR} interest coverage ratio, which measures how well the interest expenses can be
-covered from the free operating cash-flow of a company
+  \item \code{year} year index
   \item \code{LR} liquidity ratio, relating the cash held by a company to the current liabilities
-  \item \code{LEV1} leverage ratio relating debt to earnings before interest and taxes
-  \item \code{LEV2} leverage ratio measuring the percentage of debt in the long-term capital of a firm
-  \item \code{PR} profitability ratio measuring return on capital
-  \item \code{lRSIZE} log of relative size of the company in the market
-  \item \code{lSYSR} log of a measure of systematic risk
+  \item \code{LEV} leverage ratio relating debt to earnings before interest and taxes
+  \item \code{PR} profitability ratio of retained earnings to assets
+  \item \code{RSIZE} log of relative size of the company in the market
+  \item \code{BETA} a measure of systematic risk
   \item \code{BSEC} business sector of a firm (factor with 8 levels)
 }
 }

@@ -4,77 +4,53 @@
 \alias{mvord}
 \title{Multivariate Ordinal Regression Models.}
 \usage{
-mvord(formula, error.structure = cor_general(~1), link = mvprobit(), data,
-  index = NULL, response.names = NULL, response.levels = NULL,
-  coef.constraints = NULL, coef.values = NULL,
-  threshold.constraints = NULL, threshold.values = NULL, weights = NULL,
-  offset = NULL, scale = FALSE, se = TRUE, start.values = NULL,
-  solver = "newuoa", PL.lag = NULL, contrasts = NULL,
-  control = list(maxit = 2e+05, trace = 1, kkt = FALSE))
+mvord(formula, data, error.structure = cor_general(~1), link = mvprobit(),
+  response.levels = NULL, coef.constraints = NULL, coef.values = NULL,
+  threshold.constraints = NULL, threshold.values = NULL,
+  weights.name = NULL, offset = NULL, PL.lag = NULL, contrasts = NULL,
+  control = mvord.control())
 }
 \arguments{
 \item{formula}{an object of class \code{\link{formula}} of the form \code{y ~ X1 + ... + Xp}.}
 
-\item{error.structure}{different \code{error.structures}: general correlation structure (default)\cr
-\code{cor_general(~1)},
-general covariance structure \code{cov_general(~1)}, factor dependent correlation structure \code{cov_general(~f)},
-factor dependent covariance structure \code{cov_general(~f)}, covariate dependent equicorrelation structure \cr
-\code{cor_equi(~S)},
-AR(1) correlation structure \code{cor_ar1(~1)} or a covariate dependent \cr
-AR(1) correlation structure \code{cor_ar1(~S)}.
-See \code{\link{error_struct}} or 'Details'.}
-
-\item{link}{specifies the link function by \code{mvprobit()} (multivariate normally distributed errors)
-or \code{mvlogit(df = 8)} (multivariate logistically distributed errors), where \code{df} specifies the degrees of freedom of the t copula.}
-
 \item{data}{\code{\link{data.frame}} containing a subject index, an index for the multiple measurements,
 an ordinal response \code{y} and covariates \code{X1, ..., Xp}.}
 
-\item{index}{(optional) argument to specify the column names of the subject index and the multiple measurement index
-by a vector \cr
-\code{c("subject", "multiple_measurement")} in \code{data}.
-The default value of \code{index} is \code{NULL} assuming that the first column of \code{data} contains
-the subject index and the second column the multiple measurement index.}
+\item{error.structure}{different \code{error.structures}: general correlation structure (default)\cr
+\code{cor_general(~1)},
+general covariance structure \code{cov_general(~ 1)}, factor dependent correlation structure \code{cov_general(~ f)},
+factor dependent covariance structure \code{cov_general(~ f)}, a constant  \code{cor_equi(~ 1)} or a covariate dependent equicorrelation structure \cr
+\code{cor_equi(~ S)},
+AR(1) correlation structure \code{cor_ar1(~ 1)} or a covariate dependent
+AR(1) correlation structure \code{cor_ar1(~ S)}.
+See \code{\link{error_struct}} or 'Details'.}
 
-\item{response.names}{(optional) \code{\link{vector}} of the labels of the multiple measurement index in order to
-specify the ordering of the responses which is essential when setting constraints on the model parameters.
- The default value of \code{response.names} is \code{NULL} giving the natural ordering of the levels of the factor variable
- of multiple measurements.}
+\item{link}{specifies the link function by \code{mvprobit()} (multivariate normally distributed errors - default)
+or \code{mvlogit(df = 8)} (multivariate logistically distributed errors), where \code{df} specifies the degrees of freedom of the t copula.}
 
 \item{response.levels}{(optional) \code{\link{list}} of length equal to the number of multiple measurements to specify the category labels
 in case of varying categories across multiple measurements}
 
-\item{coef.constraints}{\code{\link{vector}} or \code{\link{matrix}} of constraints on the regression coefficients. See 'Details'.}
+\item{coef.constraints}{(optional) \code{\link{vector}} or \code{\link{matrix}} of constraints on the regression coefficients. See 'Details'.}
 
-\item{coef.values}{\code{\link{matrix}} setting fixed values on the regression coefficients. See 'Details'.}
+\item{coef.values}{(optional) \code{\link{matrix}} setting fixed values on the regression coefficients. See 'Details'.}
 
-\item{threshold.constraints}{\code{\link{vector}} of constraints on the threshold parameters. See 'Details'.}
+\item{threshold.constraints}{(optional) \code{\link{vector}} of constraints on the threshold parameters. See 'Details'.}
 
-\item{threshold.values}{\code{\link{list}} of (optional) fixed values for the threshold parameters. See 'Details'.}
+\item{threshold.values}{(optional) \code{\link{list}} of (optional) fixed values for the threshold parameters. See 'Details'.}
 
-\item{weights}{(optional) column name of subject-specific weights in \code{data} which need to be
+\item{weights.name}{(optional) character string with the column name of subject-specific weights in \code{data} which need to be
 constant across multiple measurements. Negative weights are not allowed.}
 
-\item{offset}{this can be used to specify an a priori known component to be included in the linear predictor during fitting.
+\item{offset}{(optional) this can be used to specify an a priori known component to be included in the linear predictor during fitting.
 This should be NULL or a numeric vector of length equal to the number of cases. One or more offset terms can be included
 in the formula instead or as well, and if more than one is specified their sum is used. See model.offset.}
 
-\item{scale}{If \code{scale = TRUE}, the continuous covariates are standardized
-by substracting the mean and dividing by the standard deviation.
-This operation is performed for each repeated measurement before fitting.}
+\item{PL.lag}{(optional) specifies the time lag of the pairs in the pairwise likelihood approach to be optimized (can be used with \code{cor_ar1}).}
 
-\item{se}{logical, if \code{TRUE} standard errors are computed.}
+\item{contrasts}{(optional) an optional list. See the \code{contrasts.arg} of \code{\link{model.matrix.default}}.}
 
-\item{start.values}{vector of (optional) starting values.}
-
-\item{solver}{character string containing the name of the applicable solver of \code{\link{optimx}} (default is \code{"newuoa"})
-or wrapper function for user defined solver.}
-
-\item{PL.lag}{specifies the time lag of the pairs in the pairwise likelihood approach to be optimized.}
-
-\item{contrasts}{an optional list. See the \code{contrasts.arg} of \code{\link{model.matrix.default}}.}
-
-\item{control}{a list of control arguments. See \code{\link{optimx}}.}
+\item{control}{(optional) a list of parameters for controlling the fitting process. See \code{\link{mvord.control}} for details.}
 }
 \value{
 The function \code{mvord} returns an object of \code{\link{class}} \code{"mvord"}.
@@ -82,7 +58,7 @@ The function \code{mvord} returns an object of \code{\link{class}} \code{"mvord"
 The functions \code{summary} and \code{print} are used to display the results.
 The function \code{coef} extracts the regression coefficients, a function \code{thresholds} the threshold coefficients
 and the function \cr
-\code{get_error_struct} returns the estimated parameters of the corresponding error structure.
+\code{error_structure} returns the estimated parameters of the corresponding error structure.
 
 An object of \code{\link{class}} \code{"mvord"} is a list containing the following components:
 
@@ -112,72 +88,95 @@ An object of \code{\link{class}} \code{"mvord"} is a list containing the followi
 }
 }
 \description{
-\code{mvord} is used to estimate multivariate ordinal regression models. Different model types are implemented and can be chosen by
-the use of different \code{error.structures}. Constraints on the threshold as well as on the regression parameters can be imposed.
+Multivariate ordinal regression models in the R package  \code{mvord} can be fitted using the function
+\code{mvord()}. Two different data structures can be passed on to \code{mvord()} through
+the use of two different multiple measurement objects \code{MMO} and \code{MMO2} in the left-hand side of
+the model formula. \code{MMO} uses a long data format, which has the advantage that it allows for
+varying covariates across multiple measurements. This flexibility requires the specification a
+subject index as well as a multiple measurement index. In contrast to \code{MMO}, the function \code{MMO2}
+has a simplified data structure, but is only applicable in settings where the covariates do not
+vary between the multiple measurements. In this case, the multiple ordinal observations as
+well as the covariates are stored in different columns of a \code{\link{data.frame}}. We refer to this data
+structure as wide data format.
 }
 \details{
 \describe{
-  \item{\code{data}}{
-We use the long format for the input of \code{data}, where each row contains a subject
-index \eqn{i} (\code{firm_id}), a multiple measurement index \eqn{j} (\code{rater_id}), an ordinal response
-(\code{rating}) and all the covariates (\code{X1, ..., Xp}). This long format data stucture
-is internally transformed to matrix of covariates \eqn{Y} and a list of covariate matrices
-\eqn{X_j} for all \eqn{j \in J} by a matching according to the subject index \eqn{i} and the multiple
-measurement index \eqn{j}, which are passed by an optional argument \code{index}. This is
-usually performed by a character vector of length two specifying the column names
-of the subject index and the multiple measurement index in \code{data}. For the data set in \code{\link{data_mvord}} we have:
-
-   \code{index = c("firm_id", "rater_id")}
-
-The default value of \code{index} is \code{NULL} assuming that the first column of \code{data}
-contains the subject index and the second column the multiple measurement index.
-(Note that if the covariates have different scale, the estimation is prone to numerical instabilities.
-In such a case one could standardize the covariates \eqn{x_{ij}}.)
-
-If specific constraints are imposed on the parameter set, a well defined index \eqn{j \in J}
-for the multiple measurements is needed. Therefore, a vector \code{response.names}
-is used to define the index number of the multiple measurement.
-
-    \code{response.names = c("rater1", "rater2", "rater3")}
-
-The default value of \code{response.names} is \code{NULL} giving the natural ordering
-of the levels of the factor variable for all the multiple measurements.
-The ordering of \code{response.names} always specifies the index of the
-multiple measurement unit \eqn{j \in J}. This ordering is essential when
-putting constraints on the parameters and when setting \code{response.levels}.
-
-\preformatted{response.levels = list(c("G","F","E", "D", "C", "B", "A"),
-                       c("G","F","E", "D", "C", "B", "A"),
-                       c("O","N","M","L", "K", "J", "I", "H"))}
+\item{Implementation \code{MMO}:}{
+  \itemize{
+    \item{\code{data}:}{
+In \code{MMO} we use a long format for the input of data, where each row contains a subject index
+(\code{subject_index}), a multiple measurement index (\code{multiple_measurement_index}), an ordinal
+observation (Y) and all the covariates (X1 to Xp). This long format data structure is
+internally transformed to a matrix of responses which contains NA in the case of missing
+entries and a list of covariate matrices. This is performed by the multiple measurement object
+\code{MMO(Y, subject_index, multiple_measurement_index)}
+specifying the column names of the subject index and the multiple measurement index in data.
+The column containing the ordinal observations can contain integer or character values or can
+be of class (ordered) 'factor'. When using the long data structure, this column is basically
+a concatenated vector of each of the multiple ordinal responses. Internally, this vector is
+then split according to the measurement index. Then the ordinal variable corresponding to
+each measurement index is transformed into an ordered factor. For an integer or a character
+vector the natural ordering is used (ascending, or alphabetical). If for character vectors the
+alphabetical order does not correspond to the ordering of the categories, the optional argument
+response.levels allows to specify the levels for each response explicitly. This is performed
+by a list of length q, where each element contains the names of the levels of the ordered
+categories in ascending (or if desired descending) order. If all the multiple measurements use
+the same number of classes and same labelling of the classes, the column Y can be stored as
+an ordered 'factor' (as it is often the case in longitudinal studies).
+The order of the multiple measurements is needed when specifying constraints on the thresh-
+old or regression parameters. This order is based on the type of the
+multiple measurement index column in data. For 'integer', 'character' or 'factor' the
+natural ordering is used (ascending, or alphabetical). If a different order of the multiple responses is desired,
+the multiple measurement index column should be an ordered factor with
+a corresponding ordering of the levels.
 
 If the categories differ across multiple measurements (either the number of categories or the category labels)
 one needs to specify the \code{response.levels} explicitly. This is performed by a list
 of length \eqn{J} (number of multiple measurements), where each element contains
 the names of the levels of the ordered categories in ascending or descending order.}
+\preformatted{response.levels = list(c("G","F","E", "D", "C", "B", "A"),
+                       c("G","F","E", "D", "C", "B", "A"),
+                       c("O","N","M","L", "K", "J", "I", "H"))}
 
 \item{\code{formula}}{
-The ordinal responses \eqn{Y} (\code{rating}) are passed by a \code{formula} object.
+The ordinal responses (e.g., \code{rating}) are passed by a \code{formula} object.
 Intercepts can be included or excluded in the model depending on the model paramterization:
 \itemize{
-\item {Model without intercept:}
-
-If the intercept should be removed the \code{formula} for a given response (\code{rating})
+\item {Model without intercept:} If the intercept should be removed the \code{formula} for a given response (\code{rating})
 and covariates (\code{X1} to \code{Xp}) has the following form:
 
-     \code{formula = rating ~ 0 + X1 + ... + Xp}.
+     \code{formula = MMO(rating, firm_id, rater_id) ~ 0 + X1 + ... + Xp}.
 
-\item {Model with intercept:}
+\item {Model with intercept:} If one wants to include an intercept in the model, there are two equivalent possibilities
+to set the model \code{formula}. Either one includes the intercept explicitly by:
 
-If one wants to include an intercept in the model, there are two equivalent possibilities
-to set the model \code{formula}. Either one inludes the intercept explicitly by:
-
-    \code{formula = rating ~ 1 + X1 + ... + Xp},
+    \code{formula = MMO(rating, firm_id, rater_id) ~ 1 + X1 + ... + Xp},
 
 or by
 
-  \code{formula = rating ~ X1 + ... + Xp}.
+  \code{formula = MMO(rating, firm_id, rater_id) ~ X1 + ... + Xp}.
 }
-  }
+}
+}
+}
+\item{Implementation \code{MMO2}:}{
+  \itemize{
+    \item{\code{data}:}{The data structure applied by \code{MMO2} is slightly simplified, where the multiple ordinal
+observations as well as the covariates are stored as columns in a \code{\link{data.frame}}. Each subject \eqn{i}
+corresponds to one row of the data frame, where all outcomes (with missing
+observations set to NA) and all the covariates are stored in different columns.
+Ideally each outcome column is of type ordered factor. For column types like 'integer',
+'character' or 'factor' a warning is given and the natural ordering is used (ascending, or
+alphabetical).}
+
+\item{\code{formula}}{
+The ordinal responses (e.g., \code{rating}) are passed by a \code{formula} object.
+Intercepts can be included or excluded in the model depending on the model parameterization:
+
+  \code{formula = MMO2(rater1, rater2, rater3) ~ X1 + ... + Xp}.
+}
+}
+}
   \item{\code{error.structure}}{
  We allow for different error structures depending on the model parameterization:
 \itemize{
@@ -211,7 +210,6 @@ over time for each subject \eqn{i}.
 
       \code{error.structure = cor_ar1(~ S1 + ... + Sm)}
 }
-
 
 \item {Covariance:}
 \itemize{
@@ -258,7 +256,7 @@ Using the first option, constraints can be specified by a vector or a matrix \cr
    \code{coef.constraints}.
     First, a simple and less flexible way by specifying a vector \cr
     \code{coef.constraints}
-     of dimension \eqn{J}. The ordering \eqn{j \in J} of the responses is given by \code{response.names}.
+     of dimension \eqn{J}.
      This vector is allocated in the following way:
 The first element of the vector \code{coef.constraints} gets a value of 1. If the coefficients
  of the multiple measurement \eqn{j = 2} should be equal to the coefficients of the first dimension (\eqn{j=1}) again
@@ -305,14 +303,12 @@ The first element of the vector \code{coef.constraints} gets a value of 1. If th
 
  \preformatted{coef.values <- cbind(c(NA,NA,NA), c(NA,NA,NA), c(0,NA,NA),
                      c(1,1,1), c(NA,NA,NA))}
-Interaction terms
-
-When constraints on the regression coefficient should be specified in models with interaction terms,
+Interaction terms: When constraints on the regression coefficient should be specified in models with interaction terms,
 the \code{coef.constraints} matrix has to be expanded manually. In case of interaction terms
- (specified either by \code{X1 + X2 + X1:X2} or equivalently by \code{X1*X2}), one additional
-  column at the end of \code{coef.constraints} for the interaction term has to be specified for
-   numerical variables. For interaction terms including factor variables suitably more columns have
-    to be added to the \code{coef.constraints} matrix.
+(specified either by \code{X1 + X2 + X1:X2} or equivalently by \code{X1*X2}), one additional
+column at the end of \code{coef.constraints} for the interaction term has to be specified for
+numerical variables. For interaction terms including factor variables suitably more columns have
+to be added to the \code{coef.constraints} matrix.
 }
 
 
@@ -350,28 +346,42 @@ the \code{coef.constraints} matrix has to be expanded manually. In case of inter
 library(mvord)
 
 #toy example
-data(data_toy_example)
+data(data_mvord_toy)
 
-# convert data_toy_example into long format
-df <- cbind.data.frame("i" = rep(1:100,2), "j" = rep(1:2,each = 100),
-                       "Y" = c(data_toy_example$Y1,data_toy_example$Y2),
-                       "X1" = rep(data_toy_example$X1,2),
-                       "X2" = rep(data_toy_example$X2,2))
-
-res <- mvord(formula = Y ~ 0 + X1 + X2,
-               data = df,
-               index = c("i", "j"),
-               link = mvprobit(),
-               solver = "BFGS",
-               se = TRUE,
-               error.structure = cor_general(~1),
-               threshold.constraints = c(1,1),
-               coef.constraints = c(1,1))
+#wide data format with MMO2
+res <- mvord(formula = MMO2(Y1, Y2) ~ 0 + X1 + X2,
+             data = data_mvord_toy)
 print(res)
 summary(res)
 thresholds(res)
 coefficients(res)
-get_error_struct(res)
+head(error_structure(res))
+
+# convert data_mvord_toy into long format
+df <- cbind.data.frame("i" = rep(1:100,2), "j" = rep(1:2,each = 100),
+                       "Y" = c(data_mvord_toy$Y1,data_mvord_toy$Y2),
+                       "X1" = rep(data_mvord_toy$X1,2),
+                       "X2" = rep(data_mvord_toy$X2,2))
+
+#for long format data, use MMO instead of MMO2
+res <- mvord(formula = MMO(Y, i, j) ~ 0 + X1 + X2, #or formula = MMO(Y) ~ 0 + X1 + X2
+               data = df)
+print(res)
+summary(res)
+thresholds(res)
+coefficients(res)
+head(error_structure(res))
+\donttest{
+res2 <- mvord(formula = MMO(Y) ~ 0 + X1 + X2,
+               data = df,
+               control = mvord.control(solver = "BFGS"),
+               threshold.constraints = c(1,1),
+               coef.constraints = c(1,1))
+print(res2)
+summary(res2)
+thresholds(res2)
+coefficients(res2)
+head(error_structure(res2))
 
 ## examples
 #load data
@@ -381,70 +391,44 @@ head(data_mvord)
 #-------------
 # cor_general
 #-------------
-\donttest{
-# approx 1 min
-res_cor <- mvord(formula = rating ~ 0 + X1 + X2 + X3 + X4 + X5,
-#formula ~ 0 ... without intercept
-               index = c("firm_id", "rater_id"),
-#not necessary if firm_id is first column and rater is second column in data
-               data = data_mvord, #choose data
-               response.levels = list(c("G","F","E", "D", "C", "B", "A"),
-                                      c("G","F","E", "D", "C", "B", "A"),
-                                      c("O","N","M","L", "K", "J", "I", "H")),
-#list for each rater;
-#need to be set if specific levels/labels are desired (not in natural ordering)
-               response.names = c("rater1", "rater2", "rater3"),
-# set if not all raters are used and specifies ordering
-               link = mvprobit(), #mvprobit() or mvlogit()
-               error.structure = cor_general(~1), #different error structures
-               coef.constraints = cbind(c(1,2,2),
-                                        c(1,1,2),
-                                        c(NA,1,2),
-                                        c(NA,NA,NA),
-                                        c(1,1,2)),#either a vector or a matrix
-               coef.values = cbind(c(NA,NA,NA),
-                                   c(NA,NA,NA),
-                                   c(0,NA,NA),
-                                   c(1,1,1),
-                                   c(NA,NA,NA)),
-#matrix (possible if coef.constraints is a matrix)
-               threshold.constraints = c(1,1,2),
-               solver = "BFGS") #BFGS is faster
+# approx 2 min
+res_cor <- mvord(formula = MMO(rating) ~ 0 + X1 + X2 + X3 + X4 + X5,
+                 data = data_mvord,
+                 coef.constraints = cbind(c(1,2,2),
+                                          c(1,1,2),
+                                          c(NA,1,2),
+                                          c(NA,NA,NA),
+                                          c(1,1,2)),
+                 coef.values = cbind(c(NA,NA,NA),
+                                     c(NA,NA,NA),
+                                     c(0,NA,NA),
+                                     c(1,1,1),
+                                     c(NA,NA,NA)),
+                 threshold.constraints = c(1,1,2),
+                 control = mvord.control(solver = "newuoa"))
 print(res_cor)
 summary(res_cor)
 thresholds(res_cor)
 coefficients(res_cor)
-get_error_struct(res_cor)
+head(error_structure(res_cor))
 
 #-------------
 # cov_general
 #-------------
 #approx 4 min
-res_cov <- mvord(formula = rating ~ 1 + X1 + X2 + X3 + X4 + X5,
-#formula ~ 0 ... without intercept
-            index = c("firm_id", "rater_id"),
-#not necessary if firm_id is first column and rater is second column in data
-            data = data_mvord, #choose data
-            response.levels = list(c("G","F","E", "D", "C", "B", "A"),
-                                   c("G","F","E", "D", "C", "B", "A"),
-                                   c("O","N","M","L", "K", "J", "I", "H")),
-#list for each rater;
-#need to be set if specific levels/labels are desired
-            response.names = c("rater1", "rater2", "rater3"),
-# set if not all raters are used and specifies ordering
-            link = mvprobit(), #mvprobit() or mvlogit()
-            error.structure = cov_general(~1), #different error structures
-            threshold.constraints = NULL, #vector
-            threshold.values = list(c(-4,NA,NA,NA,NA,4.5),
-                                    c(-4,NA,NA,NA,NA,4),
-                                    c(-5,NA,NA,NA,NA,NA,4.5)),
-#list for each rater
-            solver = "newuoa") #does not converge with BFGS
+res_cov <- mvord(formula = MMO(rating) ~ 1 + X1 + X2 + X3 + X4 + X5,
+                 data = data_mvord,
+                 error.structure = cov_general(~1),
+                 threshold.values = list(c(-4,NA,NA,NA,NA,4.5),
+                                         c(-4,NA,NA,NA,NA,4),
+                                         c(-5,NA,NA,NA,NA,NA,4.5))
+) #does not converge with BFGS
+
 print(res_cov)
 summary(res_cov)
 thresholds(res_cov)
 coefficients(res_cov)
-get_error_struct(res_cov)
+head(error_structure(res_cov))
 
 
 #-------------
@@ -453,35 +437,52 @@ get_error_struct(res_cov)
 #approx 4min
 data(data_mvord_panel)
 head(data_mvord_panel)
+
+#select subset of data
+subset_dat <- data_mvord_panel$year \%in\% c("year3", "year4", "year5", "year6", "year7")
+data_mvord_panel <- data_mvord_panel[subset_dat,]
+
 mult.obs <- 5
-res_AR1 <- mvord(formula = rating ~ 0 + X1 + X2 + X3 + X4 + X5,
-#formula ~ 0 ... without intercept
-           index = c("firm_id", "year"),
-#not necessary if firm_id is first column and rater is second column in data
-           data = data_mvord_panel, #choose data
-           response.levels = rep(list(c("G","F","E", "D", "C", "B", "A")), mult.obs),
-#list for each rater;
-#need to be set if specific levels/labels are desired (not in natural ordering)
-           response.names = c("year3", "year4", "year5", "year6", "year7"),
-# set if not all raters are used and specifies ordering
-           link = mvprobit(), #mvprobit() or mvlogit()
-           error.structure = cor_ar1(~1), #different error structures
-           threshold.constraints = c(1,1,1,2,2),
-           coef.constraints = c(1,1,1,2,2),
-           solver = "BFGS")
+res_AR1 <- mvord(formula = MMO(rating) ~ 0 + X1 + X2 + X3 + X4 + X5,
+                 data = data_mvord_panel,
+                 error.structure = cor_ar1(~1),
+                 threshold.constraints = c(1,1,1,2,2),
+                 coef.constraints = c(1,1,1,2,2),
+                 control = mvord.control(solver = "BFGS"))
 print(res_AR1)
 summary(res_AR1)
 thresholds(res_AR1)
 coefficients(res_AR1)
-get_error_struct(res_AR1)
-get_error_struct(res_AR1, type = "corr")
+head(error_structure(res_AR1))
+head(error_structure(res_AR1, type = "corr"))
+
+# approx 2 min
+res_cor <- mvord(formula = MMO2(rater1, rater2, rater3) ~ 0 + X1 + X2 + X3 + X4 + X5,
+                 data = data_mvord2,
+                 coef.constraints = cbind(c(1,2,2),
+                                          c(1,1,2),
+                                          c(NA,1,2),
+                                          c(NA,NA,NA),
+                                          c(1,1,2)),
+                 coef.values = cbind(c(NA,NA,NA),
+                                     c(NA,NA,NA),
+                                     c(0,NA,NA),
+                                     c(1,1,1),
+                                     c(NA,NA,NA)),
+                 threshold.constraints = c(1,1,2),
+                 control = mvord.control(solver = "newuoa"))
+print(res_cor)
+summary(res_cor)
+thresholds(res_cor)
+coefficients(res_cor)
+head(error_structure(res_cor))
 }
 
 }
 \seealso{
 %\code{\link{predict.mvord}},
 \code{\link{print.mvord}}, \code{\link{summary.mvord}}, \code{\link{coef.mvord}},
- \code{\link{thresholds.mvord}}, \code{\link{get_error_struct.mvord}},
- \code{\link{data_cr_panel}},\code{\link{data_cr_mvord}}, \code{\link{data_cr_mvord2}},
+ \code{\link{thresholds.mvord}}, \code{\link{error_structure.mvord}}, \code{\link{mvord.control}},
+ \code{\link{data_cr_panel}},\code{\link{data_cr}},
  \code{\link{data_mvord_panel}},\code{\link{data_mvord}}, \code{\link{data_mvord2}}
 }

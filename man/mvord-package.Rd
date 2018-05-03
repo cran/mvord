@@ -19,5 +19,5 @@ implementation. However, constraints can be defined by the user if a
 reduction of the parameter space is desired.
 }
 \details{
-see \code{\link{mvord}}, \code{\link{mvord2}}
+see \code{\link{mvord}}
 }

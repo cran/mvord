@@ -7,7 +7,7 @@
 \method{print}{mvord}(x, call = TRUE, ...)
 }
 \arguments{
-\item{x}{object of class \code{"mvord"}}
+\item{x}{object of class \code{'mvord'}}
 
 \item{call}{displays function call if \code{TRUE}}
 
@@ -15,5 +15,5 @@
 }
 \description{
 Prints thresholds, regression coefficients
- and parameters of the error structure of class \code{"mvord"}.
+ and parameters of the error structure of class \code{'mvord'}.
 }

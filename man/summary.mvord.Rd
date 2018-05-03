@@ -7,7 +7,7 @@
 \method{summary}{mvord}(object, short = TRUE, call = TRUE, ...)
 }
 \arguments{
-\item{object}{object of class \code{"mvord"}}
+\item{object}{object of class \code{'mvord'}}
 
 \item{short}{if \code{TRUE} short summary, otherwise extended summary}
 
@@ -17,5 +17,5 @@
 }
 \description{
 Summary of thresholds, regression coefficients
-and parameters of the error structure of class \code{"mvord"}.
+and parameters of the error structure of class \code{'mvord'}.
 }

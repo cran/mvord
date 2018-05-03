@@ -1,13 +1,14 @@
 #' @title Error Structures in mvord
 #' @description Different \code{error.structures} are available in \pkg{mvord}:
 #' \itemize{
-#' \item general correlation structure (default) \code{cor_general(~1)},
-#' \item general covariance structure \code{cov_general(~1)},
-#' \item factor dependent correlation structure \code{cor_general(~f)},
-#' \item factor dependent covariance structure \code{cov_general(~f)},
-#' \item covariate dependent equicorrelation structure \code{cor_equi(~S)},
-#' \item AR(1) correlation structure \code{cor_ar1(~1)}, or
-#' \item covariate dependent AR(1) correlation structure \code{cor_ar1(~S)}.
+#' \item general correlation structure (default) \code{cor_general(~ 1)},
+#' \item general covariance structure \code{cov_general(~ 1)},
+#' \item factor dependent correlation structure \code{cor_general(~ f)},
+#' \item factor dependent covariance structure \code{cov_general(~ f)},
+#' \item equicorrelation structure \code{cor_equi(~ 1)},
+#' \item covariate dependent equicorrelation structure \code{cor_equi(~ S)},
+#' \item AR(1) correlation structure \code{cor_ar1(~ 1)}, or
+#' \item covariate dependent AR(1) correlation structure \code{cor_ar1(~ S)}.
 #' }
 #' See \code{\link{error_struct}} or vignette.
 #' @param formula \code{\link{formula}} object
@@ -111,36 +112,33 @@ get_covariate.error_struct <-
     suppressWarnings(model.matrix(formula(object),
       model.frame(formula(object), x, na.action = function(x) x),
       contrasts.arg = contrasts)))
-  ## check if covariate matrices are equal
+  ## check if covariate matrices are equal  
   if (!all(sapply(1:(length(covar_mat) - 1), function(i)
-    all(covar_mat[[i]] == covar_mat[[i+1]], na.rm = T)))) {
-  	stop("Covariates in error structure must be
-  		  constant across outcomes!")
+      all(covar_mat[[i]] == covar_mat[[i+1]], na.rm = T)))) {
+   	  stop("Covariates in error structure must be
+  		    constant across outcomes!")
   }
   # make one matrix
   covar_mat1 <- sapply(1:ncol(covar_mat[[1]]), function(k){
       xtcol <- do.call(cbind,lapply(covar_mat, `[`,,k))
       xtcol_final <- apply(xtcol,1,function(i) unique(i[!is.na(i)]))
       xtcol_final
-    })
+  })
   attributes(covar_mat1) <- attributes(covar_mat[[1]])
   covar_mat1
 }
 
 initialize.error_struct <-
   ## initializes some attributes of error_struct objects
-  ## takes as data the output on mvord.data
-  function(object, data)
+  ## takes as data the output on mvord_data
+  function(object, data, contrasts)
 {
-
-  contr <- attr(data, "contrasts")
   attr(object, "ynames") <- colnames(data$y)
   attr(object, "subjnames") <- rownames(data$y)
-
   attr(object, "ndim") <- length(data$x)
-  attr(object, "nobs") <- nrow(data$x[[1]])
+  attr(object, "nobs") <- nrow(data$y)
   attr(object, "covariate") <-
-    get_covariate(object, data.x = data$x, contrasts = contr)
+    get_covariate(object, data.x = data$x, contrasts = contrasts)
   object
 }
 
@@ -148,7 +146,7 @@ initialize.error_struct <-
 ### Methods for cov_general ###
 ###############################
 init_fun.cov_general <-
-function(object,  data)
+function(object,  data, contrasts)
 {
 	## initializes some attributes of error_struct objects
 	form <- formula(object)
@@ -157,23 +155,25 @@ function(object,  data)
   ## if intercept included rewrite formula without
   if (length(all.vars(form)) == 1 & attr(terms(form), "intercept") == 1)
     attr(object, "formula") <- as.formula(sprintf("~ 0 + %s", all.vars(form)))
-  object <- initialize(object, data)
+  object <- initialize(object, data, contrasts)
 	ndim <- attr(object, "ndim")
-	npar1 <- ndim * (ndim - 1)/2
-	attr(object, "npar") <- (npar1 + ndim)* NCOL(attr(object, "covariate"))
-    if(length(all.vars(form)) == 1 && !is.factor(data$x[[1]][, all.vars(form)]))
+  attr(object, "npar.cor") <- ndim * (ndim - 1)/2 * NCOL(attr(object, "covariate"))
+  attr(object, "npar.sd") <-  ndim *  NCOL(attr(object, "covariate"))
+	attr(object, "npar") <-   attr(object, "npar.cor") + attr(object, "npar.sd")
+  if(length(all.vars(form)) == 1 && !is.factor(data$x[[1]][, all.vars(form)]))
     	stop("For cov_general covariate must be factor!")
-  	object
+  object
 }
 
 build_error_struct.cov_general <-
 function(object, tpar)
 {
-  ## takes the transformed parameters and builds initializes some attributes of cor_general objects
+  ## takes the transformed parameters and builds/initializes some attributes of 
+  ## cor_general objects
   ndim <- attr(object, "ndim")
   covar <- attr(object, "covariate")
   nlev <- NCOL(covar)
-  npar.cor <- attr(object, "npar")/nlev  - ndim
+  npar.cor <- attr(object, "npar.cor")/nlev
   corr_pars <- sapply(1:nlev, function(l) {
     nu <- tpar[(l - 1) * npar.cor + seq_len(npar.cor)]
     angles <- pi * exp(nu)/(1 + exp(nu))
@@ -187,8 +187,7 @@ function(object, tpar)
     sigma <- crossprod(tLmat)
     sigma[lower.tri(sigma)]
   })
-  if (is.null(ncol(corr_pars)))
-  	dim(corr_pars) <- c(1, nlev)
+  if (is.null(ncol(corr_pars))) dim(corr_pars) <- c(1, nlev)
   rVec <- covar %*% t(corr_pars)
   pos <- npar.cor * nlev
   sd_lev <- sapply(1:nlev,
@@ -200,7 +199,7 @@ function(object, tpar)
 finalize.cov_general <-
 function(object, tpar)
 {
-  ## takes the transformed parameters and builds initializes some attributes of cor_general objects
+  ## takes the transformed parameters and finalizez cor_general objects
   ndim <- attr(object, "ndim")
   covar <- attr(object, "covariate")
   nlev <- NCOL(covar)
@@ -248,27 +247,29 @@ function(object, tpar)
     names(cov_vec)  <-  c(names.corr, names.sigma)
     attr(object, "par") <- cov_vec
 
-     attr(object, "parnames") <- c(names.corr, names.sigma)
-     object
+    attr(object, "parnames") <- c(names.corr, names.sigma)
+    object
 }
-################################
-#########################################
-###*# Methods for  cor_general
 
+#################################
+#### Methods for cor_general ####
+#################################
 init_fun.cor_general <-
-function(object,  data)
+function(object,  data, contrasts)
 {
 	## initializes some attributes of error_struct objects
 	form <- formula(object)
-    if (length(all.vars(form)) > 1)
+  if (length(all.vars(form)) > 1)
   	    stop("Only one factor is supported in cor_general.")
-    ## if intercept included rewrite formula without
-  	if (length(all.vars(form)) == 1 & attr(terms(form), "intercept") == 1)
+  ## if intercept included rewrite formula without
+  if (length(all.vars(form)) == 1 & attr(terms(form), "intercept") == 1)
         attr(object, "formula") <- as.formula(sprintf("~ 0 + %s", all.vars(form)))
-  object <- initialize(object, data)
+  object <- initialize(object, data, contrasts)
 	npar1 <- attr(object, "ndim") * (attr(object, "ndim") - 1)/2
-	attr(object, "npar") <- npar1 * NCOL(attr(object, "covariate"))
-    if(length(all.vars(form)) == 1 && !is.factor(data$x[[1]][, all.vars(form)]))
+  attr(object, "npar.cor") <- npar1 * NCOL(attr(object, "covariate"))
+	attr(object, "npar.sd") <- 0
+  attr(object, "npar") <-   attr(object, "npar.cor") + attr(object, "npar.sd")
+  if(length(all.vars(form)) == 1 && !is.factor(data$x[[1]][, all.vars(form)]))
     	stop("For cor_general covariate must be factor!")
   object
 }
@@ -304,7 +305,6 @@ function(object, tpar)
 finalize.cor_general <-
 function(object, tpar)
 {
-  ## takes the transformed parameters and builds initializes some attributes of cor_general objects
   ndim <- attr(object, "ndim")
   covar <- attr(object, "covariate")
   nlev <- NCOL(covar)
@@ -347,15 +347,16 @@ function(object, tpar)
      object
   }
 
-################################
-#########################################
-###*# Methods for  cor_ar1
-
+#############################
+#### Methods for cor_ar1 ####
+#############################
 init_fun.cor_ar1 <-
-function(object,  data)
+function(object,  data, contrasts)
 {
-  object <- initialize(object, data)
-	attr(object, "npar") <- NCOL(attr(object, "covariate"))
+  object <- initialize(object, data, contrasts)
+	attr(object, "npar.cor") <- NCOL(attr(object, "covariate"))
+  attr(object, "npar.sd") <- 0
+  attr(object, "npar") <-   attr(object, "npar.cor") + attr(object, "npar.sd")
   object
 }
 
@@ -388,16 +389,19 @@ function(object, tpar)
   attr(object, "parnames") <- colnames(covar)
   object
 }
-################################
-#########################################
-###*# Methods for  cor_equi
+##############################
+#### Methods for cor_equi ####
+##############################
 init_fun.cor_equi <-
-function(object,  data)
+function(object,  data, contrasts)
 {
   ## initializes some attributes of cor_equi objects
   form <- formula(object)
-  object <- initialize(object, data)
-  attr(object, "npar") <- NCOL(attr(object, "covariate"))
+  object <- initialize(object, data, contrasts)
+
+  attr(object, "npar.cor") <- NCOL(attr(object, "covariate"))
+  attr(object, "npar.sd") <- 0
+  attr(object, "npar") <- attr(object, "npar.cor") + attr(object, "npar.sd")
   object
 }
 
@@ -434,12 +438,14 @@ function(object, tpar)
 #############################
 
 init_fun.cor_ident <-
-function(object,  data)
+function(object,  data, contrasts)
 {
-  ## initializes some attributes of cor_equi objects
+  ## initializes some attributes of cor_ident objects
   form <- formula(object)
-  object <- initialize(object, data)
-  attr(object, "npar") <- 0
+  object <- initialize(object, data, contrasts)
+  attr(object, "npar.cor") <- 0
+  attr(object, "npar.sd") <- 0
+  attr(object, "npar") <- attr(object, "npar.cor") + attr(object, "npar.sd")
   object
 }
 
@@ -457,7 +463,7 @@ function(object, tpar)
 finalize.cor_ident <-
 function(object, tpar)
 {
-  ## finalizes some attributes of cor_equi objects
+  ## finalizes some attributes of cor_ident objects
   ndim <- attr(object, "ndim")
   covar <- attr(object, "covariate")
  # names(tpar) <- colnames(covar)
@@ -465,33 +471,33 @@ function(object, tpar)
   attr(object, "parnames") <- NULL
   object
 }
-
+########################################################
 ########################################################
 #' @title Extracts Error Structure of Multivariate Ordinal Regression Models.
 #' @description
 #' \code{get_error_struct} is a generic function which extracts for each subject the estimated
-#' error structure parameters from objects of class \code{"mvord"}.
-#' @param object object of class \code{"mvord"}
-#' @param type choose type \code{c("sigmas", "alpha", "corr", "z")}
+#' error structure parameters from objects of class \code{'mvord'}.
+#' @param object an object of class \code{'mvord'}.
+#' @param type choose type \code{"sigmas"}, \code{"alpha"}, \code{"corr"}, or \code{"z"}.
 #' @param ... further arguments passed to or from other methods.
 #' @details \itemize{
 #' \item{\code{sigmas}} {extracts the correlation/covariance matrices corresponding to each subject.
-#'             Applicable in line with \code{cor_general, cov_general, cor_equi, cor_ar1}}
-#' \item{\code{alpha}} {extracts the parameters of covariate dependent error structure.
-#' Applicable in line with \code{cor_equi, cor_ar1}}
-#' \item{\code{corr}} {extracts the subject-specific correlation parameters. Applicable in l
-#' ine with \code{cor_equi, cor_ar1}}
+#'             Applicable in line with \code{cor_general, cov_general, cor_equi, cor_ar1}.}
+#' \item{\code{alpha}} {extracts the parameters of the covariate dependent error structure.
+#' Applicable in line with \code{cor_equi, cor_ar1}.}
+#' \item{\code{corr}} {extracts the subject-specific correlation parameters. Applicable in
+#' line with \code{cor_equi}, \code{cor_ar1}.}
 #' \item{\code{z}} {extracts the subject-specific Fisher-z score. Applicable in line
-#' with \code{cor_equi, cor_ar1}}}
+#' with \code{cor_equi, cor_ar1}.}}
 #' @export
-get_error_struct <- function(object, type, ...) UseMethod("get_error_struct")
-#' @rdname get_error_struct
+error_structure <- function(object, type, ...) UseMethod("error_structure")
+#' @rdname error_structure
 #' @export
-get_error_struct.mvord <- function(object, type = NULL, ...)  {
-  val <- get_error_struct(object$error.struct, type = type , ...)
+error_structure.mvord <- function(object, type = NULL, ...)  {
+  val <- error_structure(object$error.struct, type = type , ...)
   val
 }
-get_error_struct.cor_general <- function(object, type, ...){
+error_structure.cor_general <- function(object, type, ...){
   npar <- attr(object, "npar")
   par <- attr(object, "par")
   ndim <- attr(object, "ndim")
@@ -512,7 +518,7 @@ get_error_struct.cor_general <- function(object, type, ...){
   corr_n
 }
 
-get_error_struct.cov_general <- function(object, type, ...){
+error_structure.cov_general <- function(object, type, ...){
   npar <- attr(object, "npar")
   par <- attr(object, "par")
   ndim <- attr(object, "ndim")
@@ -535,7 +541,7 @@ get_error_struct.cov_general <- function(object, type, ...){
   cov_n
 }
 
-get_error_struct.cor_equi <- function(object, type, ...){
+error_structure.cor_equi <- function(object, type, ...){
   npar <- attr(object, "npar")
   par <- attr(object, "par")
   ndim <- attr(object, "ndim")
@@ -564,7 +570,7 @@ get_error_struct.cor_equi <- function(object, type, ...){
   return(par)
 }
 
-get_error_struct.cor_ar1 <- function(object, type, ...){
+error_structure.cor_ar1 <- function(object, type, ...){
   npar <- attr(object, "npar")
   par <- attr(object, "par")
   ndim <- attr(object, "ndim")
@@ -594,7 +600,7 @@ get_error_struct.cor_ar1 <- function(object, type, ...){
   return(par)
 }
 
-get_error_struct.cor_ident <- function(object, type, ...){
+error_structure.cor_ident <- function(object, type, ...){
   npar <- attr(object, "npar")
   par <- attr(object, "par")
   ndim <- attr(object, "ndim")
@@ -604,6 +610,25 @@ get_error_struct.cor_ident <- function(object, type, ...){
   corr <- diag(ndim)
   rownames(corr) <- colnames(corr) <- ynames
   rep(list(corr), nobs)
+}
+
+error_structure.cor_rel_var <- function(object, type, ...){
+  npar <- attr(object, "npar")
+  par <- attr(object, "par")
+  ndim <- attr(object, "ndim")
+  covar <- attr(object, "covariate")
+  ynames <- attr(object, "ynames")
+  nobs <- attr(object, "nobs")
+  npar.cor <- attr(object, "npar.cor")
+  R <- diag(ndim)
+  R[lower.tri(R)] <- par[seq_len(npar.cor)]
+  R <- R + t(R) - diag(ndim)
+  s <- c(1, par[npar.cor + seq_len(attr(object, "npar.sd"))])
+  sigma <- t(s * R) * s
+  colnames(sigma) <- rownames(sigma) <- ynames
+  sigmas <- rep(list(sigma), nobs)
+  names(sigmas) <- attr(object, "subjnames")
+  sigmas
 }
 
 ##########################################
@@ -635,6 +660,15 @@ corr_jac.cor_ar1 <- function(object, tpar){
 }
 corr_jac.cor_equi<- function(object, tpar){
   list(diag(attr(object, "npar")))
+}
+corr_jac.cor_rel_var <- function(object, tpar){
+  ndim <- attr(object, "ndim")
+  npar.cor <- attr(object, "npar.cor")
+  npar.sd <- attr(object, "npar.sd")
+  l <- list(sapply(1:npar.cor, function(i) grad(function(x) corr_jac_num_fct(ndim, x, i),
+      x=tpar[seq_len(npar.cor)])))
+  l[1 + seq_len(npar.sd)] <- exp(tpar[npar.cor + seq_len(npar.sd)])
+  l
 }
 
 corr_jac_num_fct <- function(ndim, nu, i){

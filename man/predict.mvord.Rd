@@ -7,28 +7,28 @@
 \method{predict}{mvord}(object, type = "prob", subjectID = NULL, ...)
 }
 \arguments{
-\item{object}{of class \code{mvord}}
+\item{object}{an object of class \code{'mvord'}.}
 
-\item{type}{\code{c("class.max", "prob", "cum.prob")}}
+\item{type}{types \code{"class"}, \code{"prob"} and \code{"cum.prob"} are available.}
 
 \item{subjectID}{(optional) vector specifying for which subjectIDs the predictions\cr or fitted values should be computed.}
 
 \item{...}{further arguments passed to or from other methods.}
 }
 \description{
-Obtains predicted or fitted values for objects of class \code{"mvord"}.
+Obtains predicted or fitted values for objects of class \code{'mvord'}.
 }
 \details{
 \tabular{ll}{
   \code{type} \tab description\cr
-  \code{"class.max"} \tab combination of response categories with the highest probability in the fitted model\cr
-  \code{"prob"} \tab (default) fitted joint probability for the observed response categories\cr
-  \code{"cum.prob"} \tab fitted joint cumulative probability for the observed response categories
+  \code{"class"} \tab combination of response categories with the highest probability in the fitted model.\cr
+  \code{"prob"} \tab (default) fitted joint probability for the observed response categories.\cr
+  \code{"cum.prob"} \tab fitted joint cumulative probability for the observed response categories.
   }
 
 The current implementation supports only in-sample predictions.
-The rownames of the output correspond to the subjectIDs.
+The row names of the output correspond to the subjectIDs.
 }
 \seealso{
-\code{\link{marginal.predict}}, \code{\link{get.prob}}
+\code{\link{marginal_predict}}, \code{\link{joint_probabilities}}
 }

@@ -7,11 +7,11 @@
 \method{terms}{mvord}(x, ...)
 }
 \arguments{
-\item{x}{object of class \code{"mvord"}}
+\item{x}{an object of class \code{'mvord'}.}
 
 \item{...}{further arguments passed to or from other methods.}
 }
 \description{
 \code{terms} is a generic function which can be used to extract terms from objects of class \cr
-\code{"mvord"}.
+\code{'mvord'}.
 }

@@ -3,16 +3,16 @@
 \name{constraints}
 \alias{constraints}
 \alias{constraints.mvord}
-\title{Regression constraints of Multivariate Ordinal Regression Models.}
+\title{Constraints on the Regression Coefficients of Multivariate Ordinal Regression Models.}
 \usage{
 constraints(object)
 
 \method{constraints}{mvord}(object)
 }
 \arguments{
-\item{object}{object of class \code{"mvord"}}
+\item{object}{an object of class \code{'mvord'}.}
 }
 \description{
-\code{constraints} is a generic function which extracts the regression constraints from objects of class \cr
-\code{"mvord"}.
+\code{constraints} is a generic function which extracts the constraints on the regression
+coefficients from objects of class \code{'mvord'}.
 }

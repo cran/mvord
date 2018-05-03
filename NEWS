@@ -1,5 +1,19 @@
 This file documents updates and changes in the package mvord
 
+changes in version 0.3.0 (2018-04-19)
+- new model design with multiple measurement objects MMO and MMO2 (former mvord2())
+- removed function mvord2()
+- removed argument scale (covariates are scaled internally for optimizer)
+- fixed bug in standard errors with binary outcomes
+- removed argument response.names (if specific ordering is desired this can be performed by an ordered factor for the multiple measurement index)
+- additional input types are now applicable for ordinal response variables
+- fixed bug trace
+- control = mvord.control()
+- additional checks
+- new function name marginal_predict() (instead of marginal.predict())
+- new function name joint_probabilities() (instead of get.prob()); type "class" instead of "class.max"
+- new function name error_structure() (instead of get_error_struct())
+
 changes in version 0.2.1 (2017-11-29)
 - adapted predict(), get.prob(), marginal.predict()
 - added contrasts as argument to mvord() and mvord2()

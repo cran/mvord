@@ -82,7 +82,7 @@ formula <- yy ~ 0 + X1 + X2 + X3 + X4
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         index = c("firm", "rater"))
 , silent = TRUE), "condition")))
 #Model needs formula
@@ -92,20 +92,20 @@ mvord:::check(!is.null(attr(try(
         solver = "newuoa",
         index = c("firm", "rater"))
 , silent = TRUE), "condition")))
-#Model needs link
-mvord:::check(!is.null(attr(try(
-  mvord:::mvord(formula = formula, data = data,
-        #link = mvprobit(),
-        solver = "newuoa",
-        index = c("firm", "rater"))
-, silent = TRUE), "condition")))
+# #Model needs link
+# mvord:::check(!is.null(attr(try(
+#   mvord:::mvord(formula = formula, data = data,
+#         #link = mvprobit(),
+#         solver = "newuoa",
+#         index = c("firm", "rater"))
+# , silent = TRUE), "condition")))
 
 #only one response needed
 formula <- yy + X4 ~ 0 + X1 + X2 + X3 + X4
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         index = c("firm", "rater"))
 , silent = TRUE), "condition")))
 
@@ -113,7 +113,7 @@ formula <- cbind(yy + X4) ~ 0 + X1 + X2 + X3 + X4
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         index = c("firm", "rater"))
 , silent = TRUE), "condition")))
 
@@ -124,7 +124,7 @@ data2$firm[2] <- 1
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data2,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         index = c("firm", "rater"))
 , silent = TRUE), "condition")))
 
@@ -132,7 +132,7 @@ mvord:::check(!is.null(attr(try(
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         index = c("firm", "rater"),
         response.levels = list(c(1),c(3,4)))
 , silent = TRUE), "condition")))
@@ -145,7 +145,7 @@ data3$X4[101] <- 2
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data3,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         index = c("firm", "rater"),
         weights = "X4")
 , silent = TRUE), "condition")))
@@ -156,7 +156,7 @@ data3$X4 <- rep(sample(-1:3,100, replace = TRUE),4)
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data3,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         index = c("firm", "rater"),
         weights = "X4")
 , silent = TRUE), "condition")))
@@ -173,7 +173,7 @@ mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula,
                     data = data4,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         error.structure = cor_general(~ X4 + X5),
         index = c("firm", "rater"))
 , silent = TRUE), "condition")))
@@ -182,7 +182,7 @@ mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula,
                     data = data,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         error.structure = cor_general(~X1),
         index = c("firm", "rater"))
 , silent = TRUE), "condition")))
@@ -191,7 +191,7 @@ mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula,
                     data = data,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         error.structure = cov_general(~X1 + X2),
         index = c("firm", "rater"))
 , silent = TRUE), "condition")))
@@ -200,7 +200,7 @@ mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula,
                     data = data,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         error.structure = cor_general(~X1 *X3),
         index = c("firm", "rater"))
 , silent = TRUE), "condition")))
@@ -213,7 +213,7 @@ mvord:::check(!is.null(attr(try(
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         index = c("firm", "rater"),
         error.structure = cor_general(~1),
         PL.lag = 1)
@@ -222,7 +222,7 @@ mvord:::check(!is.null(attr(try(
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         index = c("firm", "rater"),
         error.structure = cov_general(~1),
         PL.lag = 1)
@@ -231,7 +231,7 @@ mvord:::check(!is.null(attr(try(
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         index = c("firm", "rater"),
         error.structure = cor_equi(~1),
         PL.lag = 1)
@@ -240,7 +240,7 @@ mvord:::check(!is.null(attr(try(
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         index = c("firm", "rater"),
         error.structure = cor_ar1(~1),
         PL.lag = -1)
@@ -261,7 +261,7 @@ formula <- yy ~ 1 + X1 + X2 + X3 + X4
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         index = c("firm", "rater"),
         error.structure = cov_general(~1),
         threshold.values = list(c(0), c(-1,NA,NA),c(-2,NA,NA),c(-1.5, NA, NA, NA, NA)))
@@ -269,7 +269,7 @@ mvord:::check(!is.null(attr(try(
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         index = c("firm", "rater"),
         error.structure = cov_general(~1),
         threshold.values = list(c(NA), c(NA,NA,NA),c(NA,NA,NA),c(NA, NA, NA, NA, NA)))
@@ -280,7 +280,7 @@ formula <- yy ~ 1 + X1 + X2 + X3 + X4
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         index = c("firm", "rater"),
         error.structure = cov_general(~1),
         threshold.values = list(c(0), c(-1,NA,NA),c(-2,-1,NA),c(-1.5, NA, NA, NA, NA)))
@@ -289,7 +289,7 @@ mvord:::check(!is.null(attr(try(
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         index = c("firm", "rater"),
         error.structure = cov_general(~1),
         threshold.values = list(c(0), c(-1,NA,NA),c(NA,NA,NA),c(-1.5, NA, NA, NA, NA)))
@@ -300,21 +300,21 @@ formula <- yy ~ 0 + X1 + X2 + X3 + X4
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         index = c("firm", "rater"),
         threshold.constraints = c(1,1))
 , silent = TRUE), "condition")))
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         index = c("firm", "rater"),
         threshold.constraints = c(1,1,1,1,1,1))
 , silent = TRUE), "condition")))
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         index = c("firm", "rater"),
         threshold.constraints = 1:6)
 , silent = TRUE), "condition")))
@@ -322,7 +322,7 @@ mvord:::check(!is.null(attr(try(
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         index = c("firm", "rater"),
         threshold.values = list(c(-1,NA,NA),c(NA,NA,NA),c(-1.5, NA, NA, NA, NA)))
 , silent = TRUE), "condition")))
@@ -330,14 +330,14 @@ mvord:::check(!is.null(attr(try(
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data,
                 link = mvprobit(),
-                solver = "newuoa",
+                #solver = "newuoa",
                 index = c("firm", "rater"),
                 threshold.values = list(c(0,1),c(-1,NA,NA),c(NA,NA,NA),c(-1.5, NA, NA, NA, NA)))
 , silent = TRUE), "condition")))
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         index = c("firm", "rater"),
         threshold.values = list(c(0),c(-1,NA,NA,NA),c(NA,NA,NA),c(-1.5, NA, NA, NA, NA)))
 , silent = TRUE), "condition")))
@@ -345,7 +345,7 @@ mvord:::check(!is.null(attr(try(
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         index = c("firm", "rater"),
         threshold.constraints = c(1,2,2,3),
         threshold.values = list(c(0),c(-1,NA,NA),c(-2,NA,NA),c(-1.5, NA, NA, NA, NA)))
@@ -354,14 +354,14 @@ mvord:::check(!is.null(attr(try(
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         index = c("firm", "rater"),
         coef.constraints = matrix(1,ncol = 4, nrow = 3))
 , silent = TRUE), "condition")))
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data,
         link = mvprobit(),
-        solver = "newuoa",
+        #solver = "newuoa",
         index = c("firm", "rater"),
         coef.constraints = matrix(1,ncol = 4, nrow = 5))
 , silent = TRUE), "condition")))
@@ -371,7 +371,7 @@ mvord:::check(!is.null(attr(try(
 mvord:::check(!is.null(attr(try(
   mvord:::mvord(formula = formula, data = data,
                     link = mvprobit(),
-                    solver = "newuoa",
+                    #solver = "newuoa",
                     index = c("firm", "rater"),
                     coef.constraints = matrix(1,ncol = 3, nrow = 5))
   , silent = TRUE), "condition")))

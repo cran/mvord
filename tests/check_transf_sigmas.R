@@ -12,15 +12,15 @@ covar_error <- matrix(rep(1,10), ncol = 1)
 attr(error.structure, "ndim") <- ndim
 attr(error.structure, "covariate") <- covar_error
 attr(error.structure, "npar") <- NCOL(attr(error.structure, "covariate"))
- 
+
 par.sigma <- 2
 sigma <- diag(ndim)
 sigma[lower.tri(sigma)]   <- mvord:::z2r(par.sigma)^sequence((ndim-1):1)
 sigma <- sigma + t(sigma) - diag(diag(sigma))
-## make list with two elemets: 
+## make list with two elemets:
 ## rVec: for each row the sigma[lower.tri(sigma)]
 ## sdVec: for correlation a vector of ones
-l <- list(rVec = t(sapply(1:10, function(i) sigma[lower.tri(sigma)])), 
+l <- list(rVec = t(sapply(1:10, function(i) sigma[lower.tri(sigma)])),
 	 sdVec = rep(1, ndim))
 
 mvord:::check(identical(mvord:::build_error_struct.cor_ar1(error.structure, par.sigma), l))
@@ -46,17 +46,17 @@ covar_error <- cbind(1:10,11:20,21:30)
 attr(error.structure, "ndim") <- ndim
 attr(error.structure, "covariate") <- covar_error
 attr(error.structure, "npar") <- NCOL(attr(error.structure, "covariate"))
- 
+
 
 par.sigma <- c(1,2,-3)
 sigma <- diag(ndim)
 sigma[lower.tri(sigma)]   <- mvord:::z2r(covar_error %*% par.sigma)
 sigma <- sigma + t(sigma) - diag(diag(sigma))
 sigma
-## make list with two elemets: 
+## make list with two elemets:
 ## rVec: for each row the sigma[lower.tri(sigma)]
 ## sdVec: for correlation a vector of ones
-l <- list(rVec = t(sapply(1:10, function(i) sigma[lower.tri(sigma)])), 
+l <- list(rVec = t(sapply(1:10, function(i) sigma[lower.tri(sigma)])),
 	 sdVec = rep(1, ndim))
 
 mvord:::check(identical(mvord:::build_error_struct.cor_equi(error.structure, par.sigma), l))
@@ -66,7 +66,7 @@ par.sigma <- c(0.1,0.2,-0.3)
 sigma <- diag(ndim)
 sigma[lower.tri(sigma)]   <- mvord:::z2r(covar_error %*% par.sigma)
 sigma <- sigma + t(sigma) - diag(diag(sigma))
-l <- list(rVec = t(sapply(1:10, function(i) sigma[lower.tri(sigma)])), 
+l <- list(rVec = t(sapply(1:10, function(i) sigma[lower.tri(sigma)])),
 	 sdVec = rep(1, ndim))
 
 mvord:::check(identical(mvord:::build_error_struct.cor_equi(error.structure, par.sigma), l))
@@ -124,7 +124,12 @@ attr(error.structure, "ndim") <- ndim
 attr(error.structure, "covariate") <- covar_error
 npar1 <- attr(error.structure, "ndim") * (attr(error.structure, "ndim") - 1)/2
 attr(error.structure, "npar") <- (npar1 + ndim)* NCOL(attr(error.structure, "covariate"))
+attr(error.structure, "npar.cor") <- npar1* NCOL(attr(error.structure, "covariate"))
+attr(error.structure, "npar.sd") <-  ndim * NCOL(attr(error.structure, "covariate"))
 
+## new
+attr(error.structure, "npar.cor") <- ndim * (ndim - 1)/2 * NCOL(covar_error)
+##
 par.sigma <- c(0.5, 1, 2, -0.5, -1, -2, c(-1, 0.2, 0.5), c(1, -0.2, -0.5))
 l <-  mvord:::build_error_struct.cov_general(error.structure, par.sigma)
 l
@@ -140,7 +145,8 @@ sigma2 <- t(l$sdVec[6, ] * sigma2) * l$sdVec[6, ]
 sigma1
 sigma2
 
-mvord:::check(all.equal(c(mvord:::backtransf_sigmas(cov2cor(sigma1)), diag(sigma1)), 
+mvord:::check(all.equal(c(mvord:::backtransf_sigmas(cov2cor(sigma1)), diag(sigma1)),
 	c(par.sigma[1:3], exp(2 * par.sigma[7:9]))))
-mvord:::check(all.equal(c(mvord:::backtransf_sigmas(cov2cor(sigma2)), diag(sigma2)), 
+mvord:::check(all.equal(c(mvord:::backtransf_sigmas(cov2cor(sigma2)), diag(sigma2)),
 	c(par.sigma[4:6], exp(2 * par.sigma[10:12]))))
+

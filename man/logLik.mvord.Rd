@@ -2,16 +2,16 @@
 % Please edit documentation in R/mvord.R
 \name{logLik.mvord}
 \alias{logLik.mvord}
-\title{log Pairwise Likelihood of Multivariate Ordinal Regression Models.}
+\title{Pairwise Log-Likelihood of Multivariate Ordinal Regression Models.}
 \usage{
 \method{logLik}{mvord}(object, ...)
 }
 \arguments{
-\item{object}{object of class \code{"mvord"}}
+\item{object}{an object of class \code{'mvord'}.}
 
 \item{...}{further arguments passed to or from other methods.}
 }
 \description{
-\code{logLik} is a generic function which extracts the log pairwise likelihood from objects of class \cr
-\code{"mvord"}.
+\code{logLik} is a generic function which extracts the pairwise log-likelihood from objects of class \cr
+\code{'mvord'}.
 }

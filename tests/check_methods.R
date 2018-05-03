@@ -1,24 +1,24 @@
 library(mvord)
-data(data_toy_example)
+data(data_mvord_toy)
 tolerance <- 1e-6
 
-# convert data_toy_example into long format
+# convert data_mvord_toy into long format
 df <- cbind.data.frame("i" = rep(1:100,2), "j" = rep(1:2,each = 100),
-                       "Y" = c(data_toy_example$Y1,data_toy_example$Y2),
-                       "X1" = rep(data_toy_example$X1,2),
-                       "X2" = rep(data_toy_example$X2,2),
-                       "f1" = factor(sample(rep(data_toy_example$Y2,2)), ordered =F),
-                       "f2" = factor(rep(data_toy_example$Y1,2), ordered=F))
+                       "Y" = c(data_mvord_toy$Y1,data_mvord_toy$Y2),
+                       "X1" = rep(data_mvord_toy$X1,2),
+                       "X2" = rep(data_mvord_toy$X2,2),
+                       "f1" = factor(sample(rep(data_mvord_toy$Y2,2)), ordered =F),
+                       "f2" = factor(rep(data_mvord_toy$Y1,2), ordered=F))
 
 df_NA <- df[-c(1,90:110),]
 
 
-res <- mvord:::mvord(formula = Y ~ 0 + X1 + X2,
+res <- mvord:::mvord(formula = MMO(Y, i, j) ~ 0 + X1 + X2,
                      data = df_NA,
-                     index = c("i", "j"),
+                     #index = c("i", "j"),
                      link = mvprobit(),
-                     solver = "BFGS",
-                     se = T,
+                     control = mvord.control(solver = "BFGS"),
+                     #se = T,
                      error.structure = cor_general(~1),
                      threshold.constraints = c(1,2),
                      coef.constraints = c(1,1))
@@ -49,18 +49,17 @@ constraints(res)
 names_constraints(Y ~ 0 + X1 + X2, df_NA)
 
 #predict functions
-marginal.predict(res, type = "prob", subjectID = c(2,5,32,88))
-marginal.predict(res, type = "class", subjectID = c(2,5,32,88)+2)
-marginal.predict(res, type = "class")
-marginal.predict(res, type = "pred", subjectID = c(2,5,32,88))
-marginal.predict(res, type = "pred", subjectID = c(2,5,32,88)+4)
-marginal.predict(res, type = "cum.prob", subjectID = c(2,5,32,88)+8)
+marginal_predict(res, type = "prob", subjectID = c(2,5,32,88))
+marginal_predict(res, type = "class", subjectID = c(2,5,32,88)+2)
+marginal_predict(res, type = "class")
+marginal_predict(res, type = "cum.prob", subjectID = c(2,5,32,88)+8)
 predict(res, type = "prob", subjectID = c(3,6,33,55,90))
-predict(res, type = "class.max", subjectID = c(3,6,33,55,90)+1)
+predict(res, type = "class", subjectID = c(3,6,33,55,90)+1)
 predict(res, type = "cum.prob", subjectID = c(3,6,33,55,90)+2)
-get.prob(res, response.cat = c(1,2))
-get.prob(res, response.cat = c(3,3), subjectID = 22:33)
-get.prob(res, response.cat = res$rho$y)
+joint_probabilities(res, response.cat = c(1,2))
+joint_probabilities(res, response.cat = c(3,3), subjectID = 22:33)
+joint_probabilities(res, response.cat = res$rho$y)
+joint_probabilities(res, type = "cum.prob", response.cat = c(1,2))
 
-get_error_struct(res)
+error_structure(res)
 
