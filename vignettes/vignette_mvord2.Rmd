@@ -1,0 +1,304 @@
+---
+title: "mvord: Supplementary examples"
+author: "Rainer Hirk, Kurt Hornik and Laura Vana"
+date: "`r Sys.Date()`"
+output:
+  html_vignette:
+    toc: TRUE
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{mvord: Supplementary examples}
+  %\VignetteDepends{mvord}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load package **mvord**
+```{r}
+library(mvord)
+```
+
+Load data set
+```{r}
+data("data_cr")
+str(data_cr, vec.len = 3)
+head(data_cr, n = 3)
+```
+
+## Example 1 - A simple example with 2 raters
+A simple example with 2 raters (rater1 and rater2). The data set data_cr has a wide format and hence, we apply the multiple measurement object MMO2 on the left-hand side of the formula object. The covariates LR, LEV, PR, RSIZE, BETA are passed on the right-hand side of the formula. The thresholds are set equal by the argument thresholds.constraints.
+```{r eval = FALSE}
+res_cor_probit_2raters <- mvord(formula = MMO2(rater1, rater2) ~ 0 + LR + LEV + PR + RSIZE + BETA,
+                               threshold.constraints = c(1, 1),
+                               data = data_cr)
+```
+
+```{r echo = FALSE, results = 'hide', eval = TRUE}
+cache <- TRUE
+FILE <- "res_cor_probit_2raters.rda"
+if (cache & file.exists(FILE)) {
+  load(FILE)
+} else {
+  if (cache) {
+res_cor_probit_2raters <- mvord(formula = MMO2(rater1, rater2) ~ 0 + LR + LEV + PR + RSIZE + BETA,
+                               threshold.constraints = c(1, 1),
+                               data = data_cr)
+res_cor_probit_2raters <- mvord:::reduce_size.mvord(res_cor_probit_2raters)
+  save(res_cor_probit_2raters, file  = FILE)
+  } else {
+      if(file.exists(FILE)) file.remove(FILE)
+  }
+}
+```
+The results are displayed by:
+```{r}
+summary(res_cor_probit_2raters)
+```
+
+The coefficients can be extracted by:
+```{r}
+coef(res_cor_probit_2raters)
+```
+
+
+## Example 2 - A simple example with 2 raters
+A simple example with 3 raters (rater1, rater2 and rater3). The regression coefficients are set equal by the argument coef.constraints.
+```{r eval = FALSE}
+res_cor_probit_3raters <- mvord(formula = MMO2(rater1, rater2, rater 3) ~ 0 + LR + LEV + PR + RSIZE + BETA,
+                               coef.constraints = c(1, 1, 1),
+                               data = data_cr,
+                               link = mvlogit())
+```
+
+```{r echo = FALSE, results = 'hide', eval = TRUE}
+cache <- TRUE
+FILE <- "res_cor_probit_3raters.rda"
+if (cache & file.exists(FILE)) {
+  load(FILE)
+} else {
+  if (cache) {
+res_cor_probit_3raters <- mvord(formula = MMO2(rater1, rater2, rater3) ~ 0 + LR + LEV + PR + RSIZE + BETA,
+                               coef.constraints = c(1, 1, 1),
+                               data = data_cr,
+                               link = mvlogit())
+res_cor_probit_3raters <- mvord:::reduce_size.mvord(res_cor_probit_3raters)
+  save(res_cor_probit_3raters, file  = FILE)
+  } else {
+      if(file.exists(FILE)) file.remove(FILE)
+  }
+}
+```
+The results are displayed by:
+```{r}
+summary(res_cor_probit_3raters)
+```
+The threshold parameters are presented by:
+```{r}
+thresholds(res_cor_probit_3raters)
+```
+
+## Example 3a - A model of firm ratings assigned by multiple raters and IG-SG indicator
+This example presents a multivariate ordinal regression model with probit link and a general correlation error structure (cor_general(~ 1)).
+```{r eval = FALSE}
+res_cor_probit_simple <- mvord(formula = MMO2(rater1, rater2, rater3,
+  rater4) ~ 0 + LR + LEV + PR + RSIZE + BETA, data = data_cr)
+```
+
+```{r echo = FALSE, results = 'hide', eval = TRUE}
+cache <- TRUE
+FILE <- "res_cor_probit_simple.rda"
+if (cache & file.exists(FILE)) {
+  load(FILE)
+} else {
+  if (cache) {
+res_cor_probit_simple <- mvord(
+    formula =
+    MMO2(rater1, rater2, rater3, rater4) ~ 0 + LR + LEV + PR + RSIZE + BETA, data = data_cr)
+res_cor_probit_simple <- mvord:::reduce_size.mvord(res_cor_probit_simple)
+  save(res_cor_probit_simple, file  = FILE)
+  } else {
+      if(file.exists(FILE)) file.remove(FILE)
+  }
+}
+```
+
+The results are displayed by:
+```{r}
+summary(res_cor_probit_simple)
+```
+The threshold coefficients can be extracted by:
+```{r}
+thresholds(res_cor_probit_simple)
+```
+The regression coefficients are obtained by:
+```{r}
+coef(res_cor_probit_simple)
+```
+
+The error structure for firm with firm_id = 11 is displayed by:
+```{r}
+error_structure(res_cor_probit_simple)[[11]]
+```
+
+
+## Example 3b - A more elaborate model of ratings assigned by multiple raters
+In this example, we extend the setting of the above example by imposing constraints on the
+regression as well as on the threshold parameters and changing the link function to the
+multivariate logit link.
+```{r eval = FALSE}
+res_cor_logit <- mvord(formula = MMO2(rater1, rater2, rater3, rater4) ~
+    0 + LR + LEV + PR + RSIZE + BETA, data = data_cr, link = mvlogit(),
+    coef.constraints = cbind(LR = c(1, 1, 1, 1), LEV = c(1, 2, 3, 4),
+      PR = c(1, 1, 1, 1), RSIZE = c(1, 1, 1, 2), BETA = c(1, 1, 2, 3)),
+    threshold.constraints = c(1, 1, 2, 3))
+```
+
+```{r echo = FALSE, results = 'hide', eval = TRUE}
+FILE <- "res_cor_logit.rda"
+if (cache & file.exists(FILE)) {
+  load(FILE)
+} else {
+  if (cache) {
+res_cor_logit <- mvord(formula = MMO2(rater1, rater2, rater3, rater4) ~
+    0 + LR + LEV + PR + RSIZE + BETA, data = data_cr, link = mvlogit(),
+  coef.constraints = cbind(
+    c(1,1,1,1),
+    c(1,2,3,4),
+    c(1,1,1,1),
+    c(1,1,1,2),
+    c(1,1,2,3)),
+    threshold.constraints = c(1, 1, 2, 3))
+#res_cor_logit <- mvord:::reduce_size2.mvord(res_cor_logit)
+  save(res_cor_logit, file  = FILE)
+  } else {
+      if(file.exists(FILE)) file.remove(FILE)
+  }
+
+}
+```
+The results are displayed by:
+```{r}
+summary(res_cor_logit)
+```
+The constraints are displayed by:
+```{r}
+constraints(res_cor_logit)
+```
+Note that the composite likelihood information criteria can be used for model comparison. For
+objects of class ‘mvord’ CLAIC and CLBIC are computed by AIC() and BIC(), respectively.
+The model fits of examples one and two are compared by means of BIC and AIC. We observe
+that the model of Example 3b has a lower BIC and AIC indicating a better model fit:
+```{r}
+BIC(res_cor_probit_simple)
+BIC(res_cor_logit)
+```
+
+```{r}
+AIC(res_cor_probit_simple)
+AIC(res_cor_logit)
+```
+
+The value of the pairwise log-likelihood of the two models can be extracted by:
+```{r}
+logLik(res_cor_probit_simple)
+logLik(res_cor_logit)
+```
+
+Marginal predictions are obtained by:
+```{r}
+mp <- marginal_predict(res_cor_logit, type = "class")
+```
+```{r}
+table(res_cor_logit$rho$y[,1], mp[,1])
+table(res_cor_logit$rho$y[,2], mp[,2])
+table(res_cor_logit$rho$y[,3], mp[,3])
+table(res_cor_logit$rho$y[,4], mp[,4])
+```
+
+Joint predictions are obtained by:
+```{r eval = FALSE}
+jp <- joint_probabilities(res_cor_logit, type = "class")
+```
+
+```{r echo = FALSE, results = 'hide', eval = TRUE}
+FILE <- "jp.rda"
+if (cache & file.exists(FILE)) {
+  load(FILE)
+} else {
+  if (cache) {
+jp <- predict(res_cor_logit, type = "class")
+  save(jp, file  = FILE)
+  } else {
+      if(file.exists(FILE)) file.remove(FILE)
+  }
+}
+```
+
+```{r}
+table(res_cor_logit$rho$y[,1], jp[,1])
+table(res_cor_logit$rho$y[,2], jp[,2])
+table(res_cor_logit$rho$y[,3], jp[,3])
+table(res_cor_logit$rho$y[,4], jp[,4])
+```
+
+## Example 4 - A longitudinal model
+In this example, we present a longitudinal multivariate ordinal probit regression model
+with a covariate dependent AR(1) error structure using the data set data_cr_panel:
+```{r}
+data(data_cr_panel)
+str(data_cr_panel, vec.len = 3)
+head(data_cr_panel, n = 3)
+```
+
+
+```{r eval=F}
+res_AR1_probit <- mvord(formula = MMO(rating, firm_id, year) ~ LR + LEV +
+  PR + RSIZE + BETA, error.structure = cor_ar1(~ BSEC), link = mvprobit(),
+  data = data_cr_panel, coef.constraints = c(rep(1, 4), rep(2, 4)),
+  threshold.constraints = rep(1, 8), threshold.values = rep(list(c(0, NA,
+    NA, NA)),8), mvord.control(solver = "BFGS"))
+```
+
+
+```{r echo = FALSE, results = 'hide', eval = TRUE}
+FILE <- "res_AR1_probit.rda"
+if (cache & file.exists(FILE)) {
+  load(FILE)
+} else {
+  if (cache) {
+res_AR1_probit <- mvord(
+  formula = MMO(rating, firm_id, year) ~ LR + LEV + PR + RSIZE +  BETA,
+  data = data_cr_panel,
+  error.structure = cor_ar1(~ BSEC),
+  coef.constraints = c(rep(1,4), rep(2,4)),
+  threshold.constraints = c(rep(1,8)),
+  threshold.values = rep(list(c(0,NA,NA,NA)),8),
+  link = mvprobit(),
+  control = mvord.control(solver = "BFGS",  solver.optimx.control = list(trace = TRUE)))
+   res_AR1_probit <- mvord:::reduce_size.mvord(res_AR1_probit)
+  save(res_AR1_probit, file  = FILE)
+  } else {
+      if(file.exists(FILE)) file.remove(FILE)
+  }
+}
+```
+The results of the model can be presented by
+```{r}
+summary(res_AR1_probit, short = TRUE, call = FALSE)
+```
+The default error structure output for AR(1) models:
+```{r}
+error_structure(res_AR1_probit)
+```
+Correlation parameters ρ i for each firm are obtained by choosing type =
+"corr"
+```{r}
+head(error_structure(res_AR1_probit, type = "corr"), n = 3)
+```
+Correlation matrices for each specific firm are obtained by choosing type =
+"sigmas"
+```{r}
+head(error_structure(res_AR1_probit, type = "sigmas"), n = 1)
+```

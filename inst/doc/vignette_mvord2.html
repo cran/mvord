@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Rainer Hirk, Kurt Hornik and Laura Vana" />
+
+<meta name="date" content="2018-06-12" />
+
+<title>mvord: Supplementary examples</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">mvord: Supplementary examples</h1>
+<h4 class="author"><em>Rainer Hirk, Kurt Hornik and Laura Vana</em></h4>
+<h4 class="date"><em>2018-06-12</em></h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#example-1---a-simple-example-with-2-raters">Example 1 - A simple example with 2 raters</a></li>
+<li><a href="#example-2---a-simple-example-with-2-raters">Example 2 - A simple example with 2 raters</a></li>
+<li><a href="#example-3a---a-model-of-firm-ratings-assigned-by-multiple-raters-and-ig-sg-indicator">Example 3a - A model of firm ratings assigned by multiple raters and IG-SG indicator</a></li>
+<li><a href="#example-3b---a-more-elaborate-model-of-ratings-assigned-by-multiple-raters">Example 3b - A more elaborate model of ratings assigned by multiple raters</a></li>
+<li><a href="#example-4---a-longitudinal-model">Example 4 - A longitudinal model</a></li>
+</ul>
+</div>
+
+<p>Load package <strong>mvord</strong></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(mvord)</code></pre></div>
+<p>Load data set</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&quot;data_cr&quot;</span>)
+<span class="kw">str</span>(data_cr, <span class="dt">vec.len =</span> <span class="dv">3</span>)</code></pre></div>
+<pre><code>## 'data.frame':    690 obs. of  10 variables:
+##  $ rater1 : Ord.factor w/ 5 levels &quot;A&quot;&lt;&quot;B&quot;&lt;&quot;C&quot;&lt;&quot;D&quot;&lt;..: 2 3 3 2 5 4 3 4 ...
+##  $ rater2 : Ord.factor w/ 5 levels &quot;A&quot;&lt;&quot;B&quot;&lt;&quot;C&quot;&lt;&quot;D&quot;&lt;..: 2 4 4 2 5 NA 3 4 ...
+##  $ rater3 : Ord.factor w/ 6 levels &quot;F&quot;&lt;&quot;G&quot;&lt;&quot;H&quot;&lt;&quot;I&quot;&lt;..: 3 NA NA NA 6 NA 2 5 ...
+##  $ rater4 : Ord.factor w/ 2 levels &quot;L&quot;&lt;&quot;M&quot;: 1 2 2 1 2 2 2 2 ...
+##  $ firm_id: int  1 2 3 4 5 6 7 8 ...
+##  $ LR     : num  1.72 1.84 2.64 1.31 ...
+##  $ LEV    : num  2.114 0.883 2.3 2.638 ...
+##  $ PR     : num  0.3779 -0.1503 -0.0521 0.3289 ...
+##  $ RSIZE  : num  -6.37 -7.84 -7.98 -5.86 ...
+##  $ BETA   : num  0.836 0.49 0.802 1.137 ...</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(data_cr, <span class="dt">n =</span> <span class="dv">3</span>)</code></pre></div>
+<pre><code>##   rater1 rater2 rater3 rater4 firm_id       LR       LEV          PR
+## 1      B      B      H      L       1 1.720041 2.1144513  0.37792213
+## 2      C      D   &lt;NA&gt;      M       2 1.836574 0.8826725 -0.15032402
+## 3      C      D   &lt;NA&gt;      M       3 2.638177 2.2997237 -0.05205389
+##       RSIZE      BETA
+## 1 -6.365053 0.8358773
+## 2 -7.839813 0.4895358
+## 3 -7.976650 0.8022900</code></pre>
+<div id="example-1---a-simple-example-with-2-raters" class="section level2">
+<h2>Example 1 - A simple example with 2 raters</h2>
+<p>A simple example with 2 raters (rater1 and rater2). The data set data_cr has a wide format and hence, we apply the multiple measurement object MMO2 on the left-hand side of the formula object. The covariates LR, LEV, PR, RSIZE, BETA are passed on the right-hand side of the formula. The thresholds are set equal by the argument thresholds.constraints.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_cor_probit_2raters &lt;-<span class="st"> </span><span class="kw">mvord</span>(<span class="dt">formula =</span> <span class="kw">MMO2</span>(rater1, rater2) <span class="op">~</span><span class="st"> </span><span class="dv">0</span> <span class="op">+</span><span class="st"> </span>LR <span class="op">+</span><span class="st"> </span>LEV <span class="op">+</span><span class="st"> </span>PR <span class="op">+</span><span class="st"> </span>RSIZE <span class="op">+</span><span class="st"> </span>BETA,
+                               <span class="dt">threshold.constraints =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>),
+                               <span class="dt">data =</span> data_cr)</code></pre></div>
+<p>The results are displayed by:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(res_cor_probit_2raters)</code></pre></div>
+<pre><code>## 
+## Call: mvord(formula = MMO2(rater1, rater2) ~ 0 + LR + LEV + PR + RSIZE + 
+##     BETA, data = data_cr, threshold.constraints = c(1, 1))
+## 
+## Formula: MMO2(rater1, rater2) ~ 0 + LR + LEV + PR + RSIZE + BETA
+## 
+##     link threshold nsubjects ndim   logPL   CLAIC   CLBIC fevals
+## mvprobit  flexible       690    2 -799.84 1630.35 1699.91   3218
+## 
+## Thresholds:
+##            Estimate Std. Error z value  Pr(&gt;|z|)    
+## rater1 A|B  8.40534    0.39600  21.225 &lt; 2.2e-16 ***
+## rater1 B|C  9.87575    0.42661  23.149 &lt; 2.2e-16 ***
+## rater1 C|D 11.68479    0.46471  25.145 &lt; 2.2e-16 ***
+## rater1 D|E 14.00772    0.53773  26.050 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Coefficients:
+##          Estimate Std. Error  z value  Pr(&gt;|z|)    
+## LR 1     0.191815   0.059864   3.2042  0.001354 ** 
+## LR 2     0.089980   0.069426   1.2961  0.194953    
+## LEV 1    0.456827   0.039714  11.5028 &lt; 2.2e-16 ***
+## LEV 2    0.441118   0.044323   9.9523 &lt; 2.2e-16 ***
+## PR 1    -2.626682   0.174938 -15.0149 &lt; 2.2e-16 ***
+## PR 2    -2.761411   0.203692 -13.5568 &lt; 2.2e-16 ***
+## RSIZE 1 -1.166861   0.050982 -22.8878 &lt; 2.2e-16 ***
+## RSIZE 2 -1.184522   0.050259 -23.5685 &lt; 2.2e-16 ***
+## BETA 1   1.644008   0.100520  16.3550 &lt; 2.2e-16 ***
+## BETA 2   1.741845   0.128535  13.5515 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Error Structure:
+##                    Estimate Std. Error z value  Pr(&gt;|z|)    
+## corr rater1 rater2 0.872025   0.025461   34.25 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<p>The coefficients can be extracted by:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">coef</span>(res_cor_probit_2raters)</code></pre></div>
+<pre><code>##        LR 1        LR 2       LEV 1       LEV 2        PR 1        PR 2 
+##  0.19181519  0.08998022  0.45682662  0.44111809 -2.62668211 -2.76141092 
+##     RSIZE 1     RSIZE 2      BETA 1      BETA 2 
+## -1.16686094 -1.18452182  1.64400769  1.74184465</code></pre>
+</div>
+<div id="example-2---a-simple-example-with-2-raters" class="section level2">
+<h2>Example 2 - A simple example with 2 raters</h2>
+<p>A simple example with 3 raters (rater1, rater2 and rater3). The regression coefficients are set equal by the argument coef.constraints.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_cor_probit_3raters &lt;-<span class="st"> </span><span class="kw">mvord</span>(<span class="dt">formula =</span> <span class="kw">MMO2</span>(rater1, rater2, rater <span class="dv">3</span>) <span class="op">~</span><span class="st"> </span><span class="dv">0</span> <span class="op">+</span><span class="st"> </span>LR <span class="op">+</span><span class="st"> </span>LEV <span class="op">+</span><span class="st"> </span>PR <span class="op">+</span><span class="st"> </span>RSIZE <span class="op">+</span><span class="st"> </span>BETA,
+                               <span class="dt">coef.constraints =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>),
+                               <span class="dt">data =</span> data_cr,
+                               <span class="dt">link =</span> <span class="kw">mvlogit</span>())</code></pre></div>
+<p>The results are displayed by:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(res_cor_probit_3raters)</code></pre></div>
+<pre><code>## 
+## Call: mvord(formula = MMO2(rater1, rater2, rater3) ~ 0 + LR + LEV + 
+##     PR + RSIZE + BETA, data = data_cr, link = mvlogit(), coef.constraints = c(1, 
+##     1, 1))
+## 
+## Formula: MMO2(rater1, rater2, rater3) ~ 0 + LR + LEV + PR + RSIZE + BETA
+## 
+##    link threshold nsubjects ndim   logPL   CLAIC   CLBIC fevals
+## mvlogit  flexible       690    3 -1561.4 3194.64 3357.58   4222
+## 
+## Thresholds:
+##            Estimate Std. Error z value  Pr(&gt;|z|)    
+## rater1 A|B 14.71273    0.84962  17.317 &lt; 2.2e-16 ***
+## rater1 B|C 17.46132    0.92699  18.837 &lt; 2.2e-16 ***
+## rater1 C|D 20.65829    1.03917  19.880 &lt; 2.2e-16 ***
+## rater1 D|E 24.68645    1.20698  20.453 &lt; 2.2e-16 ***
+## rater2 A|B 14.87020    0.85299  17.433 &lt; 2.2e-16 ***
+## rater2 B|C 17.43897    0.93096  18.732 &lt; 2.2e-16 ***
+## rater2 C|D 20.47189    1.04358  19.617 &lt; 2.2e-16 ***
+## rater2 D|E 24.80045    1.22174  20.299 &lt; 2.2e-16 ***
+## rater3 F|G 14.66330    0.86375  16.976 &lt; 2.2e-16 ***
+## rater3 G|H 17.35099    0.92572  18.743 &lt; 2.2e-16 ***
+## rater3 H|I 20.73809    1.04700  19.807 &lt; 2.2e-16 ***
+## rater3 I|J 23.25685    1.15044  20.216 &lt; 2.2e-16 ***
+## rater3 J|K 25.33849    1.22854  20.625 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Coefficients:
+##          Estimate Std. Error  z value  Pr(&gt;|z|)    
+## LR 1     0.333598   0.112624   2.9621  0.003056 ** 
+## LEV 1    0.746847   0.076165   9.8057 &lt; 2.2e-16 ***
+## PR 1    -4.930267   0.356519 -13.8289 &lt; 2.2e-16 ***
+## RSIZE 1 -2.073425   0.108014 -19.1958 &lt; 2.2e-16 ***
+## BETA 1   3.021152   0.222735  13.5639 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Error Structure:
+##                    Estimate Std. Error z value  Pr(&gt;|z|)    
+## corr rater1 rater2 0.866603   0.027446  31.575 &lt; 2.2e-16 ***
+## corr rater1 rater3 0.903774   0.024724  36.554 &lt; 2.2e-16 ***
+## corr rater2 rater3 0.822653   0.045875  17.933 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<p>The threshold parameters are presented by:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">thresholds</span>(res_cor_probit_3raters)</code></pre></div>
+<pre><code>## $rater1
+##      A|B      B|C      C|D      D|E 
+## 14.71273 17.46132 20.65829 24.68645 
+## 
+## $rater2
+##      A|B      B|C      C|D      D|E 
+## 14.87020 17.43897 20.47189 24.80045 
+## 
+## $rater3
+##      F|G      G|H      H|I      I|J      J|K 
+## 14.66330 17.35099 20.73809 23.25685 25.33849</code></pre>
+</div>
+<div id="example-3a---a-model-of-firm-ratings-assigned-by-multiple-raters-and-ig-sg-indicator" class="section level2">
+<h2>Example 3a - A model of firm ratings assigned by multiple raters and IG-SG indicator</h2>
+<p>This example presents a multivariate ordinal regression model with probit link and a general correlation error structure (cor_general(~ 1)).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_cor_probit_simple &lt;-<span class="st"> </span><span class="kw">mvord</span>(<span class="dt">formula =</span> <span class="kw">MMO2</span>(rater1, rater2, rater3,
+  rater4) <span class="op">~</span><span class="st"> </span><span class="dv">0</span> <span class="op">+</span><span class="st"> </span>LR <span class="op">+</span><span class="st"> </span>LEV <span class="op">+</span><span class="st"> </span>PR <span class="op">+</span><span class="st"> </span>RSIZE <span class="op">+</span><span class="st"> </span>BETA, <span class="dt">data =</span> data_cr)</code></pre></div>
+<p>The results are displayed by:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(res_cor_probit_simple)</code></pre></div>
+<pre><code>## 
+## Call: mvord(formula = MMO2(rater1, rater2, rater3, rater4) ~ 0 + LR + 
+##     LEV + PR + RSIZE + BETA, data = data_cr)
+## 
+## Formula: MMO2(rater1, rater2, rater3, rater4) ~ 0 + LR + LEV + PR + RSIZE + 
+##     BETA
+## 
+##     link threshold nsubjects ndim    logPL   CLAIC   CLBIC fevals
+## mvprobit  flexible       690    4 -2925.79 6037.29 6458.57   6139
+## 
+## Thresholds:
+##            Estimate Std. Error z value  Pr(&gt;|z|)    
+## rater1 A|B  8.05308    0.44312  18.174 &lt; 2.2e-16 ***
+## rater1 B|C  9.57196    0.47384  20.201 &lt; 2.2e-16 ***
+## rater1 C|D 11.35469    0.51753  21.940 &lt; 2.2e-16 ***
+## rater1 D|E 13.52181    0.60134  22.486 &lt; 2.2e-16 ***
+## rater2 A|B  8.59974    0.49820  17.262 &lt; 2.2e-16 ***
+## rater2 B|C 10.06007    0.53930  18.654 &lt; 2.2e-16 ***
+## rater2 C|D 11.86508    0.59726  19.866 &lt; 2.2e-16 ***
+## rater2 D|E 14.34057    0.70069  20.466 &lt; 2.2e-16 ***
+## rater3 F|G  8.24546    0.51708  15.946 &lt; 2.2e-16 ***
+## rater3 G|H  9.77754    0.55527  17.608 &lt; 2.2e-16 ***
+## rater3 H|I 11.70957    0.62261  18.807 &lt; 2.2e-16 ***
+## rater3 I|J 13.09715    0.68735  19.055 &lt; 2.2e-16 ***
+## rater3 J|K 14.17708    0.72080  19.669 &lt; 2.2e-16 ***
+## rater4 L|M 13.54304    1.00738  13.444 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Coefficients:
+##          Estimate Std. Error  z value  Pr(&gt;|z|)    
+## LR 1     0.208387   0.067996   3.0647  0.002179 ** 
+## LR 2     0.153527   0.073349   2.0931  0.036340 *  
+## LR 3     0.180650   0.078391   2.3045  0.021195 *  
+## LR 4     0.150135   0.112011   1.3404  0.180128    
+## LEV 1    0.430524   0.043758   9.8388 &lt; 2.2e-16 ***
+## LEV 2    0.433143   0.050132   8.6400 &lt; 2.2e-16 ***
+## LEV 3    0.399637   0.050768   7.8719 3.493e-15 ***
+## LEV 4    0.626346   0.074278   8.4325 &lt; 2.2e-16 ***
+## PR 1    -2.574577   0.194047 -13.2678 &lt; 2.2e-16 ***
+## PR 2    -2.829004   0.216932 -13.0410 &lt; 2.2e-16 ***
+## PR 3    -2.679726   0.222574 -12.0397 &lt; 2.2e-16 ***
+## PR 4    -2.797267   0.281530  -9.9360 &lt; 2.2e-16 ***
+## RSIZE 1 -1.130529   0.056380 -20.0518 &lt; 2.2e-16 ***
+## RSIZE 2 -1.197017   0.061751 -19.3845 &lt; 2.2e-16 ***
+## RSIZE 3 -1.196935   0.066398 -18.0266 &lt; 2.2e-16 ***
+## RSIZE 4 -1.567831   0.116397 -13.4696 &lt; 2.2e-16 ***
+## BETA 1   1.602576   0.110842  14.4581 &lt; 2.2e-16 ***
+## BETA 2   1.802612   0.140077  12.8687 &lt; 2.2e-16 ***
+## BETA 3   1.517178   0.139209  10.8985 &lt; 2.2e-16 ***
+## BETA 4   1.990449   0.204850   9.7166 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Error Structure:
+##                    Estimate Std. Error z value  Pr(&gt;|z|)    
+## corr rater1 rater2 0.874183   0.024864  35.158 &lt; 2.2e-16 ***
+## corr rater1 rater3 0.914814   0.023171  39.481 &lt; 2.2e-16 ***
+## corr rater1 rater4 0.900697   0.031939  28.201 &lt; 2.2e-16 ***
+## corr rater2 rater3 0.837847   0.041416  20.230 &lt; 2.2e-16 ***
+## corr rater2 rater4 0.926213   0.031728  29.192 &lt; 2.2e-16 ***
+## corr rater3 rater4 0.845626   0.060134  14.062 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<p>The threshold coefficients can be extracted by:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">thresholds</span>(res_cor_probit_simple)</code></pre></div>
+<pre><code>## $rater1
+##       A|B       B|C       C|D       D|E 
+##  8.053083  9.571962 11.354686 13.521806 
+## 
+## $rater2
+##       A|B       B|C       C|D       D|E 
+##  8.599739 10.060068 11.865083 14.340568 
+## 
+## $rater3
+##       F|G       G|H       H|I       I|J       J|K 
+##  8.245461  9.777541 11.709568 13.097152 14.177082 
+## 
+## $rater4
+##      L|M 
+## 13.54304</code></pre>
+<p>The regression coefficients are obtained by:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">coef</span>(res_cor_probit_simple)</code></pre></div>
+<pre><code>##       LR 1       LR 2       LR 3       LR 4      LEV 1      LEV 2 
+##  0.2083869  0.1535266  0.1806502  0.1501350  0.4305235  0.4331427 
+##      LEV 3      LEV 4       PR 1       PR 2       PR 3       PR 4 
+##  0.3996369  0.6263461 -2.5745773 -2.8290041 -2.6797255 -2.7972672 
+##    RSIZE 1    RSIZE 2    RSIZE 3    RSIZE 4     BETA 1     BETA 2 
+## -1.1305294 -1.1970173 -1.1969355 -1.5678310  1.6025757  1.8026120 
+##     BETA 3     BETA 4 
+##  1.5171782  1.9904487</code></pre>
+<p>The error structure for firm with firm_id = 11 is displayed by:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">error_structure</span>(res_cor_probit_simple)[[<span class="dv">11</span>]]</code></pre></div>
+<pre><code>##           rater1    rater2    rater3    rater4
+## rater1 1.0000000 0.8741830 0.9148139 0.9006967
+## rater2 0.8741830 1.0000000 0.8378465 0.9262133
+## rater3 0.9148139 0.8378465 1.0000000 0.8456261
+## rater4 0.9006967 0.9262133 0.8456261 1.0000000</code></pre>
+</div>
+<div id="example-3b---a-more-elaborate-model-of-ratings-assigned-by-multiple-raters" class="section level2">
+<h2>Example 3b - A more elaborate model of ratings assigned by multiple raters</h2>
+<p>In this example, we extend the setting of the above example by imposing constraints on the regression as well as on the threshold parameters and changing the link function to the multivariate logit link.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_cor_logit &lt;-<span class="st"> </span><span class="kw">mvord</span>(<span class="dt">formula =</span> <span class="kw">MMO2</span>(rater1, rater2, rater3, rater4) <span class="op">~</span>
+<span class="st">    </span><span class="dv">0</span> <span class="op">+</span><span class="st"> </span>LR <span class="op">+</span><span class="st"> </span>LEV <span class="op">+</span><span class="st"> </span>PR <span class="op">+</span><span class="st"> </span>RSIZE <span class="op">+</span><span class="st"> </span>BETA, <span class="dt">data =</span> data_cr, <span class="dt">link =</span> <span class="kw">mvlogit</span>(),
+    <span class="dt">coef.constraints =</span> <span class="kw">cbind</span>(<span class="dt">LR =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>), <span class="dt">LEV =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>),
+      <span class="dt">PR =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>), <span class="dt">RSIZE =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">BETA =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)),
+    <span class="dt">threshold.constraints =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</code></pre></div>
+<p>The results are displayed by:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(res_cor_logit)</code></pre></div>
+<pre><code>## 
+## Call: mvord(formula = MMO2(rater1, rater2, rater3, rater4) ~ 0 + LR + 
+##     LEV + PR + RSIZE + BETA, data = data_cr, link = mvlogit(), 
+##     coef.constraints = cbind(c(1, 1, 1, 1), c(1, 2, 3, 4), c(1, 
+##         1, 1, 1), c(1, 1, 1, 2), c(1, 1, 2, 3)), threshold.constraints = c(1, 
+##         1, 2, 3))
+## 
+## Formula: MMO2(rater1, rater2, rater3, rater4) ~ 0 + LR + LEV + PR + RSIZE + 
+##     BETA
+## 
+##    link threshold nsubjects ndim    logPL   CLAIC   CLBIC fevals
+## mvlogit  flexible       690    4 -2926.42 5987.81 6293.98  10626
+## 
+## Thresholds:
+##            Estimate Std. Error z value  Pr(&gt;|z|)    
+## rater1 A|B 15.04918    0.82409  18.262 &lt; 2.2e-16 ***
+## rater1 B|C 17.75219    0.89727  19.785 &lt; 2.2e-16 ***
+## rater1 C|D 20.97822    1.00773  20.817 &lt; 2.2e-16 ***
+## rater1 D|E 25.13048    1.17487  21.390 &lt; 2.2e-16 ***
+## rater3 F|G 14.47061    0.83922  17.243 &lt; 2.2e-16 ***
+## rater3 G|H 17.17327    0.89515  19.185 &lt; 2.2e-16 ***
+## rater3 H|I 20.56635    1.01119  20.339 &lt; 2.2e-16 ***
+## rater3 I|J 23.00524    1.11045  20.717 &lt; 2.2e-16 ***
+## rater3 J|K 24.97259    1.18725  21.034 &lt; 2.2e-16 ***
+## rater4 L|M 23.92769    1.63196  14.662 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Coefficients:
+##          Estimate Std. Error  z value  Pr(&gt;|z|)    
+## LR 1     0.340210   0.110547   3.0775  0.002087 ** 
+## LEV 1    0.784295   0.075977  10.3228 &lt; 2.2e-16 ***
+## LEV 2    0.779695   0.078364   9.9497 &lt; 2.2e-16 ***
+## LEV 3    0.718330   0.093425   7.6889 1.484e-14 ***
+## LEV 4    1.107836   0.123681   8.9572 &lt; 2.2e-16 ***
+## PR 1    -4.917965   0.343464 -14.3187 &lt; 2.2e-16 ***
+## RSIZE 1 -2.093379   0.103690 -20.1889 &lt; 2.2e-16 ***
+## RSIZE 2 -2.746162   0.188731 -14.5507 &lt; 2.2e-16 ***
+## BETA 1   3.135693   0.221944  14.1283 &lt; 2.2e-16 ***
+## BETA 2   2.733086   0.252960  10.8044 &lt; 2.2e-16 ***
+## BETA 3   3.572688   0.349493  10.2225 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Error Structure:
+##                    Estimate Std. Error z value  Pr(&gt;|z|)    
+## corr rater1 rater2 0.859773   0.027907  30.808 &lt; 2.2e-16 ***
+## corr rater1 rater3 0.908834   0.024636  36.891 &lt; 2.2e-16 ***
+## corr rater1 rater4 0.903959   0.031857  28.375 &lt; 2.2e-16 ***
+## corr rater2 rater3 0.834910   0.044258  18.865 &lt; 2.2e-16 ***
+## corr rater2 rater4 0.932243   0.032172  28.977 &lt; 2.2e-16 ***
+## corr rater3 rater4 0.856221   0.058398  14.662 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<p>The constraints are displayed by:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">constraints</span>(res_cor_logit)</code></pre></div>
+<pre><code>## $LR
+##     LR 1
+## A|B    1
+## B|C    1
+## C|D    1
+## D|E    1
+## A|B    1
+## B|C    1
+## C|D    1
+## D|E    1
+## F|G    1
+## G|H    1
+## H|I    1
+## I|J    1
+## J|K    1
+## L|M    1
+## 
+## $LEV
+##     LEV 1 LEV 2 LEV 3 LEV 4
+## A|B     1     0     0     0
+## B|C     1     0     0     0
+## C|D     1     0     0     0
+## D|E     1     0     0     0
+## A|B     0     1     0     0
+## B|C     0     1     0     0
+## C|D     0     1     0     0
+## D|E     0     1     0     0
+## F|G     0     0     1     0
+## G|H     0     0     1     0
+## H|I     0     0     1     0
+## I|J     0     0     1     0
+## J|K     0     0     1     0
+## L|M     0     0     0     1
+## 
+## $PR
+##     PR 1
+## A|B    1
+## B|C    1
+## C|D    1
+## D|E    1
+## A|B    1
+## B|C    1
+## C|D    1
+## D|E    1
+## F|G    1
+## G|H    1
+## H|I    1
+## I|J    1
+## J|K    1
+## L|M    1
+## 
+## $RSIZE
+##     RSIZE 1 RSIZE 2
+## A|B       1       0
+## B|C       1       0
+## C|D       1       0
+## D|E       1       0
+## A|B       1       0
+## B|C       1       0
+## C|D       1       0
+## D|E       1       0
+## F|G       1       0
+## G|H       1       0
+## H|I       1       0
+## I|J       1       0
+## J|K       1       0
+## L|M       0       1
+## 
+## $BETA
+##     BETA 1 BETA 2 BETA 3
+## A|B      1      0      0
+## B|C      1      0      0
+## C|D      1      0      0
+## D|E      1      0      0
+## A|B      1      0      0
+## B|C      1      0      0
+## C|D      1      0      0
+## D|E      1      0      0
+## F|G      0      1      0
+## G|H      0      1      0
+## H|I      0      1      0
+## I|J      0      1      0
+## J|K      0      1      0
+## L|M      0      0      1</code></pre>
+<p>Note that the composite likelihood information criteria can be used for model comparison. For objects of class ‘mvord’ CLAIC and CLBIC are computed by AIC() and BIC(), respectively. The model fits of examples one and two are compared by means of BIC and AIC. We observe that the model of Example 3b has a lower BIC and AIC indicating a better model fit:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">BIC</span>(res_cor_probit_simple)</code></pre></div>
+<pre><code>## [1] 6458.566</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">BIC</span>(res_cor_logit)</code></pre></div>
+<pre><code>## [1] 6293.977</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">AIC</span>(res_cor_probit_simple)</code></pre></div>
+<pre><code>## [1] 6037.293</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">AIC</span>(res_cor_logit)</code></pre></div>
+<pre><code>## [1] 5987.81</code></pre>
+<p>The value of the pairwise log-likelihood of the two models can be extracted by:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">logLik</span>(res_cor_probit_simple)</code></pre></div>
+<pre><code>## 'log Lik.' -2925.788 (df=92.85905)</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">logLik</span>(res_cor_logit)</code></pre></div>
+<pre><code>## 'log Lik.' -2926.418 (df=67.48687)</code></pre>
+<p>Marginal predictions are obtained by:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mp &lt;-<span class="st"> </span><span class="kw">marginal_predict</span>(res_cor_logit, <span class="dt">type =</span> <span class="st">&quot;class&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(res_cor_logit<span class="op">$</span>rho<span class="op">$</span>y[,<span class="dv">1</span>], mp[,<span class="dv">1</span>])</code></pre></div>
+<pre><code>##    
+##       A   B   C   D   E
+##   A  47  23   4   0   0
+##   B  11  65  44   3   0
+##   C   0  28 135  38   0
+##   D   1   2  44 116  17
+##   E   0   0   0  30  47</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(res_cor_logit<span class="op">$</span>rho<span class="op">$</span>y[,<span class="dv">2</span>], mp[,<span class="dv">2</span>])</code></pre></div>
+<pre><code>##    
+##       A   B   C   D   E
+##   A  29  20   8   0   0
+##   B  12  41  22   2   0
+##   C   1  18 103  24   0
+##   D   0   0  35 109   7
+##   E   0   0   0  13  39</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(res_cor_logit<span class="op">$</span>rho<span class="op">$</span>y[,<span class="dv">3</span>], mp[,<span class="dv">3</span>])</code></pre></div>
+<pre><code>##    
+##      F  G  H  I  J  K
+##   F 25  8  2  0  0  0
+##   G  4 33 23  1  0  0
+##   H  1 18 85 13  0  0
+##   I  0  0 28 30  3  2
+##   J  0  0  2 13 10  7
+##   K  0  0  0  6  8 23</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(res_cor_logit<span class="op">$</span>rho<span class="op">$</span>y[,<span class="dv">4</span>], mp[,<span class="dv">4</span>])</code></pre></div>
+<pre><code>##    
+##       L   M
+##   L 195  40
+##   M  30 425</code></pre>
+<p>Joint predictions are obtained by:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">jp &lt;-<span class="st"> </span><span class="kw">joint_probabilities</span>(res_cor_logit, <span class="dt">type =</span> <span class="st">&quot;class&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(res_cor_logit<span class="op">$</span>rho<span class="op">$</span>y[,<span class="dv">1</span>], jp[,<span class="dv">1</span>])</code></pre></div>
+<pre><code>##    
+##       A   B   C   D   E
+##   A  50  20   4   0   0
+##   B  11  68  41   3   0
+##   C   0  36 130  35   0
+##   D   1   2  47 112  18
+##   E   0   0   0  25  52</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(res_cor_logit<span class="op">$</span>rho<span class="op">$</span>y[,<span class="dv">2</span>], jp[,<span class="dv">2</span>])</code></pre></div>
+<pre><code>##    
+##       A   B   C   D   E
+##   A  33  17   7   0   0
+##   B  12  46  17   2   0
+##   C   1  24  99  22   0
+##   D   0   0  39 103   9
+##   E   0   0   0  10  42</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(res_cor_logit<span class="op">$</span>rho<span class="op">$</span>y[,<span class="dv">3</span>], jp[,<span class="dv">3</span>])</code></pre></div>
+<pre><code>##    
+##      F  G  H  I  J  K
+##   F 27  7  1  0  0  0
+##   G  6 33 21  1  0  0
+##   H  1 24 77 15  0  0
+##   I  0  0 25 35  1  2
+##   J  0  0  2 17  3 10
+##   K  0  0  0  9  1 27</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(res_cor_logit<span class="op">$</span>rho<span class="op">$</span>y[,<span class="dv">4</span>], jp[,<span class="dv">4</span>])</code></pre></div>
+<pre><code>##    
+##       L   M
+##   L 175  60
+##   M  22 433</code></pre>
+</div>
+<div id="example-4---a-longitudinal-model" class="section level2">
+<h2>Example 4 - A longitudinal model</h2>
+<p>In this example, we present a longitudinal multivariate ordinal probit regression model with a covariate dependent AR(1) error structure using the data set data_cr_panel:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(data_cr_panel)
+<span class="kw">str</span>(data_cr_panel, <span class="dt">vec.len =</span> <span class="dv">3</span>)</code></pre></div>
+<pre><code>## 'data.frame':    11320 obs. of  9 variables:
+##  $ rating : Ord.factor w/ 5 levels &quot;A&quot;&lt;&quot;B&quot;&lt;&quot;C&quot;&lt;&quot;D&quot;&lt;..: 5 3 3 3 3 1 3 3 ...
+##  $ firm_id: int  1 2 3 4 5 6 7 8 ...
+##  $ year   : Factor w/ 8 levels &quot;year1&quot;,&quot;year2&quot;,..: 1 1 1 1 1 1 1 1 ...
+##  $ LR     : num  572.86 1.38 7.46 10.9 ...
+##  $ LEV    : num  1.2008 0.0302 0.1517 0.5485 ...
+##  $ PR     : num  0.1459 -0.0396 0.0508 0.1889 ...
+##  $ RSIZE  : num  1.423 -1.944 2.024 -0.433 ...
+##  $ BETA   : num  1.148 1.693 0.761 2.24 ...
+##  $ BSEC   : Factor w/ 8 levels &quot;BSEC1&quot;,&quot;BSEC2&quot;,..: 3 6 3 7 6 7 7 7 ...</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(data_cr_panel, <span class="dt">n =</span> <span class="dv">3</span>)</code></pre></div>
+<pre><code>##   rating firm_id  year         LR        LEV          PR     RSIZE
+## 1      E       1 year1 572.864658 1.20084294  0.14585117  1.422948
+## 2      C       2 year1   1.379547 0.03022761 -0.03962597 -1.944265
+## 3      C       3 year1   7.462706 0.15170420  0.05083517  2.024098
+##        BETA  BSEC
+## 1 1.1481020 BSEC3
+## 2 1.6926956 BSEC6
+## 3 0.7610057 BSEC3</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_AR1_probit &lt;-<span class="st"> </span><span class="kw">mvord</span>(<span class="dt">formula =</span> <span class="kw">MMO</span>(rating, firm_id, year) <span class="op">~</span><span class="st"> </span>LR <span class="op">+</span><span class="st"> </span>LEV <span class="op">+</span>
+<span class="st">  </span>PR <span class="op">+</span><span class="st"> </span>RSIZE <span class="op">+</span><span class="st"> </span>BETA, <span class="dt">error.structure =</span> <span class="kw">cor_ar1</span>(<span class="op">~</span><span class="st"> </span>BSEC), <span class="dt">link =</span> <span class="kw">mvprobit</span>(),
+  <span class="dt">data =</span> data_cr_panel, <span class="dt">coef.constraints =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">4</span>), <span class="kw">rep</span>(<span class="dv">2</span>, <span class="dv">4</span>)),
+  <span class="dt">threshold.constraints =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">8</span>), <span class="dt">threshold.values =</span> <span class="kw">rep</span>(<span class="kw">list</span>(<span class="kw">c</span>(<span class="dv">0</span>, <span class="ot">NA</span>,
+    <span class="ot">NA</span>, <span class="ot">NA</span>)),<span class="dv">8</span>), <span class="kw">mvord.control</span>(<span class="dt">solver =</span> <span class="st">&quot;BFGS&quot;</span>))</code></pre></div>
+<p>The results of the model can be presented by</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(res_AR1_probit, <span class="dt">short =</span> <span class="ot">TRUE</span>, <span class="dt">call =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<pre><code>## Formula: MMO(rating, firm_id, year) ~ LR + LEV + PR + RSIZE + BETA
+## 
+##     link threshold nsubjects ndim     logPL     CLAIC     CLBIC fevals
+## mvprobit fix1first      1415    8 -77843.09 156104.49 157203.55    189
+## 
+## Thresholds:
+##           Estimate Std. Error z value  Pr(&gt;|z|)    
+## year1 A|B 0.000000   0.000000      NA        NA    
+## year1 B|C 0.984647   0.025802  38.162 &lt; 2.2e-16 ***
+## year1 C|D 2.364711   0.039873  59.306 &lt; 2.2e-16 ***
+## year1 D|E 3.728002   0.055724  66.901 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Coefficients:
+##                  Estimate  Std. Error  z value  Pr(&gt;|z|)    
+## (Intercept) 1  1.42471225  0.04556961  31.2645 &lt; 2.2e-16 ***
+## (Intercept) 2  1.49164394  0.05786976  25.7759 &lt; 2.2e-16 ***
+## LR 1           0.02142909  0.00054203  39.5346 &lt; 2.2e-16 ***
+## LR 2           0.02959425  0.00096574  30.6442 &lt; 2.2e-16 ***
+## LEV 1          0.01114252  0.00052558  21.2004 &lt; 2.2e-16 ***
+## LEV 2          0.01390128  0.00081658  17.0238 &lt; 2.2e-16 ***
+## PR 1          -0.87154954  0.03320032 -26.2512 &lt; 2.2e-16 ***
+## PR 2          -0.67501624  0.04542960 -14.8585 &lt; 2.2e-16 ***
+## RSIZE 1       -0.34752657  0.00995679 -34.9035 &lt; 2.2e-16 ***
+## RSIZE 2       -0.35102290  0.01354452 -25.9162 &lt; 2.2e-16 ***
+## BETA 1         0.04802612  0.02197463   2.1855  0.028850 *  
+## BETA 2         0.08627324  0.03090444   2.7916  0.005245 ** 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Error Structure:
+##              Estimate Std. Error  z value  Pr(&gt;|z|)    
+## (Intercept)  1.408874   0.054179  26.0042 &lt; 2.2e-16 ***
+## BSECBSEC2   -0.487134   0.071649  -6.7989 1.054e-11 ***
+## BSECBSEC3   -0.055125   0.064215  -0.8585   0.39064    
+## BSECBSEC4   -0.108108   0.062361  -1.7336   0.08299 .  
+## BSECBSEC5   -0.069888   0.079575  -0.8783   0.37980    
+## BSECBSEC6   -0.599137   0.069668  -8.5999 &lt; 2.2e-16 ***
+## BSECBSEC7   -0.764239   0.067277 -11.3597 &lt; 2.2e-16 ***
+## BSECBSEC8   -0.653992   0.078939  -8.2848 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<p>The default error structure output for AR(1) models:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">error_structure</span>(res_AR1_probit)</code></pre></div>
+<pre><code>## (Intercept)   BSECBSEC2   BSECBSEC3   BSECBSEC4   BSECBSEC5   BSECBSEC6 
+##  1.40887376 -0.48713415 -0.05512540 -0.10810818 -0.06988803 -0.59913737 
+##   BSECBSEC7   BSECBSEC8 
+## -0.76423929 -0.65399207</code></pre>
+<p>Correlation parameters ρ i for each firm are obtained by choosing type = “corr”</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(<span class="kw">error_structure</span>(res_AR1_probit, <span class="dt">type =</span> <span class="st">&quot;corr&quot;</span>), <span class="dt">n =</span> <span class="dv">3</span>)</code></pre></div>
+<pre><code>##   Correlation
+## 1   0.8749351
+## 2   0.6694448
+## 3   0.8749351</code></pre>
+<p>Correlation matrices for each specific firm are obtained by choosing type = “sigmas”</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(<span class="kw">error_structure</span>(res_AR1_probit, <span class="dt">type =</span> <span class="st">&quot;sigmas&quot;</span>), <span class="dt">n =</span> <span class="dv">1</span>)</code></pre></div>
+<pre><code>## [[1]]
+##           year1     year2     year3     year4     year5     year6
+## year1 1.0000000 0.8749351 0.7655115 0.6697729 0.5860078 0.5127188
+## year2 0.8749351 1.0000000 0.8749351 0.7655115 0.6697729 0.5860078
+## year3 0.7655115 0.8749351 1.0000000 0.8749351 0.7655115 0.6697729
+## year4 0.6697729 0.7655115 0.8749351 1.0000000 0.8749351 0.7655115
+## year5 0.5860078 0.6697729 0.7655115 0.8749351 1.0000000 0.8749351
+## year6 0.5127188 0.5860078 0.6697729 0.7655115 0.8749351 1.0000000
+## year7 0.4485957 0.5127188 0.5860078 0.6697729 0.7655115 0.8749351
+## year8 0.3924921 0.4485957 0.5127188 0.5860078 0.6697729 0.7655115
+##           year7     year8
+## year1 0.4485957 0.3924921
+## year2 0.5127188 0.4485957
+## year3 0.5860078 0.5127188
+## year4 0.6697729 0.5860078
+## year5 0.7655115 0.6697729
+## year6 0.8749351 0.7655115
+## year7 1.0000000 0.8749351
+## year8 0.8749351 1.0000000</code></pre>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

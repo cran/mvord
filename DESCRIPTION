@@ -1,7 +1,7 @@
 Package: mvord
 Title: Multivariate Ordinal Regression Models
-Version: 0.3.0
-Date: 2018-05-03
+Version: 0.3.1
+Date: 2018-06-12
 Author: Rainer Hirk [aut, cre],
         Kurt Hornik [aut],
         Laura Vana [aut],
@@ -12,8 +12,11 @@ Description: A flexible framework for fitting multivariate
 License: GPL-3
 Depends: R (>= 3.1.0)
 Imports: MASS, pbivnorm, stats, optimx, mnormt, numDeriv, Matrix
+Suggests: knitr
+VignetteBuilder: knitr
+Encoding: UTF-8
 NeedsCompilation: yes
 RoxygenNote: 6.0.1
-Packaged: 2018-05-03 20:17:56 UTC; rainer
+Packaged: 2018-06-12 11:09:33 UTC; rainer
 Repository: CRAN
-Date/Publication: 2018-05-03 21:04:23 UTC
+Date/Publication: 2018-06-12 13:33:24 UTC

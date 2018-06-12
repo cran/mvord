@@ -651,6 +651,7 @@ NULL
 #' head(error_structure(res_AR1))
 #' head(error_structure(res_AR1, type = "corr"))
 #'
+#' data(data_mvord2)
 #' # approx 2 min
 #' res_cor <- mvord(formula = MMO2(rater1, rater2, rater3) ~ 0 + X1 + X2 + X3 + X4 + X5,
 #'                  data = data_mvord2,
@@ -679,8 +680,6 @@ mvord <- function(formula,
                   data,
                   error.structure = cor_general(~1),
                   link = mvprobit(),
-                  #index = NULL,
-                  #response.names = NULL,
                   response.levels = NULL,
                   coef.constraints = NULL,
                   coef.values = NULL,
@@ -734,6 +733,7 @@ mvord <- function(formula,
   }
 ##############
   rho <- set_args_other(rho)
+  check_response_missings(rho)
   mvord.fit(rho)
 }
 #-----------------------------------------------------------------------------------------------------------------
@@ -1042,7 +1042,7 @@ logLik.mvord <- function(object, ...) structure(-object$rho$objective,
 constraints <- function(object) UseMethod("constraints")
 #' @rdname constraints
 #' @export
-constraints.mvord <- function(object) object$constraints
+constraints.mvord <- function(object) object$rho$constraints
 
 
 #' @title Names of regression coefficient constraints in mvord

@@ -4,14 +4,22 @@
 \alias{marginal_predict}
 \title{Marginal Predictions for Multivariate Ordinal Regression Models.}
 \usage{
-marginal_predict(object, type = "prob", subjectID = NULL, ...)
+marginal_predict(object, newdata = NULL, type = "prob", subjectID = NULL,
+  newoffset = NULL, ...)
 }
 \arguments{
 \item{object}{an objecz of class \code{'mvord'}.}
 
-\item{type}{types \code{"prob"}, \code{"class"}, \code{"pred"}, \code{"cum.prob"} are available.}
+\item{newdata}{(optional) data frame of new covariates and new responses.
+The names of the variables should correspond to the names of the
+ variables used to fit the model. By default the data on which the model
+ was estimated is considered.}
+
+\item{type}{types \code{"prob"}, \code{"class"}, \code{"linpred"}, \code{"pred"}, \code{"cum.prob"} are available.}
 
 \item{subjectID}{(optional) vector specifying for which subjectIDs the predictions\cr or fitted values should be computed.}
+
+\item{newoffset}{(optional) list of length equal to the number of outcomes, each element containing a vector of offsets to be considered.}
 
 \item{...}{further arguments passed to or from other methods.}
 }
@@ -24,6 +32,7 @@ The following types can be chosen in \code{marginal_predict}:
   \code{type} \tab description\cr
   \code{"prob"} \tab (default) fitted marginal probabilities for the observed response categories.\cr
   \code{"class"} \tab fitted marginal classes of the observed responses.\cr
+  \code{"linpred"} \tab linear predictor \cr
   \code{"cum.prob"} \tab fitted marginal cumulative probabilities for the observed response categories.\cr
   \code{"all.prob"} \tab fitted marginal probabilities for all ordered classes of each response.
   }

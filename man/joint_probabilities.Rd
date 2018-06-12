@@ -4,17 +4,22 @@
 \alias{joint_probabilities}
 \title{Extracts fitted Probabilities for Multivariate Ordinal Regression Models.}
 \usage{
-joint_probabilities(object, response.cat, type = "prob", subjectID = NULL,
-  ...)
+joint_probabilities(object, response.cat, newdata = NULL, type = "prob",
+  subjectID = NULL, newoffset = NULL, ...)
 }
 \arguments{
 \item{object}{an object of class \code{'mvord'}.}
 
 \item{response.cat}{vector or matrix with response categories (for each subject one row of length equal to the number of multiple measurements).}
 
+\item{newdata}{(optional) data frame of new covariates and new responses. The names of the variables should correspond to the names of the
+variables used to fit the model. By default the data on which the model was estimated is considered.}
+
 \item{type}{\code{"prob"} for joint probabilities and \code{"cum.prob"} for joint cumulative probabilities.}
 
 \item{subjectID}{(optional) vector specifying for which subjectIDs the predictions\cr or fitted values should be computed.}
+
+\item{newoffset}{(optional) list of length equal to the number of outcomes, each element containing a vector of offsets to be considered.}
 
 \item{...}{further arguments passed to or from other methods.}
 }

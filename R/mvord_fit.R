@@ -39,23 +39,19 @@ mvord.fit <- function(rho){
   rho$npar.thetas <- sum(rho$npar.theta.opt)
 
   #set offsets from coef.values and updates
-  rho$attributes_x_all <- attr(rho$x[[1]], "assign")
   rho <- set_offset_up(rho)
   for(j in 1L:rho$ndim){
     check_rank(j, rho)
   }
 
-
-  rho$coef.names <- colnames(rho$x[[1]])
-
-  #if(!is.list(rho$coef.constraints)) check_args_coef2(rho)
+  rho$coef.names <- attributes(rho$x[[1]])$dimnames[[2]]
 
   rho$constraints <- get_constraints(rho)
   # vector of number of parameters for each coefficient
-  rho$npar.beta <- 0
-  if (length(rho$constraints) > 0) rho$npar.beta <- sapply(rho$constraints, NCOL)
+  npar.beta <- 0
+  if (length(rho$constraints) > 0) npar.beta <- sapply(rho$constraints, NCOL)
    #number of total coefficients
-  rho$npar.betas <- sum(rho$npar.beta)
+  rho$npar.betas <- sum(npar.beta)
 
   check_args_constraints(rho)
 
@@ -102,16 +98,15 @@ mvord.fit <- function(rho){
   rho$p <- NCOL(rho$x[[1]])
   rho$inds.cat <- lapply(seq_len(rho$ndim), function(j)
     seq_len(rho$ntheta[j]) +  rho$ncat.first.ind[j] - 1)
-  rho$nbeta.first <- unname(c(0, cumsum(rho$npar.beta)[-length(rho$npar.beta)]) + 1)
   rho$indjbeta <- lapply(seq_len(rho$ndim), function(j) {
     c(outer(rho$inds.cat[[j]], (seq_len(rho$p) - 1) * rho$nthetas, "+"))
   })
 
-  rho$dim_ind <- rep(1:rho$ndim, rho$ntheta)
+  dim_ind <- rep(1:rho$ndim, rho$ntheta)
   x_new <- rho$x
   if(rho$p > 0) {
-      rho$x_center <- vector("list", rho$ndim)
-      rho$x_scale <- vector("list", rho$ndim)
+      x_center <- vector("list", rho$ndim)
+      x_scale <- vector("list", rho$ndim)
       for (j in seq_len(rho$ndim)) {
         ## standardize numeric variables
         mu <- rep(0, rho$p)
@@ -121,26 +116,26 @@ mvord.fit <- function(rho){
         x_new[[j]][, ind_int] <- tmp$x
         mu[ind_int] <- tmp$mu
         sc[ind_int] <- tmp$sc
-        rho$x_center[[j]] <- mu
-        rho$x_scale[[j]] <- sc
+        x_center[[j]] <- mu
+        x_scale[[j]] <- sc
       }
-      rho$constraints_scaled <- lapply(seq_along(rho$constraints), function(p) {
-        sxp <- sapply(rho$x_scale, "[", p)
+      constraints_scaled <- lapply(seq_along(rho$constraints), function(p) {
+        sxp <- sapply(x_scale, "[", p)
         x <- rho$constraints[[p]]
         #first index of 1
         fi <- apply(x, 2, function(y) which(y == 1)[1])
         fi[is.na(fi)] <- 1
-        sweep(x * sxp[rho$dim_ind], 2, sxp[rho$dim_ind[fi]], "/")
+        sweep(x * sxp[dim_ind], 2, sxp[dim_ind[fi]], "/")
       })
-      rho$constraints_mat <- bdiag(rho$constraints_scaled)
+      rho$constraints_mat <- bdiag(constraints_scaled)
       ## scale and center for par_beta
       tmp <- (lapply(seq_along(rho$constraints), function(p) {
-        sxp <- sapply(rho$x_scale, "[", p)
-        mxp <- sapply(rho$x_center, "[", p)
+        sxp <- sapply(x_scale, "[", p)
+        mxp <- sapply(x_center, "[", p)
         fi <- apply(rho$constraints[[p]], 2, function(y) which(y == 1)[1])
         fi[is.na(fi)] <- 1
-        list(scale = sxp[rho$dim_ind[fi]], center = mxp[rho$dim_ind[fi]])
-       }))
+        list(scale = sxp[dim_ind[fi]], center = mxp[dim_ind[fi]])
+        }))
       rho$fi_scale  <- unlist(sapply(tmp, "[", "scale"))
       rho$fi_center <- unlist(sapply(tmp, "[", "center"))
   } else rho$constraints_mat <- integer()
@@ -202,7 +197,7 @@ mvord.fit <- function(rho){
                                  control = rho$control))
     rho$optpar <- unlist(rho$optRes[1:length(rho$start)])
     rho$objective <- unlist(rho$optRes["value"])
-  } 
+  }
   if (is.function(rho$solver)){
      rho$optRes <- rho$solver(rho$start, function(x) PLfun(x, rho))
      if (is.null(rho$optRes$optpar)|is.null(rho$optRes$objvalue)|is.null(rho$optRes$convcode)) stop("Solver function does not return the required objects.")
@@ -245,20 +240,51 @@ mvord.fit <- function(rho){
   if (rho$se) {
      rownames(rho$varGamma) <- colnames(rho$varGamma) <- c(names(unlist(res$theta))[is.na(unlist(rho$threshold.values))][!duplicated(unlist(rho$ind.thresholds))],                                                        names(res$beta),                                                     attr(res$error.struct, "parnames"))
   }
+  ## clean up
   rho$XcatU <- NULL
   rho$XcatL <- NULL
+  rho$transf_thresholds <- NULL
+  rho$get_ind_thresholds <- NULL
+  rho$ind.thresholds <- NULL
+  rho$y.NA.ind <- NULL
+  rho$binary <- NULL
+  rho$intercept.type <- NULL
+  rho$intercept <- NULL
+  rho$threshold.values.fixed <- NULL
+  rho$ncat.first.ind <- NULL
+  rho$constraints_mat <- NULL
+  rho$ind_univ <- NULL
+  rho$ind_kl <- NULL
+  rho$combis <- NULL
+  rho$fi_scale <- NULL
+  rho$fi_center <- NULL
+  rho$mat_center_scale <- NULL
+  rho$dummy_pl_lag <- NULL
+  rho$inds.cat <- NULL
+  rho$thold_correction <- NULL
+  rho$contr_theta <- NULL
+  rho$error.structure <- NULL
+  rho$beta <- NULL
+  rho$theta <- NULL
+  rho$nthetas <- NULL
+  rho$npar.theta.opt <- NULL
+  rho$npar.theta <- NULL
+  rho$npar.thetas <- NULL
+  rho$npar.betas <- NULL
+  rho$coef.names <- NULL
+  ##
+  rho$link$deriv.fun <- NULL
+  rho$link$F_biv_rect <- NULL
+  rho$link$F_biv <- NULL
+  ##
   res$rho <- rho
-  res$rho$y.NA.ind <- NULL
-  res$rho$transf_thresholds <- NULL
-  res$rho$get_ind_thresholds <- NULL
   res$rho$formula <- rho$formula.input
-  res$rho$theta <- NULL
-  res$rho$beta <- NULL
-  res$constraints <- rho$constraints
+  res$rho$formula.input <- NULL
   attr(res, "contrasts") <- rho$contrasts
-
+  res$rho$contrasts <- NULL
   rho$timestamp2 <- proc.time()
   res$rho$runtime <- rho$timestamp2 - rho$timestamp1
+  res$rho$timestamp1 <- NULL
 
   class(res) <- "mvord"
 

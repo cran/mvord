@@ -103,24 +103,6 @@ check_args_coef <- function(rho){
     })
   }
 }
-#
-# check_args_coef2 <- function(rho){
-#   if (nrow(rho$coef.constraints) != rho$ndim) stop("Row dimension of coef.constraints and outcome dimension do not match.", call. = FALSE)
-#   tmp <- sum(apply(apply(rho$coef.constraints, 2, is.na),2,all) * apply(!apply(rho$coef.values, 2, is.na),2,all))
-#   if ((NCOL(rho$coef.constraints)-tmp) != NCOL(rho$x[[1]])) stop("Column dimension of coef.constraints and number of columns in model matrix do not match.
-#                                                                  Maybe (Intercept) is included or specify constraints for factors or interaction terms accordingly.", call. = FALSE)
-#
-#   for (j in seq_len(NCOL(rho$coef.constraints))){
-#     indj <- unique(rho$coef.constraints[,j])
-#     indj <- indj[!is.na(indj)]
-#     lapply(seq_along(indj), function(k) {
-#       tmpind <- which(rho$coef.constraints[,j] == indj[k])
-#       tmp <- rho$coef.values[tmpind,j]
-#       if(length(unique(tmp)) != 1) stop("If constraints are set on the coefficients (by coef.constraints),
-#                                         coef.values need to be specified accordingly for these outcome dimensions.", call. = FALSE)
-#     })
-#     }
-#   }
 
 check_args_constraints <- function(rho){
   if (!all(rho$coef.names %in% names(rho$constraints)))
@@ -128,7 +110,6 @@ check_args_constraints <- function(rho){
   #check dimensions of rho$constraints
   if(any(sapply(rho$constraints, NROW) != rho$nthetas)) stop("coef.constraints need to have number of total categories rows
                                                            (sum of number of categories for all dimensions).", call. = FALSE)
-
 }
 
 check_args_input1 <- function(rho, data){
@@ -158,6 +139,20 @@ check_args_input2 <- function(rho, data){
   }
 }
 
+check_response_missings <- function(rho){
+  y_unique <- lapply(seq_len(rho$ndim), function(j) unique(rho$y[, j]))
+  y_missing_cat <- sapply(seq_len(rho$ndim), function(j) !all(rho$levels[[j]] %in% y_unique[[j]]))
+  if(any(y_missing_cat)){
+    for (i in seq_along(sum((y_missing_cat)))){
+      ind_y_missing_cat <- which(y_missing_cat)[i]
+      if(!(rho$threshold.constraints[ind_y_missing_cat] %in% rho$threshold.constraints[-ind_y_missing_cat])){
+        stop("Model is not identifiable. For at least one dimension, not all response categories are observed.
+              Either remove the non-observed category or set constraints on the threshold parameters to ensure identifiability.")
+      }
+    }
+  }
+}
+
 set_args_other <- function(rho) {
   ## coef contraints
   ## can be null, matrix, vector, list
@@ -169,7 +164,7 @@ set_args_other <- function(rho) {
       rho$coef.constraints <- matrix(integer(), ncol = 0, nrow = rho$ndim)
     }
   }
-  ## list and coef values can't be used 
+  ## list and coef values can't be used
   if(is.list(rho$coef.constraints) && !is.null(rho$coef.values)) stop("This coef.constraints design requires offsets instead of coef.values.", call.=FALSE)
   if(!is.list(rho$coef.constraints) & NCOL(rho$coef.constraints) > 0){
       if(is.vector(rho$coef.constraints)) {
@@ -187,12 +182,12 @@ set_args_other <- function(rho) {
     #check if coef.values fit to coef.constraints
     check_args_coef(rho)
     # set coef.constraints NA  coef.values are set
-    rho$coef.constraints[!is.na(rho$coef.values)] <- NA 
+    rho$coef.constraints[!is.na(rho$coef.values)] <- NA
     rho$intercept.type <- ifelse(rho$intercept == FALSE, "fixed",
        ifelse(any(is.na(rho$coef.values[,1])), "flexible", "fixed"))
   } else {
     rho$intercept.type <- ifelse(rho$intercept == FALSE, "fixed", "flexible")
-  } 
+  }
   ## threshold.contraints
   if(is.null(rho$threshold.constraints)) rho$threshold.constraints <- 1:rho$ndim
   ## PL.lag
@@ -234,8 +229,6 @@ suppressWarnings(
 }
 
 
-
-
 get_start_values <- function(rho){
  gammas <- sapply(1:rho$ndim, function(j) {
    if (rho$npar.theta.opt[j] != 0){
@@ -272,19 +265,19 @@ transf_par <- function(par, rho) {
   sigmas <- build_error_struct(rho$error.structure, par_sigma)
   par_beta <- par[rho$npar.thetas + seq_len(rho$npar.betas)]
   betatilde <- rho$constraints_mat %*% par_beta
-  par_theta <- rho$transf_thresholds(par[seq_len(rho$npar.thetas)], rho, betatilde)
+  par_theta <- rho$transf_thresholds(par[seq_len(rho$npar.thetas)], rho,
+  	betatilde)
 
   thetatilde <- lapply(seq_len(rho$ndim), function(j)
     par_theta[[j]] + rho$thold_correction[[j]](betatilde, k = j, rho = rho))
-
   pred.upper  <- sapply(seq_len(rho$ndim), function(j) {
-   th_u <- c(thetatilde[[j]], rho$inf.value)[rho$y[, j]]
-   xbeta_u <- c(rho$XcatU[[j]] %*% betatilde[rho$indjbeta[[j]]])
-   th_u - xbeta_u - rho$offset[[j]]
+    th_u <- c(thetatilde[[j]], rho$inf.value)[rho$y[, j]]
+    xbeta_u <- as.double(rho$XcatU[[j]] %*% betatilde[rho$indjbeta[[j]]])
+    th_u - xbeta_u - rho$offset[[j]]
   })/sigmas$sdVec
   pred.lower  <- sapply(seq_len(rho$ndim), function(j) {
     th_l <- c(-rho$inf.value, thetatilde[[j]])[rho$y[, j]]
-    xbeta_l <- c(rho$XcatL[[j]] %*% betatilde[rho$indjbeta[[j]]])
+    xbeta_l <- as.double(rho$XcatL[[j]] %*% betatilde[rho$indjbeta[[j]]])
     th_l - xbeta_l - rho$offset[[j]]
   })/sigmas$sdVec
   list(U = pred.upper, L = pred.lower,
@@ -445,13 +438,14 @@ mvord_data <- function(data, index, y.names, x.names,
     df$ylevels <- y.levels
     for (j in seq_along(y.levels)) {
       ## check levels for each response
-      if (!all(levels(df$y[, j]) %in% df$ylevels[[j]]))
+      #if (!all(levels(df$y[, j]) %in% df$ylevels[[j]]))
+      if (!all(unique(df$y[, j]) %in% c(NA,df$ylevels[[j]])))
         warning("levels of response do not all match with response levels", call. = FALSE)
-      if (!all(y.levels[[j]] %in% unique(df$y[, j])))
-        warning(sprintf("For response %i, not all response
-          levels are observed. Model might be non-identifiable if
-          the thresholds for this response are not restricted.", j),
-        call.=FALSE)
+#      if (!all(y.levels[[j]] %in% unique(df$y[, j])))
+#        warning(sprintf("For response %i, not all response
+#          levels are observed. Model might be non-identifiable if
+#          the thresholds for this response are not restricted.", j),
+#        call.=FALSE)
       df$y[, j] <- ordered(df$y[, j], levels = y.levels[[j]])
     }
   }
@@ -523,7 +517,7 @@ if(is.list(rho$coef.constraints)){
       get_labels_theta(rho, j)))
     constraints[[p]]
   })
-  if(NCOL(rho$coef.constraints) == 0) constraints <- NULL
+  if (NCOL(rho$coef.constraints) == 0) constraints <- NULL
   names(constraints) <- rho$coef.names
   constraints
 }
@@ -564,26 +558,26 @@ if (all(sapply(rho$offset, is.null))) {
 
 
 set_offset_up <- function(rho){
-if (all(sapply(rho$offset, is.null))) {
-  if (any(rho$coef.values != 0, na.rm = TRUE)){
-    tmp <- rho$coef.values
-    tmp[is.na(tmp)] <- 0
-    rho$offset <- lapply(1:rho$ndim, function(j){
-      tmp2 <- c(rho$x[[j]] %*% tmp[j,])
-      tmp2[is.na(tmp2)] <- 0
-      tmp2
-    })
-  } else {
+  if (all(sapply(rho$offset, is.null))) {
+    if (any(rho$coef.values != 0, na.rm = TRUE)){
+      tmp <- rho$coef.values
+      tmp[is.na(tmp)] <- 0
+      rho$offset <- lapply(1:rho$ndim, function(j){
+        tmp2 <- c(rho$x[[j]] %*% tmp[j,])
+        tmp2[is.na(tmp2)] <- 0
+        tmp2
+      })
+    } else {
     rho$offset <- lapply(1:rho$ndim, function(j) rep(0, rho$n))
+    }
   }
-}
   if (!is.null(rho$coef.values)){
-  rho$wh_fix <- which(colSums(is.na(rho$coef.values)) == 0)
-  if (length(rho$wh_fix) != 0){
+  wh_fix <- which(colSums(is.na(rho$coef.values)) == 0)
+  if (length(wh_fix) != 0){
   for (j in 1:rho$ndim) {
      attribute <- attr(rho$x[[j]], "assign")
-     rho$x[[j]] <-  rho$x[[j]][, -rho$wh_fix, drop = F]
-     attr(rho$x[[j]], "assign") <- attribute[-rho$wh_fix]
+     rho$x[[j]] <-  rho$x[[j]][, -wh_fix, drop = F]
+     attr(rho$x[[j]], "assign") <- attribute[-wh_fix]
   }
   }
 }
@@ -672,20 +666,20 @@ reduce_size.mvord <- function(object){
   out <- object
   out$rho$x <- NULL
   out$rho$y <- NULL
-  out$rho$error.structure <- NULL
+  #out$rho$error.structure <- NULL
   out$rho$weights <- NULL
   out$rho$offset <- NULL
-  out$rho$ind_kl <- NULL
+  #out$rho$ind_kl <- NULL
   tmp <- out$rho$link$name
   out$rho$link <- NULL
   out$rho$link$name <- tmp
-  out$rho$constraints_scaled <- NULL
-  out$rho$constraints_mat <- NULL
-  out$rho$thold_correction <- NULL
+  #out$rho$constraints_scaled <- NULL
+  #out$rho$constraints_mat <- NULL
+  #out$rho$thold_correction <- NULL
   #out$rho$V <- NULL
   #out$rho$H.inv <- NULL
   out$rho$varGamma <- NULL
-  out$rho$contr_theta <- NULL
+  #out$rho$contr_theta <- NULL
   attributes(out$error.struct)$subjnames <- NULL
   out
 }
@@ -694,20 +688,47 @@ reduce_size2.mvord <- function(object){
   out <- object
   #out$rho$x <- NULL
   #out$rho$y <- NULL
-  out$rho$error.structure <- NULL
+  #out$rho$error.structure <- NULL
   out$rho$weights <- NULL
   #out$rho$offset <- NULL
-  out$rho$ind_kl <- NULL
+  #out$rho$ind_kl <- NULL
   #tmp <- out$rho$link$name
   #out$rho$link <- NULL
   #out$rho$link$name <- tmp
-  out$rho$constraints_scaled <- NULL
-  out$rho$constraints_mat <- NULL
-  out$rho$thold_correction <- NULL
+  #out$rho$constraints_scaled <- NULL
+  #out$rho$constraints_mat <- NULL
+  #out$rho$thold_correction <- NULL
   #out$rho$V <- NULL
   #out$rho$H.inv <- NULL
   out$rho$varGamma <- NULL
-  out$rho$contr_theta <- NULL
+  #out$rho$contr_theta <- NULL
+  attributes(out$error.struct)$subjnames <- NULL
+  out
+}
+
+
+reduce_size2_Funi.mvord <- function(object){
+  out <- object
+  #out$rho$x <- NULL
+  #out$rho$y <- NULL
+  out$rho$error.structure <- NULL
+  out$rho$weights <- NULL
+  #out$rho$offset <- NULL
+  #out$rho$ind_kl <- NULL
+  #tmp <- out$rho$link$name
+  #out$rho$link <- NULL
+  out$rho$link$F_biv <- NULL
+  out$rho$link$F_biv_rect <- NULL
+  out$rho$link$F_multi <- NULL
+  out$rho$link$deriv.fun <- NULL
+  #out$rho$link$name <- tmp
+  #out$rho$constraints_scaled <- NULL
+  #out$rho$constraints_mat <- NULL
+  #out$rho$thold_correction <- NULL
+  #out$rho$V <- NULL
+  #out$rho$H.inv <- NULL
+  out$rho$varGamma <- NULL
+  #out$rho$contr_theta <- NULL
   attributes(out$error.struct)$subjnames <- NULL
   out
 }

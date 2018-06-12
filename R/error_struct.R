@@ -86,8 +86,12 @@ initialize <-
   ## initializes the structures
   function(object, ...) UseMethod("initialize")
 
-finalize <-
+finalize_fun <-
   ## finalizes the structures
+  function(object, ...) UseMethod("finalize_fun")
+
+finalize <-
+  ## initializes the structures
   function(object, ...) UseMethod("finalize")
 
 get_covariate <-
@@ -141,6 +145,23 @@ initialize.error_struct <-
     get_covariate(object, data.x = data$x, contrasts = contrasts)
   object
 }
+
+finalize.error_struct <-
+  ## initializes some attributes of error_struct objects
+  ## takes as data the output on mvord_data
+  function(object, tpar)
+{
+  object <- finalize_fun(object, tpar)
+#  attr(object, "subjnames") <- NULL
+#  attr(object, "ynames") <- NULL
+#  attr(object, "ndim") <- NULL
+#  attr(object, "nobs") <- NULL
+#  attr(object, "covariate") <- NULL 
+  attr(object, "npar.cor") <- NULL 
+  attr(object, "npar.sd") <- NULL 
+  object
+}
+
 
 ###############################
 ### Methods for cov_general ###
@@ -196,7 +217,7 @@ function(object, tpar)
   return(list(rVec = rVec, sdVec = sdVec))
 }
 
-finalize.cov_general <-
+finalize_fun.cov_general <-
 function(object, tpar)
 {
   ## takes the transformed parameters and finalizez cor_general objects
@@ -302,7 +323,7 @@ function(object, tpar)
   return(list(rVec = rVec, sdVec = sd))
 }
 
-finalize.cor_general <-
+finalize_fun.cor_general <-
 function(object, tpar)
 {
   ndim <- attr(object, "ndim")
@@ -380,7 +401,7 @@ function(object, tpar)
   list(rVec = t(corr_pars), sdVec=sdVec)
 }
 
-finalize.cor_ar1 <-
+finalize_fun.cor_ar1 <-
 function(object, tpar)
 {
   covar <- attr(object, "covariate")
@@ -422,7 +443,7 @@ function(object, tpar)
   list(rVec = corr_pars, sdVec=sdVec)
 }
 
-finalize.cor_equi <-
+finalize_fun.cor_equi <-
 function(object, tpar)
 {
   ## finalizes some attributes of cor_equi objects
@@ -460,7 +481,7 @@ function(object, tpar)
     ncol = ndim * (ndim - 1)/2), sdVec=sdVec)
 }
 
-finalize.cor_ident <-
+finalize_fun.cor_ident <-
 function(object, tpar)
 {
   ## finalizes some attributes of cor_ident objects
@@ -493,7 +514,7 @@ function(object, tpar)
 error_structure <- function(object, type, ...) UseMethod("error_structure")
 #' @rdname error_structure
 #' @export
-error_structure.mvord <- function(object, type = NULL, ...)  {
+error_structure.mvord <- function(object, type = NULL, ...)  {  
   val <- error_structure(object$error.struct, type = type , ...)
   val
 }

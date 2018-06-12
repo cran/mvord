@@ -23,29 +23,25 @@ initialize_MMO <- function(rho, formula, data, error.structure, contrasts){
   }
   ## check if more than one response --
 
-
   rho$intercept <- ifelse(attr(terms.formula(rho$formula),
                                "intercept") == 1, TRUE, FALSE)
   rho$x.names <- c(all.vars(rho$formula[[3]]),
                    all.vars(formula(error.structure)[[2]]))
   if (any(is.na(data[, rho$x.names]))) stop("Missing values in the covariates are not allowed.")
 
-  names.rest <- colnames(data)#[-match(c(rho$response.name, rho$index), colnames(data))]
+  names.rest <- colnames(data)
   data.mvord <- mvord_data(data, index = rho$index, y.names = rho$response.name, x.names = names.rest,
                            y.levels = rho$response.levels,
                            response.names = rho$response.names)
 
   rho$levels <- data.mvord$ylevels
-  rho$rownames.constraints <- unlist(rho$levels)
-
 
   rho$y <- data.mvord$y
   rho$y.names <- colnames(rho$y)
+
   rho$ndim <- ncol(rho$y)
   rho$n <- nrow(rho$y)
-#  check_args_input2(rho, data)
   rho$x <- lapply(1:rho$ndim, function(j) {
-    #rhs.form <- as.formula(paste0("~",deparse(rho$formula[[3]])))
     rhs.form <- rho$formula
     rhs.form[[2]] <- NULL
     new.rhs.form <- update(rhs.form, ~  . + 1)
@@ -79,7 +75,13 @@ initialize_MMO <- function(rho, formula, data, error.structure, contrasts){
       rhs.form[[2]] <- NULL
       mf <- model.frame(rhs.form, data.mvord$x[[j]],
                         na.action = function(x) x)
-      mf[is.na(mf)] <- 0
+      #mf[is.na(mf)] <- 0
+      if(NCOL(mf) > 0){
+        for(k in seq_along(NCOL(mf))){
+          if(is.numeric(mf[,k]))
+            mf[is.na(mf[,k]),k] <- 0
+        }
+      }
       model.offset(mf)
     })
   }
@@ -89,8 +91,6 @@ initialize_MMO <- function(rho, formula, data, error.structure, contrasts){
 
 initialize_MMO2 <- function(rho, formula, data, error.structure, contrasts){
   rho$function.name <- "mvord2"
-  #rho$formula <- as.formula(paste0("cbind(", paste(formula[[2]][-1], collapse = ","), ") ~ ", as.character(formula[[3]]))
-  #rho$formula <- cbind(SPR, Fitch, Moodys, rater4) ~ 0 + R3 + R9 + R12 + R18 + R20 + R23 + R24 + R34 + R35 + RSIZE + BETA + SIGMA + MB
   rho$formula <- as.formula(paste0("cbind(", paste(formula[[2]][-1], collapse = ", "), ") ", paste(as.character(formula[-2]), collapse = " ")))
   rho$y.names <- all.vars(rho$formula[[2]])
   rho$y <- data[,rho$y.names]
@@ -98,7 +98,6 @@ initialize_MMO2 <- function(rho, formula, data, error.structure, contrasts){
   rho$n <- nrow(rho$y)
 
   check_args_input1(rho, data)
-  #check_args_input2(rho, data)
   if(!is.null(rho$weights.name)){
     if(any(is.na(data[,rho$weights.name]))) {
       data[,rho$weights.name][is.na(data[,rho$weights.name])] <- 0
@@ -123,7 +122,7 @@ initialize_MMO2 <- function(rho, formula, data, error.structure, contrasts){
         call.=FALSE)
   }
 
-  rho$rownames.constraints <- unlist(rho$levels)
+  #rho$rownames.constraints <- unlist(rho$levels)
   rho$intercept <- ifelse(attr(terms.formula(rho$formula), "intercept") == 1, TRUE, FALSE)
   rho$x <- lapply(1:rho$ndim, function(j) {
     rhs.form <- as.formula(paste(as.character(formula[-2]), collapse = " "))

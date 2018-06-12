@@ -456,6 +456,7 @@ coefficients(res_AR1)
 head(error_structure(res_AR1))
 head(error_structure(res_AR1, type = "corr"))
 
+data(data_mvord2)
 # approx 2 min
 res_cor <- mvord(formula = MMO2(rater1, rater2, rater3) ~ 0 + X1 + X2 + X3 + X4 + X5,
                  data = data_mvord2,

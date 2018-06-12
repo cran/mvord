@@ -4,14 +4,19 @@
 \alias{predict.mvord}
 \title{Predict method for Multivariate Ordinal Regression Models.}
 \usage{
-\method{predict}{mvord}(object, type = "prob", subjectID = NULL, ...)
+\method{predict}{mvord}(object, newdata = NULL, type = "prob",
+  subjectID = NULL, newoffset = NULL, ...)
 }
 \arguments{
 \item{object}{an object of class \code{'mvord'}.}
 
+\item{newdata}{(optional) data frame of new covariates and new responses.}
+
 \item{type}{types \code{"class"}, \code{"prob"} and \code{"cum.prob"} are available.}
 
 \item{subjectID}{(optional) vector specifying for which subjectIDs the predictions\cr or fitted values should be computed.}
+
+\item{newoffset}{(optional) list of length equal to the number of outcomes, each element containing a vector of offsets to be considered.}
 
 \item{...}{further arguments passed to or from other methods.}
 }
@@ -21,13 +26,15 @@ Obtains predicted or fitted values for objects of class \code{'mvord'}.
 \details{
 \tabular{ll}{
   \code{type} \tab description\cr
-  \code{"class"} \tab combination of response categories with the highest probability in the fitted model.\cr
-  \code{"prob"} \tab (default) fitted joint probability for the observed response categories.\cr
-  \code{"cum.prob"} \tab fitted joint cumulative probability for the observed response categories.
+  \code{"class"} \tab combination of response categories with the highest probability.\cr
+  \code{"prob"} \tab (default) fitted joint probability for the observed response categories\cr or
+       the categories provided in the response column(s) in \code{newdata}.If response column(s) in
+       \code{newdata} contain only NAs, this will return a vector of ones. \cr
+  \code{"cum.prob"} \tab fitted joint cumulative probability for the observed response categories\cr or
+       the categories provided in the response column(s) in \code{newdata}. If response column(s) in
+       \code{newdata} contain only NAs, this will return a vector of ones.
   }
-
-The current implementation supports only in-sample predictions.
-The row names of the output correspond to the subjectIDs.
+The (row) names of the output correspond to the subjectIDs.
 }
 \seealso{
 \code{\link{marginal_predict}}, \code{\link{joint_probabilities}}

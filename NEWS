@@ -1,6 +1,10 @@
 This file documents updates and changes in the package mvord
 
-changes in version 0.3.0 (2018-04-19)
+changes in version 0.3.1 (2018-06-12)
+- out-of-sample predictions are now available
+- additional examples are now available in an additional vignette
+
+changes in version 0.3.0 (2018-05-03)
 - new model design with multiple measurement objects MMO and MMO2 (former mvord2())
 - removed function mvord2()
 - removed argument scale (covariates are scaled internally for optimizer)
