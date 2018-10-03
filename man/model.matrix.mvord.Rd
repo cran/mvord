@@ -12,6 +12,6 @@
 \item{...}{further arguments passed to or from other methods.}
 }
 \description{
-\code{model.matrix} is a generic function which extracts the Godambe information matrix from objects of class \cr
-\code{'mvord'}.
+\code{model.matrix} is a generic function which extracts the model matrix
+ from objects of class \code{'mvord'}.
 }

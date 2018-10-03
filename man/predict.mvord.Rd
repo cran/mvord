@@ -27,12 +27,13 @@ Obtains predicted or fitted values for objects of class \code{'mvord'}.
 \tabular{ll}{
   \code{type} \tab description\cr
   \code{"class"} \tab combination of response categories with the highest probability.\cr
-  \code{"prob"} \tab (default) fitted joint probability for the observed response categories\cr or
-       the categories provided in the response column(s) in \code{newdata}.If response column(s) in
+  \code{"prob"} \tab (default) fitted joint probability for the observed response categories\cr
+  \tab or the categories provided in the response column(s) in \code{newdata}.\cr
+  \tab If response column(s) in
        \code{newdata} contain only NAs, this will return a vector of ones. \cr
-  \code{"cum.prob"} \tab fitted joint cumulative probability for the observed response categories\cr or
-       the categories provided in the response column(s) in \code{newdata}. If response column(s) in
-       \code{newdata} contain only NAs, this will return a vector of ones.
+  \code{"cum.prob"} \tab fitted joint cumulative probability for the observed response\cr
+  \tab categories or the categories provided in the response column(s) in \code{newdata}.\cr
+  \tab If response column(s) in \code{newdata} contain only NAs, this will return a vector of ones.
   }
 The (row) names of the output correspond to the subjectIDs.
 }

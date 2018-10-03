@@ -105,11 +105,11 @@ structure as wide data format.
   \itemize{
     \item{\code{data}:}{
 In \code{MMO} we use a long format for the input of data, where each row contains a subject index
-(\code{subject_index}), a multiple measurement index (\code{multiple_measurement_index}), an ordinal
+(\code{i}), a multiple measurement index (\code{j}), an ordinal
 observation (Y) and all the covariates (X1 to Xp). This long format data structure is
 internally transformed to a matrix of responses which contains NA in the case of missing
 entries and a list of covariate matrices. This is performed by the multiple measurement object
-\code{MMO(Y, subject_index, multiple_measurement_index)}
+\code{MMO(Y, i, j)}
 specifying the column names of the subject index and the multiple measurement index in data.
 The column containing the ordinal observations can contain integer or character values or can
 be of class (ordered) 'factor'. When using the long data structure, this column is basically
@@ -483,7 +483,7 @@ head(error_structure(res_cor))
 \seealso{
 %\code{\link{predict.mvord}},
 \code{\link{print.mvord}}, \code{\link{summary.mvord}}, \code{\link{coef.mvord}},
- \code{\link{thresholds.mvord}}, \code{\link{error_structure.mvord}}, \code{\link{mvord.control}},
- \code{\link{data_cr_panel}},\code{\link{data_cr}},
+ \code{\link{thresholds.mvord}}, \code{\link{error_structure.mvord}}, \cr
+ \code{\link{mvord.control}}, \code{\link{data_cr_panel}},\code{\link{data_cr}},
  \code{\link{data_mvord_panel}},\code{\link{data_mvord}}, \code{\link{data_mvord2}}
 }

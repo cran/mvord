@@ -12,6 +12,6 @@
 \item{...}{further arguments passed to or from other methods.}
 }
 \description{
-\code{fitted} is a generic function which extracts fitted probabilities for the observed categories from objects of class \cr
+A generic function which extracts fitted probabilities for the observed categories from objects of class
 \code{'mvord'}.
 }

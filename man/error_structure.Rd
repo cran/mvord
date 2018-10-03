@@ -17,7 +17,7 @@ error_structure(object, type, ...)
 \item{...}{further arguments passed to or from other methods.}
 }
 \description{
-\code{get_error_struct} is a generic function which extracts for each subject the estimated
+A generic function which extracts for each subject the estimated
 error structure parameters from objects of class \code{'mvord'}.
 }
 \details{

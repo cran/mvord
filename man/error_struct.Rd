@@ -34,5 +34,5 @@ Different \code{error.structures} are available in \pkg{mvord}:
 \item AR(1) correlation structure \code{cor_ar1(~ 1)}, or
 \item covariate dependent AR(1) correlation structure \code{cor_ar1(~ S)}.
 }
-See \code{\link{error_struct}} or vignette.
+For more details see vignette.
 }

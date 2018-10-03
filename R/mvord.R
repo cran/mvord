@@ -71,7 +71,7 @@ NULL
 #' @docType data
 # #' @keywords datasets
 #' @usage data(data_cr)
-#' @format A data frame with 690 rows and 10 variables
+#' @format A data frame with 690 rows and 11 columns
 NULL
 
 #' Simulated credit ratings
@@ -99,6 +99,7 @@ NULL
 #' @usage data(data_mvord2)
 #' @format A data frame with 1000 rows and 10 variables
 NULL
+
 
 #' Simulated panel of credit ratings
 #'
@@ -189,7 +190,10 @@ NULL
 #' @importFrom mnormt sadmvn sadmvt
 #' @importFrom Matrix bdiag
 #' @importFrom numDeriv grad hessian
-
+#' @import minqa
+#' @import BB
+#' @import dfoptim
+#' @import ucminf
 
 
 #############################################################################################
@@ -212,11 +216,11 @@ NULL
 #'   \itemize{
 #'     \item{\code{data}:}{
 #' In \code{MMO} we use a long format for the input of data, where each row contains a subject index
-#' (\code{subject_index}), a multiple measurement index (\code{multiple_measurement_index}), an ordinal
+#' (\code{i}), a multiple measurement index (\code{j}), an ordinal
 #' observation (Y) and all the covariates (X1 to Xp). This long format data structure is
 #' internally transformed to a matrix of responses which contains NA in the case of missing
 #' entries and a list of covariate matrices. This is performed by the multiple measurement object
-#' \code{MMO(Y, subject_index, multiple_measurement_index)}
+#' \code{MMO(Y, i, j)}
 #' specifying the column names of the subject index and the multiple measurement index in data.
 #' The column containing the ordinal observations can contain integer or character values or can
 #' be of class (ordered) 'factor'. When using the long data structure, this column is basically
@@ -487,8 +491,8 @@ NULL
 #'
 #' @seealso %\code{\link{predict.mvord}},
 #' \code{\link{print.mvord}}, \code{\link{summary.mvord}}, \code{\link{coef.mvord}},
-#'  \code{\link{thresholds.mvord}}, \code{\link{error_structure.mvord}}, \code{\link{mvord.control}},
-#'  \code{\link{data_cr_panel}},\code{\link{data_cr}},
+#'  \code{\link{thresholds.mvord}}, \code{\link{error_structure.mvord}}, \cr
+#'  \code{\link{mvord.control}}, \code{\link{data_cr_panel}},\code{\link{data_cr}},
 #'  \code{\link{data_mvord_panel}},\code{\link{data_mvord}}, \code{\link{data_mvord2}}
 #'
 #'
@@ -711,9 +715,15 @@ mvord <- function(formula,
   rho$weights.name <- weights.name
   rho$response.levels <- response.levels
   rho$offset <- offset
+  if (!all(names(contrasts) %in% c(labels(terms(rho$formula.input)), labels(terms(error.structure$formula))))) {
+    Terms <- c(labels(terms(rho$formula.input)), labels(terms(error.structure$formula)))
+    id_tmp <- which(!(names(contrasts) %in% Terms))
+    str_tmp <- paste(names(contrasts)[id_tmp], collapse = " and ")
+    warning(ifelse(length(id_tmp) == 1, sprintf("Variable %s is absent, the contrasts will be ignored.", str_tmp),
+                 sprintf("Variables %s are absent, the contrasts will be ignored.", str_tmp)))
+  }
   rho$contrasts <- contrasts
   nm <- names(as.list(rho$mc))
-
   if(!"data" %in% nm) stop("Model needs formula and data.", call.=FALSE)
   #if(!"link" %in% nm) stop("Model needs formula, data and link.", call.=FALSE)
   if(!"formula" %in% nm) stop("Model needs formula and data.", call.=FALSE)
@@ -1004,8 +1014,8 @@ terms.mvord <- function(x, ...) terms(x$rho$formula)
 
 #' @title model.matrix of Multivariate Ordinal Regression Models.
 #' @description
-#' \code{model.matrix} is a generic function which extracts the Godambe information matrix from objects of class \cr
-#' \code{'mvord'}.
+#' \code{model.matrix} is a generic function which extracts the model matrix
+#'  from objects of class \code{'mvord'}.
 #' @param object an object of class \code{'mvord'}.
 #' @param ... further arguments passed to or from other methods.
 #' @method model.matrix mvord
@@ -1014,7 +1024,7 @@ model.matrix.mvord <- function(object, ...) object$rho$x
 
 #' @title Fitted Probabilities of Multivariate Ordinal Regression Models.
 #' @description
-#' \code{fitted} is a generic function which extracts fitted probabilities for the observed categories from objects of class \cr
+#' A generic function which extracts fitted probabilities for the observed categories from objects of class
 #' \code{'mvord'}.
 #' @param object an object of class \code{'mvord'}.
 #' @param ... further arguments passed to or from other methods.
@@ -1035,7 +1045,7 @@ logLik.mvord <- function(object, ...) structure(-object$rho$objective,
 
 #' @title Constraints on the Regression Coefficients of Multivariate Ordinal Regression Models.
 #' @description
-#' \code{constraints} is a generic function which extracts the constraints on the regression
+#' An extractor function for the constraint matrices corresponding to the regression
 #' coefficients from objects of class \code{'mvord'}.
 #' @param object an object of class \code{'mvord'}.
 #' @export
@@ -1047,7 +1057,7 @@ constraints.mvord <- function(object) object$rho$constraints
 
 #' @title Names of regression coefficient constraints in mvord
 #' @description
-#' \code{names_constraints} is a function which extracts the names of the regression constraints based on the model \code{formula} and \code{data}.
+#' An extractor function for the names of the regression coefficient constraints based on the model \code{formula} and \code{data}.
 #' @param formula model formula
 #' @param data a given data set.
 #' @param contrasts an optional list. See the \code{contrasts.arg} of \code{\link{model.matrix.default}}.

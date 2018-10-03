@@ -25,7 +25,7 @@ PL_se <- function(rho){
     if(rho$control$trace != 0) cat("Computing variability and hessian matrix analytically ... \n")
     derivs_for_se <- derivs_ana(rho)
     rho$V <- rho$n/(rho$n - NCOL(derivs_for_se$V)) * derivs_for_se$V  ## correct for degrees of freedom
-    rho$H.inv <- solve(derivs_for_se$H)
+    rho$H.inv <- tryCatch(chol2inv(chol(derivs_for_se$H)))
   }
     rho$varGamma <- rho$H.inv %*% rho$V %*% rho$H.inv ## inverse godambe
     rho$seGamma <- sqrt(diag(rho$varGamma))
@@ -42,196 +42,258 @@ PL_se <- function(rho){
 # #' @param Lk lower predictor for the k-th response
 # #' @param Ll lower predictor for the l-th response
 # #' @param r value or vector of the correlation parameters
-# #' @param fun function computing the derivative of the bivariate pdf (depends on link)
+# #' @param fun function computing the derivative dF(x,y,r)/dr
 d_corr_rect <- function(Uk, Ul, Lk, Ll, r, fun) {
-   - fun(Uk, Ul, r) + fun(Uk, Ll, r) + fun(Lk, Ul, r) - fun(Lk, Ll, r)
+  - fun(Uk, Ul, r) + fun(Uk, Ll, r) + fun(Lk, Ul, r) - fun(Lk, Ll, r)
 }
-
-d_theta_rect <- function(Uk, Ul, Lk, Ll,
-                             r,
-                             Umatk, Lmatk,
-                             d_biv_fun, sdfack) {
-    ## derivatives of the rectangle probabilities wrt to thresholds
-    UU <-  d_biv_fun(Uk, Ul, r)
-    UL <-  d_biv_fun(Uk, Ll, r)
-    LU <-  d_biv_fun(Lk, Ul, r)
-    LL <-  d_biv_fun(Lk, Ll, r)
-    - 1/sdfack * ((UU - UL) * Umatk  - (LU - LL) * Lmatk)
+# #' @title Derivative of rectangle probability wrt threshold or regression parameter
+# #' @description This function computes the derivative of the rectangle probability wrt threshold or regression parameter
+# #' @param Uk upper predictor for the k-th response
+# #' @param Ul upper predictor for the l-th response
+# #' @param Lk lower predictor for the k-th response
+# #' @param Ll lower predictor for the l-th response
+# #' @param r value or vector of the correlation parameters
+# #' @param dUkmat d Uk/d theta or d Uk/d beta
+# #' @param dLkmat d Lk/d theta or d Lk/d beta
+# #' @param d_biv_fun function computing the derivative dF(x,y,r)/dx of the bivariate pdf (depends on link)
+d_rect <- function(Uk, Ul, Lk, Ll, r,
+                   dUkmat, dLkmat, d_biv_fun) {
+  UU <- d_biv_fun(Uk, Ul, r)
+  UL <- d_biv_fun(Uk, Ll, r)
+  LU <- d_biv_fun(Lk, Ul, r)
+  LL <- d_biv_fun(Lk, Ll, r)
+  - ((UU - UL) * dUkmat  - (LU - LL) * dLkmat)
 }
-d_beta_rect <- function(Uk, Ul, Lk, Ll, r,
-                        XmatkU, XmatkL,
-                        d_biv_fun, sdfack) {
-    ## derivatives of the rectangle probabilities wrt to thresholds
-    UU <-  d_biv_fun(Uk, Ul, r)
-    UL <-  d_biv_fun(Uk, Ll, r)
-    LU <-  d_biv_fun(Lk, Ul, r)
-    LL <-  d_biv_fun(Lk, Ll, r)
-    1/sdfack * ((UU - UL) * XmatkU - (LU - LL) * XmatkL)
-}
-d_stddev_rect <- function(Uk, Ul, Lk, Ll, r, d_biv_fun){
-    UU <- d_biv_fun(Uk, Ul, r)
-    UL <- d_biv_fun(Uk, Ll, r)
-    LU <- d_biv_fun(Lk, Ul, r)
-    LL <- d_biv_fun(Lk, Ll, r)
-    (UU * Uk - UL * Uk - LU  * Lk + LL * Lk)
+# #' @title Derivative of rectangle probability wrt standard deviation parameters
+# #' @description This function computes the derivative of the rectangle probability wrt standard deviation parameters
+# #' @param Uk upper predictor for the k-th response
+# #' @param Ul upper predictor for the l-th response
+# #' @param Lk lower predictor for the k-th response
+# #' @param Ll lower predictor for the l-th response
+# #' @param r value or vector of the correlation parameters
+# #' @param d_biv_fun function computing the derivative dF(x,y,r)/dx of the bivariate pdf (depends on link)
+d_sd_rect <- function(Uk, Ul, Lk, Ll, sd_k, r, d_biv_fun){
+  UU <- d_biv_fun(Uk, Ul, r)
+  UL <- d_biv_fun(Uk, Ll, r)
+  LU <- d_biv_fun(Lk, Ul, r)
+  LL <- d_biv_fun(Lk, Ll, r)
+  1/sd_k * (UU * Uk - UL * Uk - LU * Lk + LL * Lk)
 }
 
 d_theta_rect_kl <- function(k, l, indkl, rho) {
-    pick.col.theta <- switch(rho$threshold,
-                          flexible      = seq_len(rho$ntheta[k]),
-                          fix1first     = seq_len(rho$ntheta[k])[-1],
-                          fix2first     = seq_len(rho$ntheta[k])[-c(1,2)],
-                          fix2firstlast = seq_len(rho$ntheta[k] - 1)[-1])
-    FOO <- d_theta_rect(Uk = rho$U[indkl, k], Ul = rho$U[indkl, l],
-              Lk = rho$L[indkl, k], Ll = rho$L[indkl, l], r = rho$r,
-              Umatk = rho$B1[[k]][indkl, pick.col.theta, drop = F],
-              Lmatk = rho$B2[[k]][indkl, pick.col.theta, drop = F],
-              d_biv_fun = rho$link$deriv.fun$dF2dx,
-              sdfack =  rho$std.dev.mat[indkl, k])
-    return(FOO)
+  FOO <- d_rect(Uk = rho$U[indkl, k],
+                Ul = rho$U[indkl, l],
+                Lk = rho$L[indkl, k], Ll = rho$L[indkl, l],
+                r = rho$r,
+                dUkmat = rho$B1[[k]][indkl, ]/ rho$std.dev.mat[indkl, k],
+                dLkmat = rho$B2[[k]][indkl,] /rho$std.dev.mat[indkl, k] ,
+                d_biv_fun = rho$link$deriv.fun$dF2dx)
+  return(FOO)
 }
 
-d_beta_rect_klp <- function(k, l, p, s, indkl, rho) {
-     bb <- rho$XcatL[[k]][indkl, (p -1) * rho$ntheta[k] + seq_len(rho$ntheta[k]), drop = FALSE]
-     bbbL <- bb %*% rho$constraints[[p]][rho$inds.cat[[k]], s, drop = FALSE]
-     bb<- rho$XcatU[[k]][indkl, (p -1)*rho$ntheta[k] + seq_len(rho$ntheta[k]), drop = FALSE]
-     bbbU<- bb %*% rho$constraints[[p]][rho$inds.cat[[k]],s, drop = FALSE]
-     FOO <- d_beta_rect(Uk = rho$U[indkl, k], Ul = rho$U[indkl, l],
-                 Lk = rho$L[indkl, k], Ll = rho$L[indkl, l], r = rho$r,
-                 XmatkU =bbbU, XmatkL =bbbL,
-                 d_biv_fun = rho$link$deriv.fun$dF2dx,
-                 sdfack = rho$std.dev.mat[indkl, k])
-     return(FOO)
+d_psi_rect_kl <- function(k, l, indkl, rho, r, sd_k, sd_l) {
+  Ck <- rho$C[rho$indjbeta2[[k]], , drop = F]
+  Cl <- rho$C[rho$indjbeta2[[l]], , drop = F]
+  XmatUk <- rho$XU[[k]] %*% Ck
+  XmatUl <- rho$XU[[l]] %*% Cl
+  XmatLk <- rho$XL[[k]] %*% Ck
+  XmatLl <- rho$XL[[l]] %*% Cl
+  - as.matrix(d_rect(Uk = rho$U[indkl, k], Ul = rho$U[indkl, l],
+                     Lk = rho$L[indkl, k], Ll = rho$L[indkl, l],
+                     r = r, dUkmat =  XmatUk[indkl, ]/sd_k,
+                     dLkmat = XmatLk[indkl, ]/sd_k,
+                     d_biv_fun = rho$link$deriv.fun$dF2dx)
+              +
+                d_rect(Uk = rho$U[indkl, l], Ul = rho$U[indkl, k],
+                       Lk = rho$L[indkl, l], Ll = rho$L[indkl, k], r = r,
+                       dUkmat =  XmatUl[indkl, ]/sd_l,
+                       dLkmat = XmatLl[indkl, ]/sd_l,
+                       d_biv_fun = rho$link$deriv.fun$dF2dx))
 }
 
 
+nll_grad_univ <- function(U, L, XU, XL, sd_j, dhdsigma, wts, dfun, pfun) {
+  ## Univariate Probability
+  pr <- pfun(U) - pfun(L)
+  pr[pr < .Machine$double.eps] <- .Machine$double.eps
+  #############################################
+  ## Gradient components in univariate case: ##
+  #############################################
+  dpsi <- - 1/sd_j * (dfun(U) * XU -  dfun(L) * XL)
+  dsd <-  1/sd_j * (dfun(U) * U - dfun(L) * L) * dhdsigma
+  l <- list(dpsi = wts * 1/pr * dpsi,
+            dsd  = wts * 1/pr * dsd)
+  return(l)
+}
+
+## derivative functions dr/dalpha for the correlation part of error structures
+dr_dalpha_general <- function(S, lag = NULL){
+  S
+}
+
+dr_dalpha_equi <- function(alpha, S, lag = NULL){
+  salpha <- S %*% alpha
+  exp(2 * salpha)/(exp(2 * salpha) + 1)^2  * 4 * S
+}
+
+dr_dalpha_ar1 <- function(alpha, S, lag){
+  salpha <- c(S %*% alpha)
+  r <- (exp(2 * salpha) - 1)/(exp(2 * salpha) + 1)
+  const <-  exp(2 * salpha)/(exp(2 * salpha) + 1)^2  * 4
+
+  lag * r^(lag - 1) * const * S
+}
+## derivative functions dh/dgamma for the variance part of error structures
+dh_dgamma_general <- function(S){
+  S
+}
+
+constraints_theta <- function(rho) {
+  pick.col.theta <- lapply(seq_len(rho$ndim), function(j)
+    switch(rho$threshold,
+           flexible      = seq_len(rho$ntheta[j]),
+           fix1first     = seq_len(rho$ntheta[j])[-1],
+           fix2first     = seq_len(rho$ntheta[j])[-c(1,2)],
+           fix2firstlast = seq_len(rho$ntheta[j] - 1)[-1]))
+  C_theta <- bdiag(lapply(unique(rho$threshold.constraints), function(j) {
+    idq <- which(rho$threshold.constraints == j)
+    do.call("rbind", lapply(idq, function(k){
+      Ik <- diag(rho$ntheta[k])
+      Ik[, pick.col.theta[[k]], drop = F]
+    }))}))
+  C_theta
+}
+
+set_offset_threshold_u <- function(rho) {
+  lapply(seq_len(rho$ndim), function(j) {
+    x <- rho$threshold.values[[j]]
+    x[is.na(x)] <- 0
+    ou <- c(rep(0, rho$ntheta[j]), rho$inf.value)[rho$y[, j]]
+    rho$XU[[j]][, seq_along(x), drop = F] %*% x + ou - rho$offset[[j]]
+  })
+}
+
+set_offset_threshold_l <- function(rho) {
+  lapply(seq_len(rho$ndim), function(j) {
+    x <- rho$threshold.values[[j]]
+    x[is.na(x)] <- 0
+    ol <- c(-rho$inf.value, rep(0, rho$ntheta[j]))[rho$y[, j]]
+    rho$XL[[j]][, seq_along(x), drop = F] %*% x  + ol - rho$offset[[j]]
+  })
+}
 derivs_ana <- function(rho){
   ############################################
   ## function for analytic gradient and hessian
   #############################################
   par <- rho$optpar
-  ############################################
-  par_sigma <- par[rho$npar.thetas + rho$npar.betas +
-    seq_len(attr(rho$error.structure, "npar"))]
-  sigmas <- build_error_struct(rho$error.structure, par_sigma)
-
+  #######################################
   ## Upper and lower matrices
-  if (rho$p > 0) {
-  rho$XcatU <- vector("list", rho$ndim)
-  rho$XcatL <- vector("list", rho$ndim)
+  #######################################
+  ## making theta a vector
+  ## ideally theta would be the raw parameters in par
+  theta <- lapply(seq_len(rho$ndim), function(j)
+    switch(rho$threshold,
+           flexible      = rho$theta[[j]],
+           fix1first     = rho$theta[[j]][-1],
+           fix2first     = rho$theta[[j]][-c(1,2)],
+           fix2firstlast = rho$theta[[j]][seq_len(rho$ntheta[j] - 1)[-1]]))
+  theta <- unlist(theta[unique(rho$threshold.constraints)])
 
+  C_beta  <- bdiag(rho$constraints)
+  C_theta <- constraints_theta(rho)
+  if (length(rho$constraints) > 0){
+    rho$C <- as.matrix(bdiag(list(C_theta, C_beta)))
+  } else {
+    rho$C <- as.matrix(C_theta)
+  }
+  rho$indjbeta2 <- lapply(seq_len(rho$ndim), function(j) {
+    c(outer(rho$inds.cat[[j]], (seq_len(rho$p + 1) - 1) * rho$nthetas, "+"))
+  })
+  rho$XU <- rho$XL <- vector("list", rho$ndim)
   for (j in seq_len(rho$ndim)) {
-      ncat <- rho$ntheta[j] + 1
-      mm <- model.matrix(~ - 1 + rho$y[,j] : rho$x[[j]],
-              model.frame(~ - 1 + rho$y[,j] : rho$x[[j]],
-              na.action = function(x) x))
-      rho$XcatL[[j]] <- mm[,-(ncat * (seq_len(rho$p) - 1) + 1), drop = F]
-      rho$XcatU[[j]] <- mm[,-(ncat * seq_len(rho$p)), drop = F]
+    XcatU <- XcatL <- integer(0)
+    ncat <- rho$ntheta[j] + 1
+    if (rho$p > 0) {
+      mm <- model.matrix(~ -1 + rho$y[,j] : rho$x[[j]],
+                         model.frame(~ -1 + rho$y[,j] : rho$x[[j]],
+                                     na.action = function(x) x))
+      XcatL <- mm[,-(ncat * (seq_len(rho$p) - 1) + 1), drop = FALSE]
+      XcatU <- mm[,-(ncat * seq_len(rho$p)), drop = FALSE]
     }
-  beta_cat <- bdiag(rho$constraints) %*% rho$beta
-  } else {
-    beta_cat <- integer()
-    rho$XcatU <- lapply(seq_len(rho$ndim), function(x) integer()) #creates warning, but OK
-    rho$XcatL <- lapply(seq_len(rho$ndim), function(x) integer()) #In th_u - xbeta_u : Recycling array of length 1 in vector-array arithmetic is deprecated
-
+    B2 <- (col(matrix(0, rho$n, ncat)) == c(unclass(rho$y[, j])))
+    BU <- B2[,-ncat, drop = FALSE]
+    BL <- B2[,-1, drop = FALSE]
+    rho$XU[[j]] <- cbind(BU, -XcatU)
+    rho$XL[[j]] <- cbind(BL, -XcatL)
   }
-  rho$U  <- sapply(1:rho$ndim, function(j) {
-    th_u <- c(rho$theta[[j]], rho$inf.value)[rho$y[, j]]
-    xbeta_u <- c(rho$XcatU[[j]] %*% beta_cat[rho$indjbeta[[j]]])
-    th_u - xbeta_u - rho$offset[[j]]
-  })/sigmas$sdVec
-  rho$L  <- sapply(1:rho$ndim, function(j) {
-    th_l <- c(-rho$inf.value, rho$theta[[j]])[rho$y[, j]]
-    xbeta_l <- c(rho$XcatL[[j]] %*% beta_cat[rho$indjbeta[[j]]])
-    th_l - xbeta_l - rho$offset[[j]]
-  })/sigmas$sdVec
-  ########################################################  s
-  rho$std.dev.mat <- sigmas$sdVec ## matrix of standard deviations
-  if (is.null(dim(rho$std.dev.mat))) rho$std.dev.mat <- matrix(1, ncol = rho$ndim, nrow = rho$n)
-  std.dev.mat <- rho$std.dev.mat
-  if (!rho$error.structure$name %in% c("cor_equi", "cor_ar1")){
-    lev <- apply(attr(rho$error.structure, "covar"),1,
-      function(x) which(x==1))
-  } else {
-    lev <- rep(1, rho$n)
-  }
+  psi <- rho$C %*% c(theta, rho$beta)
+  ##
   npar.err <-  attr(rho$error.structure, "npar")
   npar.cor <-  attr(rho$error.structure, "npar.cor")
-  npar.sd <-  attr(rho$error.structure, "npar.sd")
+  npar.sd  <-  attr(rho$error.structure, "npar.sd")
+
+  par_sigma <-  par[rho$npar.thetas + rho$npar.betas + seq_len(npar.err)]
+  alpha <- par_sigma[seq_len(npar.cor)]
+  gamma <- par_sigma[-seq_len(npar.cor)]
+  S <- attr(rho$error.structure, "covariate")
+
+  sigmas <- build_error_struct(rho$error.structure, par_sigma)
+  ###############################################
+  rho$offsetu <- set_offset_threshold_u(rho)
+  rho$offsetl <- set_offset_threshold_l(rho)
+
+  rho$U  <- sapply(seq_len(rho$ndim), function(j) {
+    rho$XU[[j]] %*% psi[rho$indjbeta2[[j]]] + rho$offsetu[[j]]
+  })/sigmas$sdVec
+
+  rho$L  <- sapply(seq_len(rho$ndim), function(j) {
+    rho$XL[[j]] %*% psi[rho$indjbeta2[[j]]] + rho$offsetl[[j]]
+  })/sigmas$sdVec
   ########################################################
-  ## prepare contrast matrices for threshold parameters
-  #########################################################
-  B2 <- lapply(1:rho$ndim, function(j)
-    1 * (col(matrix(0, rho$n, rho$ntheta[j] + 1)) ==
-           c(unclass(rho$y[, j]))))
-  rho$B1 <- lapply(1:rho$ndim, function(i) as.matrix(B2[[i]][,-(rho$ntheta[i] + 1), drop = FALSE]))
-  rho$B2 <- lapply(1:rho$ndim, function(i) as.matrix(B2[[i]][,-1, drop = FALSE]))
-  ###############################################################
-
-
+  rho$std.dev.mat <- sigmas$sdVec ## matrix of standard deviations
+  if (is.null(dim(rho$std.dev.mat))){
+    rho$std.dev.mat <- matrix(1, ncol = rho$ndim, nrow = rho$n)
+  }
   ######################################################
   ## First the univariate case (q_i = 1)
   ######################################################
-  h_list <- NULL
-  if (dim(rho$ind_univ)[1] != 0){
-    ## if univariate observations:
-    h_list <- lapply(unique(rho$ind_univ[, 2]), function(j) {
-      indj <- rho$ind_univ[rho$ind_univ[, 2] == j, , drop = F]
-      ## for each j compute the univariate probabilities
-      pr <- rep(1, rho$n)
-      pr[indj[,1]] <- rho$link$F_uni(rho$U[indj]) - rho$link$F_uni(rho$L[indj])
-      pr[pr < .Machine$double.eps] <- .Machine$double.eps
-      #########################
-      ## Gradient components:
-      #########################
-      dtheta <- dbeta <- dcorr <- dstddev <- NULL
-      ## 1: dtheta
-      ##
-      pick.col.theta <- switch(rho$threshold,
-        flexible      = seq_len(rho$ntheta[j]),
-        fix1first     = seq_len(rho$ntheta[j])[-1],
-        fix2first     = seq_len(rho$ntheta[j])[-c(1,2)],
-        fix2firstlast = seq_len(rho$ntheta[j] - 1)[-1])
-      if (length(pick.col.theta) != 0) {
-        dtheta <- matrix(0, nrow = rho$n, ncol = rho$npar.thetas)
-        colposj <- rho$ind.thresholds[[j]][1] + seq_len(rho$npar.theta[j]) - 1
-        dtheta[indj[,1], colposj] <-
-          (rho$link$deriv.fun$dF1dx(rho$L[indj]) * rho$B2[[j]][indj[,1], pick.col.theta] -
-           rho$link$deriv.fun$dF1dx(rho$U[indj]) * rho$B1[[j]][indj[,1], pick.col.theta])/rho$std.dev.mat[indj]
+  g_list <- NULL
+  if (NROW(rho$ind_univ) > 0){
+    ## univariate functions
+    dfun <- rho$link$deriv.fun$dF1dx
+    pfun <- rho$link$F_uni
+    ## univariate observations:
+    g_list <- lapply(unique(rho$ind_univ[, 2]), function(j) {
+      idj <- rho$ind_univ[rho$ind_univ[, 2] == j, , drop = F]
+      subj <- idj[, 1] # subject ids for j-th response
+      ## for each j
+      U <- rho$U[idj]
+      L <- rho$L[idj]
+      sd_j <- rho$std.dev.mat[idj]
+      wts  <- rho$weights[subj]
+      XU <- rho$XU[[j]][subj, ] %*% rho$C[rho$indjbeta2[[j]], ]
+      XL <- rho$XL[[j]][subj, ] %*% rho$C[rho$indjbeta2[[j]], ]
+      Sj <- S[subj, , drop = F]
+      gr <- nll_grad_univ(U, L, XU, XL, sd_j, Sj, wts, dfun, pfun)
+      ## fill into an (n x length(par)) gradient matrix
+      if (npar.sd > 0) {
+        colpos_sd <- rho$npar.thetas + rho$npar.betas + npar.cor +
+          (seq_len(NCOL(Sj)) - 1) * rho$ndim + j
+      } else {
+        colpos_sd <-  0
       }
-      ## 2: dbeta
-      ##
-      if (rho$npar.betas > 0) {
-        dbeta <- matrix(0, nrow = rho$n, ncol = rho$npar.betas)
-        XtmpUj <- as.matrix(rho$XcatU[[j]][indj[,1], ] %*% bdiag(rho$constraints)[rho$indjbeta[[j]],])
-        XtmpLj <- as.matrix(rho$XcatL[[j]][indj[,1], ] %*% bdiag(rho$constraints)[rho$indjbeta[[j]],])
-        dbeta[indj[,1], ] <- (rho$link$deriv.fun$dF1dx(rho$U[indj]) * XtmpUj -
-          rho$link$deriv.fun$dF1dx(rho$L[indj]) * XtmpLj)/rho$std.dev.mat[indj]
-      }
-      ## 3: dcorr
-      ## no correlation in univariate case
-      if (npar.cor > 0){
-        dcorr <- matrix(0, nrow = rho$n, ncol = npar.cor)
-      }
-      ## 4: dstddev
-      ##
-      if (npar.sd > 0){
-        dstddev <- matrix(0, nrow = rho$n, ncol = npar.sd)
-        if (rho$error.structure$name == "cov_general") {
-          arr.ind.j <- cbind(indj[,1], (lev[indj[,1]] - 1) * rho$ndim + j)
-          dstddev[arr.ind.k] <- (rho$link$deriv.fun$dF1dx(rho$U[indj]) * rho$U[indj] -
-              rho$link$deriv.fun$dF1dx(rho$L[indj]) * rho$L[indj])/rho$std.dev.mat[indj]
-        }
-      }
-      rho$weights * 1/pr * cbind(dtheta, dbeta, dcorr, dstddev)
+      gr_mat <- matrix(0, nrow = rho$n, length(par))
+      gr_mat[subj, seq_len(rho$npar.thetas + rho$npar.betas)] <- gr$dpsi
+      gr_mat[subj, colpos_sd]  <- gr$dsd
+      gr_mat
     })
   }
   #####################################
-   ## take each possible pair (k, l)
+  ## take each possible pair (k, l)
   ######################################
   r_mat <- sigmas$rVec[, rho$dummy_pl_lag == 1, drop = F]
 
-  it0 <- length(h_list)
+  it0 <- length(g_list)
   #it <- 1
   for (it in (it0 + seq_along(rho$combis))) {
     comb <- rho$combis[[it - it0]]
@@ -239,115 +301,83 @@ derivs_ana <- function(rho){
     indkl <- rho$ind_kl[[it - it0]]
     k <- comb[1]
     l <- comb[2]
+    Uk <- rho$U[indkl, k] ## upper predictor k-th response
+    Ul <- rho$U[indkl, l] ## upper predictor l-th response
+    Lk <- rho$L[indkl, k] ## lower predictor k-th response
+    Ll <- rho$L[indkl, l] ## lower predictor l-th response
+    sd_k <- rho$std.dev.mat[indkl, k] ## standard deviation of k-th response
+    sd_l <- rho$std.dev.mat[indkl, l] ## standard deviation of l-th response
+    Skl <- S[indkl, , drop = F]
     ## correlation
-    rho$r <- r_mat[indkl, (it - it0)]
+    rkl <- rho$r <- r_mat[indkl, (it - it0)]
     ## pr_{kl}
     pr <- rep(1, rho$n)
-    pr[indkl] <- rho$link$F_biv_rect(U = rho$U[indkl, comb, drop = F],
-                                     L = rho$L[indkl, comb, drop = F],
-                                     r = rho$r)
+    pr[indkl] <- rho$link$F_biv_rect(
+      U = cbind(Uk, Ul), L = cbind(Lk, Ll), r = rkl)
     pr[pr < .Machine$double.eps] <- .Machine$double.eps
-
-    ## vector h_kl will contain the gradient for all d log p_{kl}/d pars
-    dtheta <- dbeta <- dcorr <- NULL
+    ## vector h_kl will contain the gradient for all d -log p_{kl}/d pars
+    dpsi <- dcorr <- dstddev <- NULL
     ##################
-    ## dtheta
+    ## dpsi
     ##################
-    if (sum(rho$npar.theta.opt) > 0) {
-      dtheta <- matrix(0, ncol = rho$npar.thetas, nrow = rho$n)
-      # check in constraints if the threshold values are the same \theta_k = \theta_l
-      th_constraints_unique <- unique(rho$threshold.constraints)
-      tmp <- lapply(th_constraints_unique, function(j) {
-          indjj <- (1:rho$ndim)[rho$threshold.constraints == j]
-          indj <- indjj[indjj %in% comb]
-          dth <- switch(length(indj) + 1,
-                  matrix(0, nrow = sum(indkl), ncol = rho$npar.theta.opt[indjj[1]]),
-                  d_theta_rect_kl(indj, comb[comb != indj], indkl, rho),
-                  d_theta_rect_kl(k, l, indkl, rho) + d_theta_rect_kl(l, k, indkl, rho))
-          dth
-      })
-      dtheta[indkl, ] <- do.call("cbind", tmp)
-    }
-    ##################
-    ## dbeta
-    ##################
-    if (rho$npar.betas > 0) {
-      dbeta <- matrix(0, ncol = rho$npar.betas, nrow = rho$n)
-      ## for which covariates are there betas to be estimated
-      inds.cats.kl <- rho$inds.cat[c(k,l)]
-      inddouble <-lapply(rho$constraints, function(x){
-        indx <- rep(0, NCOL(x))
-        for (s in seq_len(NCOL(x))){
-          if (all(x[inds.cats.kl[[1]], s] == 0))  indx[s] <- 2 ## code for only l
-          if (all(x[inds.cats.kl[[2]], s] == 0))  indx[s] <- 1   ## code for only k
-        }
-        indx
-      })
-      tmp <- lapply(seq_along(rho$constraints), function(p) {
-        sapply(seq_len(NCOL(rho$constraints[[p]])), function(s)
-          switch(inddouble[[p]][s] + 1,
-            d_beta_rect_klp(k, l, p, s, indkl, rho) + d_beta_rect_klp(l, k, p=p,s=s, indkl, rho),
-            d_beta_rect_klp(k, l, p, s, indkl, rho),
-            d_beta_rect_klp(l, k, p, s, indkl, rho))
-          )
-      })
-      dbeta[indkl, ] <- do.call("cbind", tmp)
+    if (rho$npar.betas + rho$npar.thetas > 0) {
+      dpsi <- matrix(0,
+                     ncol = rho$npar.betas + rho$npar.thetas,
+                     nrow = rho$n)
+      dpsi[indkl, ] <-  d_psi_rect_kl(k, l, indkl, rho, rkl, sd_k, sd_l)
     }
     ##################
     ## dcorr
     ##################
-    if (npar.err > 0){
-      dcorr <- matrix(0, ncol = npar.err, nrow = rho$n)
-      covar <- attr(rho$error.structure, "covariate")
-      dLdr <- d_corr_rect(Uk = rho$U[indkl, k], Ul = rho$U[indkl, l],
-                          Lk = rho$L[indkl, k], Ll = rho$L[indkl, l],
-                          r = rho$r, fun = rho$link$deriv.fun$dF2dr)
-      if (rho$error.structure$name %in% c("cor_ar1", "cor_equi")) {
-        lagabs <- switch(rho$error.structure$name,
-                          "cor_ar1" = abs(comb[1] - comb[2]),
-                          "cor_equi" = 1)
-        rpowinvlag <- rho$r^(1/lagabs)
-        salpha <- 0.5 * (log(1 + rpowinvlag) - log(1 - rpowinvlag))
-        const <- exp(2 * salpha)/(exp(2 * salpha) + 1)^2  * 4
-        dcorr[indkl, ] <- lagabs * rpowinvlag^(lagabs - 1) * dLdr * const * covar[indkl, ]
-      } else {
-        poslev <- which(sapply(combn(rho$ndim, 2, simplify=F),
-          function(x) all(x == comb)))
-        arr.ind <- cbind(which(indkl), (lev[indkl]-1) * (rho$ndim * (rho$ndim - 1)/2)  + poslev)
-        dcorr[arr.ind] <- dLdr
-      }
+    if (npar.cor > 0){
+      dcorr <- matrix(0, ncol = npar.cor, nrow = rho$n)
+      dLdr <- d_corr_rect(Uk, Ul, Lk, Ll, r = rkl,
+                          fun = rho$link$deriv.fun$dF2dr)
+      drdalpha <- switch(rho$error.structure$name,
+                         cor_general = dr_dalpha_general(Skl),
+                         cov_general = dr_dalpha_general(Skl),
+                         cor_equi    = dr_dalpha_equi(alpha, Skl),
+                         cor_ar1     = dr_dalpha_ar1(alpha, Skl, lag = l - k))
+      colpos <- switch(rho$error.structure$name,
+                       cor_general = (seq_len(NCOL(Skl)) - 1) * rho$ndim * (rho$ndim - 1)/2 + (it - it0),
+                       cov_general = (seq_len(NCOL(Skl)) - 1) * rho$ndim * (rho$ndim - 1)/2 + (it - it0),
+                       cor_equi    = seq_len(npar.cor),
+                       cor_ar1     = seq_len(npar.cor))
+
+      dcorr[indkl, colpos] <- dLdr * drdalpha
     }
     ##################
     ## dstddev
     ##################
-    if (rho$error.structure$type == "covariance") {
-      dstddev <- matrix(0, nrow = rho$n, ncol = rho$ndim * max(lev))
-      poslevk <- (lev[indkl] - 1) * rho$ndim + k
-      poslevl <- (lev[indkl] - 1) * rho$ndim + l
-      arr.ind.k <- cbind(which(indkl), poslevk)
-      arr.ind.l <- cbind(which(indkl), poslevl)
-      dstddev[arr.ind.k] <-  1/rho$std.dev.mat[indkl, k] *
-        d_stddev_rect(Uk = rho$U[indkl, k], Ul = rho$U[indkl, l],
-          Lk = rho$L[indkl, k], Ll = rho$L[indkl, l], rho$r,
-          d_biv_fun = rho$link$deriv.fun$dF2dx)
-      dstddev[arr.ind.l] <-    1/rho$std.dev.mat[indkl, l] *
-        d_stddev_rect(Uk = rho$U[indkl, l], Ul = rho$U[indkl, k],
-          Lk = rho$L[indkl, l], Ll = rho$L[indkl, k], r = rho$r,
-          d_biv_fun = rho$link$deriv.fun$dF2dx)
-     dcorr[, (NCOL(dcorr) - rho$ndim * max(lev) + 1):NCOL(dcorr)] <- dstddev
+    if (npar.sd > 0){
+      dstddev <- matrix(0, nrow = rho$n, ncol = npar.sd)
+      poslevk <- (seq_len(NCOL(Skl)) - 1) * rho$ndim + k
+      poslevl <- (seq_len(NCOL(Skl)) - 1) * rho$ndim + l
+      dhdsigma <- dh_dgamma_general(Skl)
+      dstddev[indkl, poslevk] <-
+        d_sd_rect(Uk, Ul, Lk, Ll, sd_k, rkl,
+                  d_biv_fun = rho$link$deriv.fun$dF2dx) * dhdsigma
+      dstddev[indkl, poslevl] <-
+        d_sd_rect(Ul, Uk, Ll, Lk, sd_l, rkl,
+                  d_biv_fun = rho$link$deriv.fun$dF2dx) * dhdsigma
     }
-
-    h_list[[it]] <- rho$weights * 1/pr * cbind(dtheta, dbeta, dcorr)
-
+    g_list[[it]] <- rho$weights * 1/pr * cbind(dpsi, dcorr, dstddev)
   }
   ## matrix containing the gradients for each subject
-  Vi <- Reduce("+", h_list)
-  ## variability matrix
+  Vi <- Reduce("+", g_list)
+  ## Variability matrix
   V <- crossprod(Vi)
   ## Hessian matrix
-  H <- Reduce("+", lapply(h_list, crossprod))
+  H <- Reduce("+", lapply(g_list, crossprod))
   list(V = V, H = H)
 }
+## TODO: so far standard errors are for the transformed parameters.
+## Jacobian is needed when we compute the standard errors on the paramteres entering optimizer.
+## This will help general purpose optimizers
+#### make Jacobian
+# make_jacobian <- function(rho) {
+#  diag(length(rho$optpar))
+#}
 #############################################################
 ###### neg loglikelihood component for each subject i #######
 ######                 for numeric gradient           #######

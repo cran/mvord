@@ -10,7 +10,7 @@
 #' \item AR(1) correlation structure \code{cor_ar1(~ 1)}, or
 #' \item covariate dependent AR(1) correlation structure \code{cor_ar1(~ S)}.
 #' }
-#' See \code{\link{error_struct}} or vignette.
+#' For more details see vignette.
 #' @param formula \code{\link{formula}} object
 #' @export
 #' @name error_struct
@@ -496,7 +496,7 @@ function(object, tpar)
 ########################################################
 #' @title Extracts Error Structure of Multivariate Ordinal Regression Models.
 #' @description
-#' \code{get_error_struct} is a generic function which extracts for each subject the estimated
+#' A generic function which extracts for each subject the estimated
 #' error structure parameters from objects of class \code{'mvord'}.
 #' @param object an object of class \code{'mvord'}.
 #' @param type choose type \code{"sigmas"}, \code{"alpha"}, \code{"corr"}, or \code{"z"}.

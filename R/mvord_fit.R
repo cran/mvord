@@ -40,9 +40,9 @@ mvord.fit <- function(rho){
 
   #set offsets from coef.values and updates
   rho <- set_offset_up(rho)
-  for(j in 1L:rho$ndim){
-    check_rank(j, rho)
-  }
+  #for(j in 1L:rho$ndim){
+  #  check_rank(j, rho)
+  #}
 
   rho$coef.names <- attributes(rho$x[[1]])$dimnames[[2]]
 

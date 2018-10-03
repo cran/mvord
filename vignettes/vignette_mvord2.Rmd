@@ -1,5 +1,5 @@
 ---
-title: "mvord: Supplementary examples"
+title: "mvord: Additional examples"
 author: "Rainer Hirk, Kurt Hornik and Laura Vana"
 date: "`r Sys.Date()`"
 output:
@@ -7,7 +7,7 @@ output:
     toc: TRUE
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{mvord: Supplementary examples}
+  %\VignetteIndexEntry{mvord: Additional examples}
   %\VignetteDepends{mvord}
 ---
 

@@ -4,7 +4,7 @@
 \name{data_cr}
 \alias{data_cr}
 \title{Simulated credit ratings}
-\format{A data frame with 690 rows and 10 variables}
+\format{A data frame with 690 rows and 11 columns}
 \usage{
 data(data_cr)
 }

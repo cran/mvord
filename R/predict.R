@@ -258,7 +258,7 @@ pred_class_fun <-  function(object, y, x, offset, stddevs, sigma) {
 #'
 #' @description
 #' Obtains marginal predictions/fitted measures for objects of class \code{'mvord'}.
-#' @param object an objecz of class \code{'mvord'}.
+#' @param object an object of class \code{'mvord'}.
 #' @param type types \code{"prob"}, \code{"class"}, \code{"linpred"}, \code{"pred"}, \code{"cum.prob"} are available.
 #' @param newdata (optional) data frame of new covariates and new responses.
 #' The names of the variables should correspond to the names of the
@@ -330,14 +330,15 @@ marginal_predict <- function(object, newdata = NULL, type = "prob", subjectID = 
 #' \tabular{ll}{
 #'   \code{type} \tab description\cr
 #'   \code{"class"} \tab combination of response categories with the highest probability.\cr
-#'   \code{"prob"} \tab (default) fitted joint probability for the observed response categories\cr or
-#'        the categories provided in the response column(s) in \code{newdata}.If response column(s) in
+#'   \code{"prob"} \tab (default) fitted joint probability for the observed response categories\cr
+#'   \tab or the categories provided in the response column(s) in \code{newdata}.\cr
+#'   \tab If response column(s) in
 #'        \code{newdata} contain only NAs, this will return a vector of ones. \cr
-#'   \code{"cum.prob"} \tab fitted joint cumulative probability for the observed response categories\cr or
-#'        the categories provided in the response column(s) in \code{newdata}. If response column(s) in
-#'        \code{newdata} contain only NAs, this will return a vector of ones.
+#'   \code{"cum.prob"} \tab fitted joint cumulative probability for the observed response\cr
+#'   \tab categories or the categories provided in the response column(s) in \code{newdata}.\cr
+#'   \tab If response column(s) in \code{newdata} contain only NAs, this will return a vector of ones.
 #'   }
-##   The current implementation supports only in-sample predictions.
+# #'   The current implementation supports only in-sample predictions.
 #' The (row) names of the output correspond to the subjectIDs.
 #' @seealso \code{\link{marginal_predict}}, \code{\link{joint_probabilities}}
 #' @method predict mvord

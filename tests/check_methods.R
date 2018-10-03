@@ -1,5 +1,3 @@
-#q("no")
-#R
 library(mvord)
 data(data_mvord_toy)
 tolerance <- 1e-6
@@ -18,7 +16,7 @@ df_NA <- df[-c(1,90:110),]
 res <- mvord:::mvord(formula = MMO(Y, i, j) ~ 0 + X1 + X2,
                      data = df_NA,
                      #index = c("i", "j"),
-                     link = mvlogit(),
+                     link = mvprobit(),
                      control = mvord.control(solver = "newuoa"),
                      #se = T,
                      error.structure = cor_general(~1),

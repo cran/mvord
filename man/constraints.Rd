@@ -13,6 +13,6 @@ constraints(object)
 \item{object}{an object of class \code{'mvord'}.}
 }
 \description{
-\code{constraints} is a generic function which extracts the constraints on the regression
+An extractor function for the constraint matrices corresponding to the regression
 coefficients from objects of class \code{'mvord'}.
 }

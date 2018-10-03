@@ -14,5 +14,5 @@ names_constraints(formula, data, contrasts = NULL)
 \item{contrasts}{an optional list. See the \code{contrasts.arg} of \code{\link{model.matrix.default}}.}
 }
 \description{
-\code{names_constraints} is a function which extracts the names of the regression constraints based on the model \code{formula} and \code{data}.
+An extractor function for the names of the regression coefficient constraints based on the model \code{formula} and \code{data}.
 }

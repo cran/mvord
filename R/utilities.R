@@ -74,10 +74,10 @@ check_args_error.structure <- function(error.structure, data){
 }
 
 check_args_thresholds <- function(rho){
-  #CHECK if treshold.values is in line with threshold.constraints
-  if (length(rho$threshold.constraints) != rho$ndim) stop("dimensions of threshold.values and number of thresholds do not match", call. = FALSE)
+  #CHECK if threshold.values is in line with threshold.constraints
+  if (length(rho$threshold.constraints) != rho$ndim) stop("Dimensions of threshold.values and number of outcomes do not match", call. = FALSE)
     if (any(sapply(1:rho$ndim, function(j) length(rho$threshold.values[[j]]) != rho$ntheta[j])))
-      stop("dimensions of threshold.values and number of thresholds do not match", call. = FALSE)
+      stop("Dimensions of threshold.values and number of thresholds do not match", call. = FALSE)
   for (j in unique(rho$threshold.constraints)){
     ind <- which(rho$threshold.constraints == j)
     if (length(unique(rho$threshold.values[ind]))!=1){
@@ -153,6 +153,33 @@ check_response_missings <- function(rho){
   }
 }
 
+check_rank <- function(j,rho){
+  y <- rho$y[,j]
+  ind <- !is.na(y)
+  y <- y[ind]
+  lev <- levels(y)
+  llev <- length(lev)
+  y <- unclass(y)
+  q <- llev %/% 2L
+  y1 <- (y > q)
+
+  if(rho$intercept == TRUE) x <- rho$x[[j]][ind,] else x <- cbind(Intercept = rep(1, rho$n), rho$x[[j]])[ind,]
+
+  offset <- rho$offset[[j]][ind]
+  method <- rho$link$name
+  suppressWarnings(
+    if(method == "mvlogit") fit <- glm.fit(x, y1, family = binomial("logit"), offset = offset) else{
+      fit <- glm.fit(x, y1, family = binomial("probit"), offset = offset)
+    }
+  )
+
+  coefs <- fit$coefficients
+  if(any(is.na(coefs))) {
+    warning("Design appears to be rank-deficient, dropping some coefficients may help.")
+  }
+}
+
+###################################################################################################
 set_args_other <- function(rho) {
   ## coef contraints
   ## can be null, matrix, vector, list
@@ -202,33 +229,6 @@ set_args_other <- function(rho) {
 ##########################################
 ###### AUXILIARY FUNCTIONS ##############
 ##########################################
-check_rank <- function(j,rho){
-  y <- rho$y[,j]
-  ind <- !is.na(y)
-  y <- y[ind]
-  lev <- levels(y)
-  llev <- length(lev)
-  y <- unclass(y)
-  q <- llev %/% 2L
-  y1 <- (y > q)
-
-  if(rho$intercept == TRUE) x <- rho$x[[j]][ind,] else x <- cbind(Intercept = rep(1, rho$n), rho$x[[j]])[ind,]
-
-  offset <- rho$offset[[j]][ind]
-  method <- rho$link$name
-suppressWarnings(
-  if(method == "mvlogit") fit <- glm.fit(x, y1, family = binomial(), offset = offset) else{
-    fit <- glm.fit(x, y1, family = binomial("probit"), offset = offset)
-  }
-)
-
-  coefs <- fit$coefficients
-  if(any(is.na(coefs))) {
-    warning("Design appears to be rank-deficient, dropping some coefficients may help.")
-  }
-}
-
-
 get_start_values <- function(rho){
  gammas <- sapply(1:rho$ndim, function(j) {
    if (rho$npar.theta.opt[j] != 0){
@@ -632,7 +632,7 @@ mvord.control <- function(se = TRUE,
 #' @param adjusted if \code{TRUE}, then adjusted Mc Fadden's Pseudo \eqn{R^2} is computed.
 #' @seealso \code{\link{mvord}}
 #' @export
-pseudo.R.squared <- function(object, adjusted = FALSE){
+pseudo_R_squared <- function(object, adjusted = FALSE){
   #fit model ~ 1
   formula <- object$rho$formula
   formula[[3]] <- 1
@@ -731,4 +731,24 @@ reduce_size2_Funi.mvord <- function(object){
   #out$rho$contr_theta <- NULL
   attributes(out$error.struct)$subjnames <- NULL
   out
+}
+
+# Polychoric Correlations
+#' @title Computes polychoric correlations
+#' @description This function computes polychoric correleations among two or more variables.
+#' @param x either a vector or a matrix of ordinal responses
+#' @param y an (optional) ordinal vector (only applciable if x is a vector)
+#' @export
+polycor <- function(x, y = NULL){
+  if(is.null(y)){
+    dat_mvord <- as.data.frame(x)
+    #check if $ in cplnames
+    if(any(grepl("$", unlist(colnames(dat_mvord)), fixed = TRUE))) stop("Invalid colnames in x.")
+    formula_mvord <- as.formula(paste0("MMO2(", paste(colnames(dat_mvord), collapse = ", "), ") ~ 0"))
+  } else{
+    formula_mvord <- MMO2(x, y) ~ 0
+    dat_mvord <- cbind.data.frame(x = x, y = y)
+  }
+  res <- mvord(formula_mvord, dat_mvord)
+  res$error.struct
 }

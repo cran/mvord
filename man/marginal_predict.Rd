@@ -8,7 +8,7 @@ marginal_predict(object, newdata = NULL, type = "prob", subjectID = NULL,
   newoffset = NULL, ...)
 }
 \arguments{
-\item{object}{an objecz of class \code{'mvord'}.}
+\item{object}{an object of class \code{'mvord'}.}
 
 \item{newdata}{(optional) data frame of new covariates and new responses.
 The names of the variables should correspond to the names of the
