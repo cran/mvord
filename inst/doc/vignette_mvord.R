@@ -4,7 +4,7 @@
 ###################################################
 ### code chunk number 1: vignette_mvord.Rnw:80-82
 ###################################################
-options(prompt = "R> ", continue = "+  ", width = 70, 
+options(prompt = "R> ", continue = "+  ", width = 70,
         useFancyQuotes = FALSE, deparse.cutoff = 56)
 
 

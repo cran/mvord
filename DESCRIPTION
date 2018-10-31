@@ -1,7 +1,7 @@
 Package: mvord
 Title: Multivariate Ordinal Regression Models
-Version: 0.3.2
-Date: 2018-10-03
+Version: 0.3.3
+Date: 2018-10-31
 Author: Rainer Hirk [aut, cre],
         Kurt Hornik [aut],
         Laura Vana [aut],
@@ -17,6 +17,6 @@ VignetteBuilder: knitr
 Encoding: UTF-8
 NeedsCompilation: yes
 RoxygenNote: 6.0.1.9000
-Packaged: 2018-10-03 09:38:04 UTC; rainer
+Packaged: 2018-10-31 07:53:15 UTC; rainer
 Repository: CRAN
-Date/Publication: 2018-10-03 10:00:03 UTC
+Date/Publication: 2018-10-31 08:40:03 UTC

@@ -78,7 +78,7 @@ E-mail: \email{laura.vana@wu.ac.at}
 %\Plainkeywords{composite likelihood, cross-sectional data,
 %  longitudinal data, multivariate ordinal regression model, R}
 <<echo = FALSE, results = hide>>=
-options(prompt = "R> ", continue = "+  ", width = 70, 
+options(prompt = "R> ", continue = "+  ", width = 70,
         useFancyQuotes = FALSE, deparse.cutoff = 56)
 @
 \begin{document}
@@ -828,7 +828,7 @@ categories labeled with 1, 2 and 3.
 <<eval = T>>=
 data(data_mvord_toy)
 str(data_mvord_toy)
-@ 
+@
 The data set \code{data_mvord_toy} has a wide format. We convert the
 data set into the long format, where the first column contains the
 subject index~$i$ and the second column the multiple measurement
@@ -860,7 +860,7 @@ res <- mvord:::reduce_size.mvord(res)
       if(file.exists(FILE)) file.remove(FILE)
   }
 }
-@ 
+@
 (runtime \Sexpr{round(res$rho$runtime[[1]],2)}
 seconds).\footnote{Computations have been performed with \proglang{R}
   version 3.4.4 on a machine with an Intel Core i5-4200U CPU 1.60GHz
@@ -916,24 +916,24 @@ chosen model parameterization.
 \paragraph{Model without intercept}
 If the intercept should be removed, the \code{formula} can be specified in the
 following ways:
-\begin{verbatim}
+\begin{Sinput}
 formula = MMO(Y, i, j) ~ 0 + X1 + ... + Xp
-\end{verbatim}
+\end{Sinput}
 or
-\begin{verbatim}
+\begin{Sinput}
 formula = MMO(Y, i, j) ~ -1 + X1 + ... + Xp
-\end{verbatim}
+\end{Sinput}
 \paragraph{Model with intercept}
 If one wants to include an intercept in the model, there are two
 equivalent possibilities to set the model \code{formula}. Either the
 intercept is included explicitly by:
-\begin{verbatim}
+\begin{Sinput}
 formula = MMO(Y, i, j) ~ 1 + X1 + ... + Xp
-\end{verbatim}
+\end{Sinput}
 or by
-\begin{verbatim}
+\begin{Sinput}
 formula = MMO(Y, i, j) ~ X1 + ... + Xp
-\end{verbatim}
+\end{Sinput}
 \paragraph{Note on intercept in formula}
 We differ in our approach of specifying the model \code{formula} from
 the formula objects in e.g., \code{MASS::polr()} or
@@ -999,9 +999,9 @@ natural ordering is used (ascending, or alphabetical).
 \subsubsection{Formula}
 In order to specify the model we use a
 multivariate \code{formula} object of the form:
-\begin{verbatim}
+\begin{Sinput}
 formula = MMO2(Y1, ..., Yq) ~ 0 + X1 + ... + Xp
-\end{verbatim}
+\end{Sinput}
 The ordering of the responses is given by the ordering in the
 left-hand side of the model \code{formula}. \code{MMO2} performs like
 \code{cbind()} in fitting multivariate models in e.g., \code{lm()} or
@@ -1025,15 +1025,15 @@ applied. The bivariate normal probabilities which enter the pairwise
 log-likelihood are computed with package \pkg{pbivnorm}
 \citep{pbivnorm}. The multivariate probit link is the default link
 function and can be specified by:
-\begin{verbatim}
+\begin{Sinput}
 link = mvprobit()
-\end{verbatim}
+\end{Sinput}
 For the multivariate logit link a $t$~copula based multivariate
 distribution with logistic margins is used (as explained in
 Section~\ref{subsect:model}) and can be specified by:
-\begin{verbatim}
+\begin{Sinput}
 link = mvlogit(df = 8L)
-\end{verbatim}
+\end{Sinput}
 The \code{mvlogit()} function has an optional integer valued argument
 \code{df} which specifies the degrees of freedom to be used for the
 $t$~copula.  The default value of the degrees of freedom parameter is
@@ -1139,9 +1139,9 @@ categories in the two outcome dimensions must be the same. In the
 worked example, if one wishes to restrict the threshold parameters of
 the two outcomes \code{Y1} and \code{Y2} to be equal ($\bm\theta_1 =
 \bm\theta_2$), this can be specified as:
-\begin{verbatim}
+\begin{Sinput}
 threshold.constraints = c(1, 1)
-\end{verbatim}
+\end{Sinput}
 where the first value corresponds to the first response \code{Y1} and the
 second to the second response \code{Y2}. This order of the responses is defined
 as explained in Sections~\ref{subsect:mmo} and~\ref{subsect:mmo2}
@@ -1190,9 +1190,9 @@ example:
 \item $\theta_{21} = -1 \leq \theta_{22}$,
 \end{itemize}
 this can be specified as:
-\begin{verbatim}
+\begin{Sinput}
 threshold.values = list(c(-1, NA), c(-1, NA))
-\end{verbatim}
+\end{Sinput}
 
 \begin{table}[h]
 \setlength{\tabcolsep}{2.5pt}
@@ -1265,9 +1265,9 @@ Consider the following specification of the latent processes in the worked examp
 where the regression coefficients for variables \code{X1} and \code{X2}
 are set to be equal across the two outcomes ($\bm\beta_{1} =
 \bm\beta_{2}$) by:
-\begin{verbatim}
+\begin{Sinput}
 coef.constraints = c(1, 1)
-\end{verbatim}
+\end{Sinput}
 A more flexible framework allows the user to specify constraints for
 each of the regression coefficients of the
 $p$~covariates\footnote{Note that if categorical covariates or
@@ -1290,9 +1290,9 @@ where $\mathbbm{1}_{\{f_{i2}=c2\}}$ is the indicator function which
 equals one in case the categorical covariate \code{f2} is equal to
 class \code{c2}. Class \code{c1} is taken as the baseline category.
 These restrictions on the regression coefficients are imposed by:
-\begin{verbatim}
+\begin{Sinput}
 coef.constraints = cbind(c(1, 2), c(NA, 1), c(1, 1))
-\end{verbatim}
+\end{Sinput}
 Specific values of coefficients can be fixed through the
 \code{coef.values} argument, as we will show in the following.
 \subsubsection{Fixing coefficient values}
@@ -1311,9 +1311,9 @@ regression coefficients which receive an \code{NA} in
 \code{coef.values} matrix indicates the regression coefficient ought
 to be estimated.  Setting \code{coef.values} in accordance with the
 \code{coef.constraints} from above (not needed as this is the default case):
-\begin{verbatim}
+\begin{Sinput}
 coef.values = cbind(c(NA, NA), c(0, NA), c(NA, NA))
-\end{verbatim}
+\end{Sinput}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Constraints on category-specific coefficients} \label{sec:VGAM}
 If the parallel regression or proportional odds assumption ought to be
@@ -1343,16 +1343,16 @@ auxiliary function \code{names_constraints()} available in \pkg{mvord}
 (see also next subsection):
 <<eval=T>>=
 names_constraints(formula = Y ~ 0 + X1 + X2 + f2, data = data_mvord_toy)
-@ 
+@
 The number of rows is equal to the total number of linear predictors
 $\sum_j (K_j - 1)$ of the ordered responses, in the example above
 $2+2=4$ rows. The number of columns represents the number of
 parameters to be estimated for each covariate:
-\begin{verbatim}
+\begin{Sinput}
 coef.constraints = list(
   X1 = cbind(c(1, 0, 0, 0), c(0, 1, 0, 0),  c(0, 0, 1, 1)),
   X2 = cbind(c(0, 0, 1, 0), c(0, 0, 0, 1)), f2c2 = cbind(rep(1, 4)))
-\end{verbatim}
+\end{Sinput}
 For more details we refer the reader to the documentation of the \pkg{VGAM} package.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Interaction terms and categorical covariates}
@@ -1362,12 +1362,12 @@ models with interaction terms or categorical covariates, the
 the order of the terms in the covariate matrix is not clear to the
 user, it is helpful to call the function \code{names_constraints()}
 before constructing the \code{coef.constraints} and \code{coef.values}
-matrices.  
+matrices.
 The names of each column in the covariate matrix can be obtained by:
 <<eval=T>>=
 formula <- MMO2(Y1, Y2) ~ 1 + X1 : X2 + f1 + f2 * X1
 names_constraints(formula, data = data_mvord_toy)
-@ 
+@
 This should be used when setting up the coefficient
 constraints. Please note that by default category \code{A} for factor
 \code{f1} and category \code{c1} for factor \code{f2} are taken as
@@ -1380,7 +1380,7 @@ shift of the thresholds.
 \subsection{Additional arguments}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection[weights]{\code{weights.name}}
-\sloppy 
+\sloppy
 %%
 Weights on each subject~$i$ are chosen in a way that they are
 constant across multiple measurements. Weights should be stored in a
@@ -1441,13 +1441,13 @@ convergence problems, especially for the \code{mvlogit()} link.
 Alternatively, the user has the possibility of applying other solvers
 by using a wrapper function with arguments \code{starting.values} and
 \code{objFun} of the following form:
-\begin{verbatim}
+\begin{Sinput}
 solver = function(starting.values, objFun) {
   optRes <- solver.function(...)
   list(optpar = optRes$optpar, objvalue = optRes$objvalue,
     convcode = optRes$convcode, message = optRes$message)
 }
-\end{verbatim}
+\end{Sinput}
 The \code{solver.function()} should return a list of three elements
 \code{optpar}, \code{objvalue} and \code{convcode}.  The element
 \code{optpar} should be a vector of length equal to number of
@@ -1515,7 +1515,7 @@ predict(res, type = "cum.prob", subjectID =  1:6)
 and classes:
 <<eval=T>>=
 predict(res, type = "class", subjectID =  1:6)
-@ 
+@
 %
 The function \code{marginal_predict()} provides marginal predictions
 for the types probability, cumulative probability and class, while
@@ -1599,10 +1599,10 @@ par(op)
 \end{figure}
 
 We include five financial ratios as covariates in the model without intercept through the following \code{formula}:
-\begin{verbatim}
+\begin{Sinput}
 formula = MMO2(rater1, rater2, rater3, rater4) ~ 0 + LR + LEV + PR  + RSIZE +
   BETA
-\end{verbatim}
+\end{Sinput}
 We are dealing with a wide data format, as the covariates do not vary among raters. Hence, the estimation can be performed by applying multiple measurement object \code{MMO2} in the fitting function \code{mvord()}. A model with multivariate probit link (default) is fitted by:
 <<eval = FALSE>>=
 res_cor_probit_simple <- mvord(formula = MMO2(rater1, rater2, rater3,
@@ -1659,14 +1659,14 @@ In the second example, we extend the setting of Example~1 by imposing constraint
 We include the following features in the model:
 \begin{itemize}
  \item We assume that \code{rater1} and \code{rater2} use the same rating methodology. This means that they use the same rating classes with the same labeling and the same thresholds on the latent scale. Hence, we set the following constraints on the threshold parameters:
-\begin{verbatim}
+\begin{Sinput}
  threshold.constraints = c(1, 1, 2, 3)
-\end{verbatim}
+\end{Sinput}
 \item We assume that some covariates are equal for some of the raters. We assume that the coefficients of \code{LR} and \code{PR} are equal for all four raters, that the coefficients of \code{RSIZE} are the equal for the raters \code{rater1}, \code{rater2} and \code{rater3} and the coefficients of \code{BETA} are the same for the raters \code{rater1} and \code{rater2}. The coefficients of \code{LEV} are assumed to vary for all four raters. These restrictions are imposed by:
-\begin{verbatim}
+\begin{Sinput}
 coef.constraints = cbind(LR = c(1, 1, 1, 1), LEV = c(1, 2, 3, 4),
   PR = c(1, 1, 1, 1), RSIZE = c(1, 1, 1, 2), BETA = c(1, 1, 2, 3))
-\end{verbatim}
+\end{Sinput}
 \end{itemize}
 The estimation can now be performed by the function \code{mvord()}:
 <<eval = FALSE>>=
@@ -1858,30 +1858,30 @@ head(data_cr_panel, n = 3)
 The simulated data set has a long data format and contains the credit risk measure \code{rating} and six covariates for a panel of \Sexpr{length(unique(data_cr_panel[, "firm_id"]))} firms over eight years. The number of firm-year observations is \Sexpr{NROW(data_cr_panel)}.
 
 We include five financial ratios as covariates in the model with intercept by a \code{formula} with multiple measurements object \code{MMO}:
-\begin{verbatim}
+\begin{Sinput}
 formula = MMO(rating, firm_id, year) ~ LR + LEV + PR + RSIZE + BETA
-\end{verbatim}
+\end{Sinput}
 Additionally, the model has the following features:
 \begin{itemize}
 \item %We assume that the rating agencies do not change their methodology over the sample period. This means
   The threshold parameters are constant over the years. This can be specified through the argument \code{threshold.constraints}:
-\begin{verbatim}
+\begin{Sinput}
 threshold.constraints = rep(1, nlevels(data_cr_panel$year))
-\end{verbatim}
+\end{Sinput}
 \item In order to ensure identifiability in a model with intercept, some threshold need to be fixed. We fix the first thresholds for all outcome dimensions to zero by the argument \code{threshold.values}:
-\begin{verbatim}
+\begin{Sinput}
 threshold.constraints = threshold.values = rep(list(c(0,NA,NA,NA)),8)
-\end{verbatim}
+\end{Sinput}
 \item We assume that there is a break-point in the regression coefficients after \code{year4} in the sample. This break-point could correspond to the beginning of a crisis in a real case application.
 Hence, we use one set of regression coefficients for years \code{year1}, \code{year2}, \code{year3} and \code{year4} and a different set for \code{year5}, \code{year6}, \code{year7} and \code{year8}.
 This can be specified through the argument \code{coef.constraints}:
-\begin{verbatim}
+\begin{Sinput}
 coef.constraints = c(rep(1, 4),  rep(2, 4))
-\end{verbatim}
+\end{Sinput}
 \item Given the longitudinal aspect of the data, an $AR(1)$ correlation structure is an appropriate choice. Moreover, we use the business sector as a covariate in the correlation structure. The dependence of the correlation structure on the business sector is motivated by the fact that in some sectors such as manufacturing ratings tend to be more ``sticky'', i.e., do not change often over the years, while in more volatile sectors like IT there is less ``stickiness'' in the ratings.
-\begin{verbatim}
+\begin{Sinput}
 error.structure = cor_ar1(~ BSEC)
-\end{verbatim}
+\end{Sinput}
 \end{itemize}
 The estimation is performed by calling the function \code{mvord()}:
 <<eval=F>>=
@@ -2003,11 +2003,11 @@ The persistence in the reported health status is high. The correlation
 parameter in the \code{cor_ar1} error structure is
 <<>>=
 unique(error_structure(res_srhs, type = "corr"))
-@ 
+@
 The estimated parameters are shown by the function \code{summary()}:
 <<>>=
 summary(res_srhs, call = FALSE)
-@ 
+@
 In the logit model the coefficients can be interpreted in terms of
 log-odds ratios. The results suggest that being non-white increases
 the chances of reporting a worse health status while higher people
@@ -2032,7 +2032,7 @@ y  <- read.delim(url(N), header = F, sep = "")
 wl <- read.delim(url(X), header = F, sep = "")[,2]
 df <- cbind.data.frame(y, wl)
 colnames(df)[1:5] <- paste0("Judge", 1:5)
-@ 
+@
 The traditional measure of agreement between raters in the social
 sciences is the polychoric correlation.  The polychoric correlation
 can be assessed using the \pkg{mvord} package by estimating of a model
@@ -2041,7 +2041,7 @@ with no covariates and probit link. The correlation parameters of the
 measure of agreement.
 <<>>=
 head(df)
-@ 
+@
 The data is in the wide format (each ordinal response is in one
 column) so the \code{MMO2} object will be used in the \code{formula}
 object:

@@ -245,7 +245,7 @@ mvord.fit <- function(rho){
   rho$XcatL <- NULL
   rho$transf_thresholds <- NULL
   rho$get_ind_thresholds <- NULL
-  rho$ind.thresholds <- NULL
+  #rho$ind.thresholds <- NULL
   rho$y.NA.ind <- NULL
   rho$binary <- NULL
   rho$intercept.type <- NULL
@@ -265,12 +265,12 @@ mvord.fit <- function(rho){
   rho$contr_theta <- NULL
   rho$error.structure <- NULL
   rho$beta <- NULL
-  rho$theta <- NULL
-  rho$nthetas <- NULL
-  rho$npar.theta.opt <- NULL
-  rho$npar.theta <- NULL
-  rho$npar.thetas <- NULL
-  rho$npar.betas <- NULL
+  #rho$theta <- NULL
+  #rho$nthetas <- NULL
+  #rho$npar.theta.opt <- NULL
+  #rho$npar.theta <- NULL
+  #rho$npar.thetas <- NULL
+  #rho$npar.betas <- NULL
   rho$coef.names <- NULL
   ##
   rho$link$deriv.fun <- NULL

@@ -197,7 +197,8 @@ derivs_ana <- function(rho){
            fix1first     = rho$theta[[j]][-1],
            fix2first     = rho$theta[[j]][-c(1,2)],
            fix2firstlast = rho$theta[[j]][seq_len(rho$ntheta[j] - 1)[-1]]))
-  theta <- unlist(theta[unique(rho$threshold.constraints)])
+  #theta <- unlist(theta[unique(rho$threshold.constraints)])
+  theta <- unlist(theta[!duplicated(rho$threshold.constraints)])
 
   C_beta  <- bdiag(rho$constraints)
   C_theta <- constraints_theta(rho)

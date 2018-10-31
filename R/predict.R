@@ -1,3 +1,223 @@
+#' @title Marginal Predictions for Multivariate Ordinal Regression Models.
+#'
+#' @description
+#' Obtains marginal predictions/fitted measures for objects of class \code{'mvord'}.
+#' @param object an object of class \code{'mvord'}.
+#' @param type types \code{"prob"}, \code{"class"}, \code{"linpred"}, \code{"pred"}, \code{"cum.prob"} are available.
+#' @param newdata (optional) data frame of new covariates and new responses.
+#' The names of the variables should correspond to the names of the
+#'  variables used to fit the model. By default the data on which the model
+#'  was estimated is considered.
+#' @param subjectID (optional) vector specifying for which subjectIDs the predictions\cr or fitted values should be computed.
+#' @param newoffset (optional) list of length equal to the number of outcomes, each element containing a vector of offsets to be considered.
+#' @param ... further arguments passed to or from other methods.
+#' @details The following types can be chosen in \code{marginal_predict}:
+#' \tabular{ll}{
+#'   \code{type} \tab description\cr
+#'   \code{"prob"} \tab (default) fitted marginal probabilities for the observed response categories.\cr
+#'   \code{"class"} \tab fitted marginal classes of the observed responses.\cr
+#'   \code{"linpred"} \tab linear predictor \cr
+#'   \code{"cum.prob"} \tab fitted marginal cumulative probabilities for the observed response categories.\cr
+#'   \code{"all.prob"} \tab fitted marginal probabilities for all ordered classes of each response.
+#'   }
+#'
+##' The current implementation supports only in-sample predictions.
+##' The row names of the output correspond to the subjectIDs.
+#' @seealso \code{\link{predict.mvord}}, \code{\link{joint_probabilities}}
+#' @export
+marginal_predict <- function(object, newdata = NULL, type = "prob", subjectID = NULL, newoffset = NULL, ...){
+  #NEWDATA is NULL
+  ## newoffset
+  if(!(type %in% c("prob", "linpred", "class", "cum.prob", "all.prob"))) stop("invalid type!")
+  #  args <- list(...)
+  #  exist <- "newdata" %in% names(args)
+  # if(!exist) newdata <- NULL
+  # if (!is.null(newdata)) stop("newdata is not supported at the moment!")
+  if(is.null(newdata)){
+    x <- object$rho$x
+    y <- object$rho$y
+    offset <- object$rho$offset
+  } else {
+    newdata <- as.data.frame(newdata)
+    tmp <- prepare_newdata(object, newdata, newoffset)
+    x <- tmp$x
+    y <- tmp$y
+    object$error.struct <- tmp$error.struct
+    offset <- tmp$offset
+  }
+  if (is.null(subjectID)) ind <- seq_len(NROW(y)) else {
+    if(!all(subjectID %in% rownames(y))) stop("Not all subjectIDs in data!")
+    ind <- match(subjectID, rownames(y))
+  }
+  sigma <- error_structure(object, type = "sigmas")
+  stddevs <- sqrt(t(sapply(sigma, diag)))
+  ##############################################################
+  marg_predictions <- switch(type,
+                             prob     = marg_pred_prob_fun(object, y, x, offset, stddevs, ind),
+                             linpred  = marg_pred_linpred_fun(object, y, x, offset, stddevs, ind),
+                             all.prob = marg_pred_allprob_fun(object, y, x, offset, stddevs, ind),
+                             cum.prob = marg_pred_cumprob_fun(object, y, x, offset, stddevs, ind),
+                             class    = marg_pred_class_fun(object, y, x, offset, stddevs, ind))
+  return(marg_predictions)
+}
+
+
+#' @title Predict method for Multivariate Ordinal Regression Models.
+#' @description Obtains predicted or fitted values for objects of class \code{'mvord'}.
+#' @param object an object of class \code{'mvord'}.
+#' @param type types \code{"class"}, \code{"prob"} and \code{"cum.prob"} are available.
+#' @param newdata (optional) data frame of new covariates and new responses.
+#' @param subjectID (optional) vector specifying for which subjectIDs the predictions\cr or fitted values should be computed.
+#' @param newoffset (optional) list of length equal to the number of outcomes, each element containing a vector of offsets to be considered.
+#' @param ... further arguments passed to or from other methods.
+#' @details
+#' \tabular{ll}{
+#'   \code{type} \tab description\cr
+#'   \code{"class"} \tab combination of response categories with the highest probability.\cr
+#'   \code{"prob"} \tab (default) fitted joint probability for the observed response categories\cr
+#'   \tab or the categories provided in the response column(s) in \code{newdata}.\cr
+#'   \tab If response column(s) in
+#'        \code{newdata} contain only NAs, this will return a vector of ones. \cr
+#'   \code{"cum.prob"} \tab fitted joint cumulative probability for the observed response\cr
+#'   \tab categories or the categories provided in the response column(s) in \code{newdata}.\cr
+#'   \tab If response column(s) in \code{newdata} contain only NAs, this will return a vector of ones.
+#'   }
+# #'   The current implementation supports only in-sample predictions.
+#' The (row) names of the output correspond to the subjectIDs.
+#' @seealso \code{\link{marginal_predict}}, \code{\link{joint_probabilities}}
+#' @method predict mvord
+#' @export
+predict.mvord <- function(object, newdata = NULL, type = "prob", subjectID = NULL, newoffset = NULL, ...){
+  # checks
+  if (is.null(object$rho$link$F_multi)) stop("Multivariate probabilities cannot be computed! Try marginal_predict()!")
+  if(!(type %in% c("prob", "class", "cum.prob"))) stop("invalid type!")
+  #NEWDATA is NULL
+  #args <- list(...)
+  #exist <- "newdata" %in% names(args)
+  #if(!exist) newdata <- NULL
+  #if (!is.null(newdata)) stop("newdata is not supported at the moment!")
+  if(is.null(newdata)){
+    x <- object$rho$x
+    y <- object$rho$y
+    offset <- object$rho$offset
+  } else {
+    newdata <- as.data.frame(newdata)
+    tmp <- prepare_newdata(object, newdata, newoffset)
+    x <- tmp$x
+    y <- tmp$y
+    object$error.struct <- tmp$error.struct
+    offset <- tmp$offset
+  }
+
+  if(is.null(subjectID)) ind <- seq_len(nrow(y)) else {
+    if(!all(subjectID %in% rownames(y))) stop("Not all subjectIDs in data!")
+    ind <- match(subjectID, rownames(y))
+  }
+  ## get correlation/covariance matrices
+  sigma <- error_structure(object, type ="sigmas")
+  stddevs <- sqrt(t(sapply(sigma, diag)))
+  ##############################################################
+  predictions <- switch(type,
+                        prob     = pred_prob_fun(object, y, x, offset, stddevs, sigma)[ind],
+                        cum.prob = pred_cumprob_fun(object, y, x, offset, stddevs, sigma)[ind],
+                        class    = pred_class_fun(object, y, x, offset, stddevs, sigma)[ind, ])
+  return(predictions)
+}
+
+#' @title Extracts fitted Probabilities for Multivariate Ordinal Regression Models.
+#'
+#' @description
+#' Extracts fitted probabilities for given response categories from a fitted model of class \code{'mvord'}.
+#' @param object an object of class \code{'mvord'}.
+#' @param response.cat vector or matrix with response categories (for each subject one row of length equal to the number of multiple measurements).
+#' @param newdata (optional) data frame of new covariates and new responses. The names of the variables should correspond to the names of the
+#'  variables used to fit the model. By default the data on which the model was estimated is considered.
+#' @param type \code{"prob"} for joint probabilities and \code{"cum.prob"} for joint cumulative probabilities.
+#' @param subjectID (optional) vector specifying for which subjectIDs the predictions\cr or fitted values should be computed.
+#' @param newoffset (optional) list of length equal to the number of outcomes, each element containing a vector of offsets to be considered.
+#' @param ... further arguments passed to or from other methods.
+#' @details
+# #' \code{newdata} has to be in the same data format as in the fitted object of class \code{'mvord'}.
+#'
+##' The current implementation supports only in-sample predictions.
+#' The row names of the output correspond to the subjectIDs.
+#' @seealso \code{\link{predict.mvord}}, \code{\link{marginal_predict}}
+#' @export
+joint_probabilities <- function(object, response.cat, newdata = NULL, type = "prob", subjectID = NULL, newoffset = NULL,...) {
+  #checks
+  if (is.null(object$rho$link$F_multi)) stop("Multivariate probabilities cannot be computed! Try marginal_predict()!")
+  # args <- list(...)
+  # exist <- "newdata" %in% names(args)
+  if(!type %in% c("prob", "cum.prob")) stop("Invalid type chosen. Only types prob and cum.prob are available.")
+  # if(!exist) newdata <- NULL
+  # if (!is.null(newdata)) stop("newdata is not supported at the moment!")
+  ndim <- object$rho$ndim
+  if (is.null(newdata)){
+    nobs <- nobs(object)
+    x <- object$rho$x
+    y <- object$rho$y
+    offset <- object$rho$offset
+  } else {
+    newdata <- as.data.frame(newdata)
+    ## check response.cat
+    if (is.vector(response.cat) && length(response.cat) != ndim)
+      stop("response.cat must have length equal to the number of outcomes.")
+    tmp <- prepare_newdata(object, newdata, newoffset)
+    x <- tmp$x
+    y <- tmp$y
+    if (!is.vector(response.cat) && nrow(response.cat) != nrow(y))
+      stop("Number of rows of response.cat does not correspond to number of subjects in newdata.")
+
+    object$error.struct <- tmp$error.struct
+    offset <- tmp$offset
+
+  }
+
+  if (is.null(subjectID)) {
+    ind <- seq_len(nrow(y))
+  } else {
+    if(!all(subjectID %in% rownames(y))) stop("Not all subjectIDs in data!")
+    ind <- match(subjectID, rownames(y))
+  }
+  ## get correlation/covariance matrices
+  sigma <- error_structure(object, type ="sigmas")
+  stddevs <- sqrt(t(sapply(sigma, diag)))
+  ###################################################
+  if(is.vector(response.cat)) {
+    response.cat <- matrix(response.cat, ncol = length(response.cat), nrow = nrow(y), byrow = TRUE)
+  }
+
+  ytmp <- cbind.data.frame(lapply(seq_len(ndim), function(j){
+    if (!all(response.cat[,j] %in% c(NA,levels(y[,j])))) {
+      stop("response.cat are different from the categories in the original data set")
+    } else {
+      ordered(response.cat[,j], levels = levels(y[,j]))
+    }
+  }))
+  Xcat <- make_Xcat(object, ytmp, x)
+  betatilde <- bdiag(object$rho$constraints) %*% object$beta
+
+  pred.upper  <- sapply(seq_len(object$rho$ndim), function(j) {
+    th_u <- c(object$theta[[j]], object$rho$inf.value)[ytmp[, j]]
+    xbeta_u <- as.double(Xcat$U[[j]] %*% betatilde[object$rho$indjbeta[[j]]])
+    th_u - xbeta_u - offset[[j]]
+  })/stddevs
+  pred.lower  <- sapply(seq_len(object$rho$ndim), function(j) {
+    th_l <- c(-object$rho$inf.value, object$theta[[j]])[ytmp[, j]]
+    xbeta_l <- as.double(Xcat$L[[j]] %*% betatilde[object$rho$indjbeta[[j]]])
+    th_l - xbeta_l - offset[[j]]
+  })/stddevs
+  pred.lower[is.na(pred.lower)] <- -object$rho$inf.value
+  pred.upper[is.na(pred.upper)] <- object$rho$inf.value
+  #################################
+  if(type == "cum.prob") pred.lower <- matrix(-object$rho$inf.value, ncol = ndim, nrow = nrow(pred.upper))
+  prob <- object$rho$link$F_multi(U = pred.upper, L = pred.lower,
+                                  list_R = lapply(sigma, cov2cor))[ind]
+  names(prob) <- rownames(y)[ind]
+  return(prob)
+}
+
+
 prepare_newdata <- function(object, newdata, newoffset) {
   if (object$rho$function.name == "mvord") {
       if (!all(object$rho$index %in% colnames(newdata)))
@@ -254,222 +474,3 @@ pred_class_fun <-  function(object, y, x, offset, stddevs, sigma) {
     return(class)
   }
 }
-#' @title Marginal Predictions for Multivariate Ordinal Regression Models.
-#'
-#' @description
-#' Obtains marginal predictions/fitted measures for objects of class \code{'mvord'}.
-#' @param object an object of class \code{'mvord'}.
-#' @param type types \code{"prob"}, \code{"class"}, \code{"linpred"}, \code{"pred"}, \code{"cum.prob"} are available.
-#' @param newdata (optional) data frame of new covariates and new responses.
-#' The names of the variables should correspond to the names of the
-#'  variables used to fit the model. By default the data on which the model
-#'  was estimated is considered.
-#' @param subjectID (optional) vector specifying for which subjectIDs the predictions\cr or fitted values should be computed.
-#' @param newoffset (optional) list of length equal to the number of outcomes, each element containing a vector of offsets to be considered.
-#' @param ... further arguments passed to or from other methods.
-#' @details The following types can be chosen in \code{marginal_predict}:
-#' \tabular{ll}{
-#'   \code{type} \tab description\cr
-#'   \code{"prob"} \tab (default) fitted marginal probabilities for the observed response categories.\cr
-#'   \code{"class"} \tab fitted marginal classes of the observed responses.\cr
-#'   \code{"linpred"} \tab linear predictor \cr
-#'   \code{"cum.prob"} \tab fitted marginal cumulative probabilities for the observed response categories.\cr
-#'   \code{"all.prob"} \tab fitted marginal probabilities for all ordered classes of each response.
-#'   }
-#'
-##' The current implementation supports only in-sample predictions.
-##' The row names of the output correspond to the subjectIDs.
-#' @seealso \code{\link{predict.mvord}}, \code{\link{joint_probabilities}}
-#' @export
-marginal_predict <- function(object, newdata = NULL, type = "prob", subjectID = NULL, newoffset = NULL, ...){
-  #NEWDATA is NULL
-  ## newoffset
-  if(!(type %in% c("prob", "linpred", "class", "cum.prob", "all.prob"))) stop("invalid type!")
-#  args <- list(...)
-#  exist <- "newdata" %in% names(args)
-  # if(!exist) newdata <- NULL
-  # if (!is.null(newdata)) stop("newdata is not supported at the moment!")
-  if(is.null(newdata)){
-    x <- object$rho$x
-    y <- object$rho$y
-    offset <- object$rho$offset
-  } else {
-    newdata <- as.data.frame(newdata)
-    tmp <- prepare_newdata(object, newdata, newoffset)
-    x <- tmp$x
-    y <- tmp$y
-    object$error.struct <- tmp$error.struct
-    offset <- tmp$offset
-  }
-  if (is.null(subjectID)) ind <- seq_len(NROW(y)) else {
-    if(!all(subjectID %in% rownames(y))) stop("Not all subjectIDs in data!")
-    ind <- match(subjectID, rownames(y))
-  }
-  sigma <- error_structure(object, type = "sigmas")
-  stddevs <- sqrt(t(sapply(sigma, diag)))
-##############################################################
-  marg_predictions <- switch(type,
-    prob     = marg_pred_prob_fun(object, y, x, offset, stddevs, ind),
-    linpred  = marg_pred_linpred_fun(object, y, x, offset, stddevs, ind),
-    all.prob = marg_pred_allprob_fun(object, y, x, offset, stddevs, ind),
-    cum.prob = marg_pred_cumprob_fun(object, y, x, offset, stddevs, ind),
-    class    = marg_pred_class_fun(object, y, x, offset, stddevs, ind))
-  return(marg_predictions)
-}
-
-
-#' @title Predict method for Multivariate Ordinal Regression Models.
-#' @description Obtains predicted or fitted values for objects of class \code{'mvord'}.
-#' @param object an object of class \code{'mvord'}.
-#' @param type types \code{"class"}, \code{"prob"} and \code{"cum.prob"} are available.
-#' @param newdata (optional) data frame of new covariates and new responses.
-#' @param subjectID (optional) vector specifying for which subjectIDs the predictions\cr or fitted values should be computed.
-#' @param newoffset (optional) list of length equal to the number of outcomes, each element containing a vector of offsets to be considered.
-#' @param ... further arguments passed to or from other methods.
-#' @details
-#' \tabular{ll}{
-#'   \code{type} \tab description\cr
-#'   \code{"class"} \tab combination of response categories with the highest probability.\cr
-#'   \code{"prob"} \tab (default) fitted joint probability for the observed response categories\cr
-#'   \tab or the categories provided in the response column(s) in \code{newdata}.\cr
-#'   \tab If response column(s) in
-#'        \code{newdata} contain only NAs, this will return a vector of ones. \cr
-#'   \code{"cum.prob"} \tab fitted joint cumulative probability for the observed response\cr
-#'   \tab categories or the categories provided in the response column(s) in \code{newdata}.\cr
-#'   \tab If response column(s) in \code{newdata} contain only NAs, this will return a vector of ones.
-#'   }
-# #'   The current implementation supports only in-sample predictions.
-#' The (row) names of the output correspond to the subjectIDs.
-#' @seealso \code{\link{marginal_predict}}, \code{\link{joint_probabilities}}
-#' @method predict mvord
-#' @export
-predict.mvord <- function(object, newdata = NULL, type = "prob", subjectID = NULL, newoffset = NULL, ...){
-  # checks
-  if (is.null(object$rho$link$F_multi)) stop("Multivariate probabilities cannot be computed! Try marginal_predict()!")
-  if(!(type %in% c("prob", "class", "cum.prob"))) stop("invalid type!")
-  #NEWDATA is NULL
-  #args <- list(...)
-  #exist <- "newdata" %in% names(args)
-  #if(!exist) newdata <- NULL
-  #if (!is.null(newdata)) stop("newdata is not supported at the moment!")
-  if(is.null(newdata)){
-    x <- object$rho$x
-    y <- object$rho$y
-    offset <- object$rho$offset
-  } else {
-    newdata <- as.data.frame(newdata)
-    tmp <- prepare_newdata(object, newdata, newoffset)
-    x <- tmp$x
-    y <- tmp$y
-    object$error.struct <- tmp$error.struct
-    offset <- tmp$offset
-  }
-
-  if(is.null(subjectID)) ind <- seq_len(nrow(y)) else {
-    if(!all(subjectID %in% rownames(y))) stop("Not all subjectIDs in data!")
-    ind <- match(subjectID, rownames(y))
-  }
-  ## get correlation/covariance matrices
-  sigma <- error_structure(object, type ="sigmas")
-  stddevs <- sqrt(t(sapply(sigma, diag)))
-##############################################################
-  predictions <- switch(type,
-    prob     = pred_prob_fun(object, y, x, offset, stddevs, sigma)[ind],
-    cum.prob = pred_cumprob_fun(object, y, x, offset, stddevs, sigma)[ind],
-    class    = pred_class_fun(object, y, x, offset, stddevs, sigma)[ind, ])
-  return(predictions)
-}
-
-#' @title Extracts fitted Probabilities for Multivariate Ordinal Regression Models.
-#'
-#' @description
-#' Extracts fitted probabilities for given response categories from a fitted model of class \code{'mvord'}.
-#' @param object an object of class \code{'mvord'}.
-#' @param response.cat vector or matrix with response categories (for each subject one row of length equal to the number of multiple measurements).
-#' @param newdata (optional) data frame of new covariates and new responses. The names of the variables should correspond to the names of the
-#'  variables used to fit the model. By default the data on which the model was estimated is considered.
-#' @param type \code{"prob"} for joint probabilities and \code{"cum.prob"} for joint cumulative probabilities.
-#' @param subjectID (optional) vector specifying for which subjectIDs the predictions\cr or fitted values should be computed.
-#' @param newoffset (optional) list of length equal to the number of outcomes, each element containing a vector of offsets to be considered.
-#' @param ... further arguments passed to or from other methods.
-#' @details
-# #' \code{newdata} has to be in the same data format as in the fitted object of class \code{'mvord'}.
-#'
-##' The current implementation supports only in-sample predictions.
-#' The row names of the output correspond to the subjectIDs.
-#' @seealso \code{\link{predict.mvord}}, \code{\link{marginal_predict}}
-#' @export
-joint_probabilities <- function(object, response.cat, newdata = NULL, type = "prob", subjectID = NULL, newoffset = NULL,...) {
-  #checks
-  if (is.null(object$rho$link$F_multi)) stop("Multivariate probabilities cannot be computed! Try marginal_predict()!")
-  # args <- list(...)
-  # exist <- "newdata" %in% names(args)
-  if(!type %in% c("prob", "cum.prob")) stop("Invalid type chosen. Only types prob and cum.prob are available.")
-  # if(!exist) newdata <- NULL
-  # if (!is.null(newdata)) stop("newdata is not supported at the moment!")
-  ndim <- object$rho$ndim
-  if (is.null(newdata)){
-    nobs <- nobs(object)
-    x <- object$rho$x
-    y <- object$rho$y
-    offset <- object$rho$offset
-  } else {
-    newdata <- as.data.frame(newdata)
-    ## check response.cat
-    if (is.vector(response.cat) && length(response.cat) != ndim)
-      stop("response.cat must have length equal to the number of outcomes.")
-    tmp <- prepare_newdata(object, newdata, newoffset)
-    x <- tmp$x
-    y <- tmp$y
-    if (!is.vector(response.cat) && nrow(response.cat) != nrow(y))
-      stop("Number of rows of response.cat does not correspond to number of subjects in newdata.")
-
-    object$error.struct <- tmp$error.struct
-    offset <- tmp$offset
-
-  }
-
-  if (is.null(subjectID)) {
-    ind <- seq_len(nrow(y))
-  } else {
-    if(!all(subjectID %in% rownames(y))) stop("Not all subjectIDs in data!")
-    ind <- match(subjectID, rownames(y))
-  }
-  ## get correlation/covariance matrices
-  sigma <- error_structure(object, type ="sigmas")
-  stddevs <- sqrt(t(sapply(sigma, diag)))
-  ###################################################
-  if(is.vector(response.cat)) {
-    response.cat <- matrix(response.cat, ncol = length(response.cat), nrow = nrow(y), byrow = TRUE)
-  }
-
-  ytmp <- cbind.data.frame(lapply(seq_len(ndim), function(j){
-    if (!all(response.cat[,j] %in% c(NA,levels(y[,j])))) {
-      stop("response.cat are different from the categories in the original data set")
-    } else {
-      ordered(response.cat[,j], levels = levels(y[,j]))
-    }
-  }))
-  Xcat <- make_Xcat(object, ytmp, x)
-  betatilde <- bdiag(object$rho$constraints) %*% object$beta
-
-  pred.upper  <- sapply(seq_len(object$rho$ndim), function(j) {
-    th_u <- c(object$theta[[j]], object$rho$inf.value)[ytmp[, j]]
-    xbeta_u <- as.double(Xcat$U[[j]] %*% betatilde[object$rho$indjbeta[[j]]])
-    th_u - xbeta_u - offset[[j]]
-  })/stddevs
-  pred.lower  <- sapply(seq_len(object$rho$ndim), function(j) {
-    th_l <- c(-object$rho$inf.value, object$theta[[j]])[ytmp[, j]]
-    xbeta_l <- as.double(Xcat$L[[j]] %*% betatilde[object$rho$indjbeta[[j]]])
-    th_l - xbeta_l - offset[[j]]
-  })/stddevs
-  pred.lower[is.na(pred.lower)] <- -object$rho$inf.value
-  pred.upper[is.na(pred.upper)] <- object$rho$inf.value
-  #################################
-  if(type == "cum.prob") pred.lower <- matrix(-object$rho$inf.value, ncol = ndim, nrow = nrow(pred.upper))
-  prob <- object$rho$link$F_multi(U = pred.upper, L = pred.lower,
-                    list_R = lapply(sigma, cov2cor))[ind]
-  names(prob) <- rownames(y)[ind]
-  return(prob)
-}
-
