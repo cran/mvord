@@ -6,21 +6,31 @@
 \alias{cor_general}
 \alias{cor_ar1}
 \alias{cor_equi}
-\alias{cor_ident}
 \title{Error Structures in mvord}
 \usage{
-cov_general(formula = ~1)
+cov_general(formula = ~1, value = numeric(0), fixed = FALSE)
 
-cor_general(formula = ~1)
+cor_general(formula = ~1, value = numeric(0), fixed = FALSE)
 
-cor_ar1(formula = ~1)
+cor_ar1(formula = ~1, value = numeric(0), fixed = FALSE)
 
-cor_equi(formula = ~1)
-
-cor_ident(formula = ~1)
+cor_equi(formula = ~1, value = numeric(0), fixed = FALSE)
 }
 \arguments{
 \item{formula}{\code{\link{formula}} object}
+
+\item{value}{specifies values of the correlation (and variance) parameters.
+For \code{cor_equi()} and \code{cor_ar1()} it can be either a vector of correlations (in (-1,1)) of length one
+(same correlation for all subjects) or a vector of length equal to the number of subjects.
+For \code{cor_general()}, it can be either a vector of the lower triangular correlation matrix elements
+(same structure for all subjects) or a matrix with number of rows equal to the number of subjects.
+For \code{cov_general()}, it can be either a vector of the lower triangular covariance matrix elements (including the diagonal)
+(same structure for all subjects) or a matrix with number of rows equal to the number of subjects.
+Default is \code{value = numeric(0)} object.
+In this case the correlation parameters are initialized with zero (and variance parameters with 1 for \code{cov_general})}
+
+\item{fixed}{logical specifying whether the parameters of the error structure should not be optimized in the procedure, but will be \cr
+fixed to the values specified in the argument \code{value}. Defaults to \code{fixed = FALSE}.}
 }
 \description{
 Different \code{error.structures} are available in \pkg{mvord}:

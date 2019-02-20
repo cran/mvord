@@ -41,7 +41,7 @@ initialize_MMO <- function(rho, formula, data, error.structure, contrasts){
 
   rho$ndim <- ncol(rho$y)
   rho$n <- nrow(rho$y)
-  rho$x <- lapply(1:rho$ndim, function(j) {
+  rho$x <- lapply(seq_len(rho$ndim), function(j) {
     rhs.form <- rho$formula
     rhs.form[[2]] <- NULL
     new.rhs.form <- update(rhs.form, ~  . + 1)
@@ -70,7 +70,7 @@ initialize_MMO <- function(rho, formula, data, error.structure, contrasts){
   rho$error.structure <- init_fun(error.structure, data.mvord, contrasts)
   ## set offset
   if (is.null(rho$offset)) {
-    rho$offset <- lapply(1:rho$ndim, function(j) {
+    rho$offset <- lapply(seq_len(rho$ndim), function(j) {
       rhs.form <- rho$formula
       rhs.form[[2]] <- NULL
       mf <- model.frame(rhs.form, data.mvord$x[[j]],
@@ -114,7 +114,7 @@ initialize_MMO2 <- function(rho, formula, data, error.structure, contrasts){
   }
 
   rho$levels <- lapply(rho$y, levels)
-  for (j in 1:rho$ndim){
+  for (j in seq_len(rho$ndim)){
     if (!all(rho$levels[[j]] %in% unique(rho$y[, j])))
        warning(sprintf("For response %i, not all response
           levels are observed. Model might be non-identifiable if
@@ -124,7 +124,7 @@ initialize_MMO2 <- function(rho, formula, data, error.structure, contrasts){
 
   #rho$rownames.constraints <- unlist(rho$levels)
   rho$intercept <- ifelse(attr(terms.formula(rho$formula), "intercept") == 1, TRUE, FALSE)
-  rho$x <- lapply(1:rho$ndim, function(j) {
+  rho$x <- lapply(seq_len(rho$ndim), function(j) {
     rhs.form <- as.formula(paste(as.character(formula[-2]), collapse = " "))
     new.rhs.form <- update(rhs.form, ~ . + 1)
     tmp <-  suppressWarnings(model.matrix(new.rhs.form,
@@ -140,7 +140,7 @@ initialize_MMO2 <- function(rho, formula, data, error.structure, contrasts){
   })
 
   if (is.null(rho$offset)) {
-    rho$offset <- lapply(1:rho$ndim, function(j) {
+    rho$offset <- lapply(seq_len(rho$ndim), function(j) {
       mf <- model.frame(rho$formula, data, na.action = function(x) x)
       model.offset(mf)
     })

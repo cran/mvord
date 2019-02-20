@@ -1,5 +1,11 @@
 This file documents updates and changes in the package mvord
 
+changes in version 0.3.4 (2019-02-20)
+- two additional arguments have been added to the error structures: value = numeric(0)
+  (for initial values) and fixed = FALSE (for allowing the user to fix the parameters of the error structure to the values specified in argument
+  value)
+- efficiency improvements by using rep.int, paste0, seq_len, seq_along where possible
+
 changes in version 0.3.3 (2018-10-30)
 - fixed bug standard errors with threshold.constraints
 

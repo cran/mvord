@@ -1,18 +1,18 @@
 mvord.fit <- function(rho){
   ## number of thresholds per outcome
-  rho$ntheta <- sapply(1:rho$ndim, function(j) nlevels(rho$y[, j]) - 1) # no of categories - 1
+  rho$ntheta <- sapply(seq_len(rho$ndim), function(j) nlevels(rho$y[, j]) - 1) # no of categories - 1
 
   if (is.null(rho$threshold.values)) {
     if ((rho$error.structure$type == "correlation") && (rho$intercept.type == "fixed")) {
-      rho$threshold.values <- lapply(1:rho$ndim, function(j) rep(NA,rho$ntheta[j]))
-    } else if((rho$error.structure$type %in% c("correlation")) && (rho$intercept.type == "flexible")){
-      rho$threshold.values <- lapply(1:rho$ndim, function(j) if(rho$ntheta[j] == 1) 0 else c(0,rep(NA,max(rho$ntheta[j]-1,0))))
+      rho$threshold.values <- lapply(seq_len(rho$ndim), function(j) rep.int(NA, rho$ntheta[j]))
+    } else if((rho$error.structure$type %in% c("correlation")) && (rho$intercept.type == "flexible")) {
+      rho$threshold.values <- lapply(seq_len(rho$ndim), function(j) if(rho$ntheta[j] == 1) 0 else c(0,rep.int(NA,max(rho$ntheta[j]-1,0))))
       cat("Note: First threshold for each response is fixed to 0 in order to ensure identifiability!\n")
     } else if ((rho$error.structure$type %in% c("covariance")) && (rho$intercept.type == "flexible")) {
-      rho$threshold.values <- lapply(1:rho$ndim, function(j) if(rho$ntheta[j] == 1) 0 else c(0,1,rep(NA,max(rho$ntheta[j]-2,0))))
+      rho$threshold.values <- lapply(seq_len(rho$ndim), function(j) if(rho$ntheta[j] == 1) 0 else c(0,1,rep.int(NA,max(rho$ntheta[j]-2,0))))
       cat("Note: First two thresholds for each response are fixed to 0 and 1 in order to ensure identifiability!\n")
     } else if ((rho$error.structure$type %in% c("covariance")) && (rho$intercept.type == "fixed")) {
-      rho$threshold.values <- lapply(1:rho$ndim, function(j) if(rho$ntheta[j] == 1) 0 else c(0,rep(NA,max(rho$ntheta[j]-1,0))))
+      rho$threshold.values <- lapply(seq_len(rho$ndim), function(j) if(rho$ntheta[j] == 1) 0 else c(0,rep.int(NA,max(rho$ntheta[j]-1,0))))
       cat("Note: First threshold for each response is fixed to 0 in order to ensure identifiability!\n")
     }
   } else {
@@ -21,10 +21,10 @@ mvord.fit <- function(rho){
   #values of fixed (non-NA) threshold parameters
   rho$threshold.values.fixed <- lapply(rho$threshold.values, function(x) x[!is.na(x)])
   ## number of non-fixed thresholds per rater
-  rho$npar.theta <- sapply(1:rho$ndim, function(j) sum(is.na(rho$threshold.values[[j]])))
+  rho$npar.theta <- sapply(seq_len(rho$ndim), function(j) sum(is.na(rho$threshold.values[[j]])))
 
   #checks if binary outcome is present
-  rho$binary <- any(sapply(1:rho$ndim, function(j) length(rho$threshold.values[[j]]) == 1))
+  rho$binary <- any(sapply(seq_len(rho$ndim), function(j) length(rho$threshold.values[[j]]) == 1))
 
   #rho$threshold.type
   rho$threshold <- set_threshold_type(rho)
@@ -63,12 +63,13 @@ mvord.fit <- function(rho){
 
   rho$inf.value <- 10000
 
+  rho$evalOnly <- ifelse((rho$npar.thetas + rho$npar.betas + attr(rho$error.structure, "npar") == 0), TRUE, FALSE)
+
   ###############################
   # starting values
   ###############################
   if (is.null(rho$start.values)) {
-  rho$start <- c(get_start_values(rho),
-                 rep(0, attr(rho$error.structure, "npar")))
+     rho$start <- c(get_start_values(rho), start_values(rho$error.structure))
   } else {
     if(length(unlist(rho$start.values)) !=  (rho$npar.thetas + rho$npar.betas)){
       cat(paste0("length should be ", rho$npar.thetas + rho$npar.betas))
@@ -76,13 +77,13 @@ mvord.fit <- function(rho){
     }
     #transform theta starting values
     theta.start <- rho$threshold.values
-    gamma.start <- lapply(1:rho$ndim, function(j) {theta.start[[j]][is.na(theta.start[[j]])] <-  rho$start.values$theta[[j]]
+    gamma.start <- lapply(seq_len(rho$ndim), function(j) {theta.start[[j]][is.na(theta.start[[j]])] <-  rho$start.values$theta[[j]]
     theta2gamma(theta.start[[j]])
     })
     #transform error.struct parameters
-    rho$start <- c(unlist(lapply(1:rho$ndim, function(j) gamma.start[[j]][is.na(rho$threshold.values[[j]])])), #gammas
-                   unlist(rho$start.values$beta), #betas
-                   rep(0, attr(rho$error.structure, "npar")))
+    rho$start <- c(unlist(lapply(seq_len(rho$ndim), function(j) gamma.start[[j]][is.na(rho$threshold.values[[j]])])), #gammas
+                   unlist(rho$start.values$beta),#betas
+                   start_values(rho$error.structure))
   }
   #source("mvord/R/utilities.R")
   rho$transf_thresholds <- switch(rho$threshold,
@@ -91,6 +92,7 @@ mvord.fit <- function(rho){
                                   fix2first     = transf_thresholds_fix2_first,
                                   fix2firstlast = transf_thresholds_fix2_firstlast,
                                   fixall        = transf_thresholds_fixall)
+  rho$build_error_struct <- ifelse(attr(rho$error.structure, "npar") == 0, build_error_struct_fixed,  build_error_struct)
 
   #################################
   ## make covariate matrices
@@ -102,15 +104,15 @@ mvord.fit <- function(rho){
     c(outer(rho$inds.cat[[j]], (seq_len(rho$p) - 1) * rho$nthetas, "+"))
   })
 
-  dim_ind <- rep(1:rho$ndim, rho$ntheta)
+  dim_ind <- rep.int(seq_len(rho$ndim), rho$ntheta)
   x_new <- rho$x
   if(rho$p > 0) {
       x_center <- vector("list", rho$ndim)
       x_scale <- vector("list", rho$ndim)
       for (j in seq_len(rho$ndim)) {
         ## standardize numeric variables
-        mu <- rep(0, rho$p)
-        sc <- rep(1, rho$p)
+        mu <- double(rho$p)
+        sc <- rep.int(1, rho$p)
         ind_int <- attr(x_new[[j]], "assign") != 0
         tmp <- scale_mvord(x_new[[j]][, ind_int, drop = FALSE])
         x_new[[j]][, ind_int] <- tmp$x
@@ -127,7 +129,11 @@ mvord.fit <- function(rho){
         fi[is.na(fi)] <- 1
         sweep(x * sxp[dim_ind], 2, sxp[dim_ind[fi]], "/")
       })
-      rho$constraints_mat <- bdiag(constraints_scaled)
+      if (length(constraints_scaled) > 0) {
+        rho$constraints_mat <- bdiag(constraints_scaled)
+      } else {
+        rho$constraints_mat <- numeric(0)
+      }
       ## scale and center for par_beta
       tmp <- (lapply(seq_along(rho$constraints), function(p) {
         sxp <- sapply(x_scale, "[", p)
@@ -159,7 +165,7 @@ mvord.fit <- function(rho){
 
   ####################################################
   ## build contrasts for the thetas
-  rho$contr_theta <- do.call("rbind", rep(list(diag(rho$nthetas)), rho$p))
+  rho$contr_theta <- do.call("rbind", rep.int(list(diag(rho$nthetas)), rho$p))
   ## make function which compute correction factor for thresholds:
   if(rho$p > 0){
   rho$mat_center_scale <- bdiag(rho$constraints) %*% c(rho$fi_center/rho$fi_scale)
@@ -190,24 +196,29 @@ mvord.fit <- function(rho){
   ##############################################
   ## OPTIMIZE PAIRWISE LIKELIHOOD ##############
   ##############################################
-  if (is.character(rho$solver)) {
-    rho$optRes <- suppressWarnings(optimx(rho$start, function(x) PLfun(x, rho),
-                                 method = rho$solver,
-                                 hessian = FALSE,
-                                 control = rho$control))
-    rho$optpar <- unlist(rho$optRes[1:length(rho$start)])
-    rho$objective <- unlist(rho$optRes["value"])
-  }
-  if (is.function(rho$solver)){
-     rho$optRes <- rho$solver(rho$start, function(x) PLfun(x, rho))
-     if (is.null(rho$optRes$optpar)|is.null(rho$optRes$objvalue)|is.null(rho$optRes$convcode)) stop("Solver function does not return the required objects.")
-     rho$optpar <- rho$optRes$optpar
-     rho$objective <- rho$optRes$objvalue
-     rho$message <- rho$optRes$message
+  if (rho$evalOnly) {
+    rho$optpar <- numeric(0)
+    rho$objective <- c(value = PLfun(rho$start , rho))
+  } else {
+    if (is.character(rho$solver)) {
+      rho$optRes <- suppressWarnings(optimx(rho$start, function(x) PLfun(x, rho),
+                                            method = rho$solver,
+                                            hessian = FALSE,
+                                            control = rho$control))
+      rho$optpar <- unlist(rho$optRes[1:length(rho$start)])
+      rho$objective <- unlist(rho$optRes["value"])
+    }
+    if (is.function(rho$solver)){
+      rho$optRes <- rho$solver(rho$start, function(x) PLfun(x, rho))
+      if (is.null(rho$optRes$optpar)|is.null(rho$optRes$objvalue)|is.null(rho$optRes$convcode)) stop("Solver function does not return the required objects.")
+      rho$optpar <- rho$optRes$optpar
+      rho$objective <- rho$optRes$objvalue
+      rho$message <- rho$optRes$message
 
-  }
-  if (rho$optRes$convcode != 0){
-     stop("NO/FALSE CONVERGENCE - choose a different optimizer or different starting values.")
+    }
+    if (rho$optRes$convcode != 0){
+      stop("NO/FALSE CONVERGENCE - choose a different optimizer or different starting values.")
+    }
   }
   ## Construct original parameters
   par_beta <- rho$optpar[rho$npar.thetas + seq_len(rho$npar.betas)]
@@ -220,12 +231,12 @@ mvord.fit <- function(rho){
   br <- drop(crossprod(rho$contr_theta, betatildemu[,1]))
   correction <- lapply(rho$inds.cat, function(k) br[k])
   } else {
-    correction <- rep(list(0), rho$ndim)
+    correction <- rep.int(list(0), rho$ndim)
     par_theta <- rho$transf_thresholds(rho$optpar[seq_len(rho$npar.thetas)], rho, 0)
     thetatilde <- lapply(seq_len(rho$ndim), function(j) par_theta[[j]])
   }
   ## Thresholds
-  rho$theta <- lapply(1:rho$ndim, function(j) thetatilde[[j]] + correction[[j]])
+  rho$theta <- lapply(seq_len(rho$ndim), function(j) thetatilde[[j]] + correction[[j]])
   ## Regression coefficients
   rho$beta <- par_beta/rho$fi_scale
   ############################################
@@ -301,7 +312,7 @@ PLfun <- function(par, rho){
   pred.upper <- tmp$U
   pred.lower <- tmp$L
   r_mat <- tmp$corr_par[, rho$dummy_pl_lag == 1, drop = F]
-  logp <- rep(0, rho$n)
+  logp <- double(rho$n)
   ## check for q_i = 1
   pr <- rho$link$F_uni(pred.upper[rho$ind_univ]) -
     rho$link$F_uni(pred.lower[rho$ind_univ])

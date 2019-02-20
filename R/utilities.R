@@ -1,10 +1,10 @@
 set_threshold_type <- function(rho){
 #fixall
-  if (all(sapply(1:rho$ndim, function(j) all(!is.na(rho$threshold.values[[j]]))))) {#all thresholds are fixed in all dimensions
+  if (all(sapply(seq_len(rho$ndim), function(j) all(!is.na(rho$threshold.values[[j]]))))) {#all thresholds are fixed in all dimensions
       if (rho$intercept == FALSE) cat("We suggest to include an intercept in the model (formula = y ~ 1 + ...)")
       type <- "fixall"
 #fix2first
-  } else if (all(sapply(1:rho$ndim, function(j){
+  } else if (all(sapply(seq_len(rho$ndim), function(j){
     #all first two thresholds are not NA
       (all(length(which(!is.na(rho$threshold.values[[j]])))==length(c(1,2))) && all(which(!is.na(rho$threshold.values[[j]])) == c(1,2))
       ) || ((length(rho$threshold.values[[j]]) == 1) &&  (which(!is.na(rho$threshold.values[[j]])) == 1))
@@ -17,7 +17,7 @@ set_threshold_type <- function(rho){
       }
       type <- "fix2first"
 #fix2firstlast
-  } else if (all(sapply(1:rho$ndim, function(j){
+  } else if (all(sapply(seq_len(rho$ndim), function(j){
       (all(length(which(!is.na(rho$threshold.values[[j]])))==length(c(1,rho$ntheta[j]))) &&
        all(which(!is.na(rho$threshold.values[[j]])) == c(1,rho$ntheta[j]))#all first and last two thresholds are not NA
       ) || ((length(rho$threshold.values[[j]]) == 1) &&  (which(!is.na(rho$threshold.values[[j]])) == 1))
@@ -31,7 +31,7 @@ set_threshold_type <- function(rho){
       type <- "fix2firstlast"
 #fix1first
       #all first thresholds are not NA (and no additional)
-  } else if (all(sapply(1:rho$ndim, function(j) (length(which(!is.na(rho$threshold.values[[j]])) >= 1) &&
+  } else if (all(sapply(seq_len(rho$ndim), function(j) (length(which(!is.na(rho$threshold.values[[j]])) >= 1) &&
                                                  all(which(!is.na(rho$threshold.values[[j]])) == 1))))){
       if ((rho$error.structure$type == "covariance") && (rho$intercept.type == "flexible")) stop("Model with cov_general is not identifiable.
                           Please either fix two thresholds or one threshold and the intercept.\n", call. = FALSE)
@@ -40,7 +40,7 @@ set_threshold_type <- function(rho){
       }
       type <- "fix1first"
 #flexible
-  } else if (all(sapply(1:rho$ndim, function(j) all(is.na(rho$threshold.values[[j]]))))){#all thresholds NA
+  } else if (all(sapply(seq_len(rho$ndim), function(j) all(is.na(rho$threshold.values[[j]]))))){#all thresholds NA
       if (rho$error.structure$type == "covariance") stop("Model with cov_general is not identifiable.
                                                         Please either fix two thresholds or one threshold and the intercept.\n", call. = FALSE)
       if ((rho$error.structure$type == "correlation") && (rho$intercept.type == "flexible")){
@@ -63,8 +63,7 @@ check_args_optimizer <- function(rho){
 }
 
 check_args_error.structure <- function(error.structure, data){
-  allmeth <- c("cor_general",  "cov_general",  "cor_ar1",
-   "cor_equi", "cor_ident", "cor_rel_var")
+  allmeth <- c("cor_general",  "cov_general",  "cor_ar1", "cor_equi", "cor_ident", "cor_rel_var")
   if (!(as.character(error.structure[[1]]) %in% allmeth)) stop("error.structure not among allowed methods in mvord.")
 
   if(!class(error.structure[[2]]) == "formula") stop("formula in error.structure has to be of class formula.", call. = FALSE)
@@ -76,7 +75,7 @@ check_args_error.structure <- function(error.structure, data){
 check_args_thresholds <- function(rho){
   #CHECK if threshold.values is in line with threshold.constraints
   if (length(rho$threshold.constraints) != rho$ndim) stop("Dimensions of threshold.values and number of outcomes do not match", call. = FALSE)
-    if (any(sapply(1:rho$ndim, function(j) length(rho$threshold.values[[j]]) != rho$ntheta[j])))
+    if (any(sapply(seq_len(rho$ndim), function(j) length(rho$threshold.values[[j]]) != rho$ntheta[j])))
       stop("Dimensions of threshold.values and number of thresholds do not match", call. = FALSE)
   for (j in unique(rho$threshold.constraints)){
     ind <- which(rho$threshold.constraints == j)
@@ -186,7 +185,7 @@ set_args_other <- function(rho) {
   ## if null set to matrix
   if(is.null(rho$coef.constraints)){
     if(NCOL(rho$x[[1]]) > 0){
-      rho$coef.constraints <- matrix(1:rho$ndim, ncol = NCOL(rho$x[[1]]), nrow = rho$ndim)
+      rho$coef.constraints <- matrix(seq_len(rho$ndim), ncol = NCOL(rho$x[[1]]), nrow = rho$ndim)
     } else {
       rho$coef.constraints <- matrix(integer(), ncol = 0, nrow = rho$ndim)
     }
@@ -216,7 +215,7 @@ set_args_other <- function(rho) {
     rho$intercept.type <- ifelse(rho$intercept == FALSE, "fixed", "flexible")
   }
   ## threshold.contraints
-  if(is.null(rho$threshold.constraints)) rho$threshold.constraints <- 1:rho$ndim
+  if(is.null(rho$threshold.constraints)) rho$threshold.constraints <- seq_len(rho$ndim)
   ## PL.lag
   if (is.null(rho$PL.lag)) rho$PL.lag <- rho$ndim
   if (rho$PL.lag != round(rho$PL.lag)) {
@@ -230,14 +229,14 @@ set_args_other <- function(rho) {
 ###### AUXILIARY FUNCTIONS ##############
 ##########################################
 get_start_values <- function(rho){
- gammas <- sapply(1:rho$ndim, function(j) {
+ gammas <- sapply(seq_len(rho$ndim), function(j) {
    if (rho$npar.theta.opt[j] != 0){
     theta <- if (rho$ntheta[j] >= 2) polr(rho$y[, j] ~1)$zeta else 0
     if (!grepl("mvlogit", rho$link$name)) theta <- theta/1.7
     c(theta[1L], log(diff(theta)))[1:rho$npar.theta.opt[j]]
   } else NULL
 })
-c(unlist(gammas), rep(0, rho$npar.betas))
+c(unlist(gammas), double(rho$npar.betas))
 }
 
 build_correction_thold_fun <- function(k, rho) {
@@ -254,7 +253,7 @@ build_correction_thold_fun <- function(k, rho) {
 build_correction_thold_fun0 <- function(j, rho) {
   ..j.. <- j
   f <- function(beta, k, rho)  {
-    rep(0L, rho$ntheta[..j..])
+    integer(rho$ntheta[..j..])
   }
   f
 }
@@ -262,7 +261,7 @@ build_correction_thold_fun0 <- function(j, rho) {
 transf_par <- function(par, rho) {
   par_sigma <- par[rho$npar.thetas + rho$npar.betas +
     seq_len(attr(rho$error.structure, "npar"))]
-  sigmas <- build_error_struct(rho$error.structure, par_sigma)
+  sigmas <- rho$build_error_struct(rho$error.structure, par_sigma)
   par_beta <- par[rho$npar.thetas + seq_len(rho$npar.betas)]
   betatilde <- rho$constraints_mat %*% par_beta
   par_theta <- rho$transf_thresholds(par[seq_len(rho$npar.thetas)], rho,
@@ -288,22 +287,25 @@ transf_par <- function(par, rho) {
 #########################################################################
 transf_thresholds_fixall <- function(gamma, rho, betatilde){
   betatildemu <- betatilde * rho$mat_center_scale
-  br <- drop(crossprod(rho$contr_theta, betatildemu[,1]))
+  # br <- ifdrop(crossprod(rho$contr_theta, betatildemu[,1]))
   lapply(seq_len(rho$ndim), function(j) {
+    br <- ifelse(length(betatildemu) == 0, 0, drop(crossprod(rho$contr_theta, betatildemu[,1]))[rho$inds.cat[[..l..]]])
     ..l.. <- match(rho$threshold.constraints[j],
                    rho$threshold.constraints)
-    rho$threshold.values[[j]] - br[rho$inds.cat[[..l..]]]
+    rho$threshold.values[[j]] - br
   })
 }
 
 transf_thresholds_fix1_first <- function(gamma, rho, betatilde){
   ## \theta_j = a + exp(gamma_1) + .. + exp(gamma_j)
   betatildemu <- betatilde * rho$mat_center_scale
-  br <- drop(crossprod(rho$contr_theta, betatildemu[,1]))
+  #br <- ifelse(length(betatildemu) == 0, 0, drop(crossprod(rho$contr_theta, betatildemu)))
   lapply(seq_len(rho$ndim), function(j) {
     ## TODO make nicer
+    br <- ifelse(length(betatildemu) == 0, 0, drop(crossprod(rho$contr_theta, betatildemu[,1]))[rho$inds.cat[[j]][1]])
     correction <- rho$thold_correction[[j]](betatilde, k = j, rho)[1]
-    a <- rho$threshold.values.fixed[[j]][1] - br[rho$inds.cat[[j]][1]] - correction
+    #a <- rho$threshold.values.fixed[[j]][1] - br[rho$inds.cat[[j]][1]] - correction
+    a <- rho$threshold.values.fixed[[j]][1] - br - correction
     cumsum(c(a, exp(gamma[rho$ind.thresholds[[j]]])))
   })
 }
@@ -311,11 +313,14 @@ transf_thresholds_fix1_first <- function(gamma, rho, betatilde){
 transf_thresholds_fix2_first <- function(gamma, rho, betatilde){
   ## \theta_j = a + b + exp(gamma_1) + .. + exp(gamma_j)
   betatildemu <- betatilde * rho$mat_center_scale
-  br <- drop(crossprod(rho$contr_theta, betatildemu[,1]))
+  # br <- drop(crossprod(rho$contr_theta, betatildemu[,1]))
   lapply(seq_len(rho$ndim), function(j) {
+    br1 <- ifelse(length(betatildemu) == 0, 0, drop(crossprod(rho$contr_theta, betatildemu[,1]))[rho$inds.cat[[j]][1]])
+    br2 <- ifelse(length(betatildemu) == 0, 0, drop(crossprod(rho$contr_theta, betatildemu[,1]))[rho$inds.cat[[j]][2]])
+
     correction <- rho$thold_correction[[j]](betatilde, k = j, rho)[1:2]
-    a <- rho$threshold.values.fixed[[j]][1] - br[rho$inds.cat[[j]][1]] - correction[1]
-    b <- rho$threshold.values.fixed[[j]][2] - br[rho$inds.cat[[j]][2]] - correction[2]
+    a <- rho$threshold.values.fixed[[j]][1] - br1 - correction[1]
+    b <- rho$threshold.values.fixed[[j]][2] - br2 - correction[2]
         if (is.na(b)) b <- NULL ## it implies one can have binary with fix2first
         c(a, cumsum(c(b, exp(gamma[rho$ind.thresholds[[j]]]))))
     })
@@ -324,12 +329,15 @@ transf_thresholds_fix2_first <- function(gamma, rho, betatilde){
 transf_thresholds_fix2_firstlast <- function(gamma, rho, betatilde){
   ## (theta_j - theta_{j-1})/(1 - theta_j) = exp(gamma_j)/(1 + exp(gamma_j))
   betatildemu <- betatilde * rho$mat_center_scale
-  br <- drop(crossprod(rho$contr_theta, betatildemu[,1]))
+  #br <- drop(crossprod(rho$contr_theta, betatildemu[,1]))
   lapply(seq_len(rho$ndim), function(j){
+    br1 <- ifelse(length(betatildemu) == 0, 0, drop(crossprod(rho$contr_theta, betatildemu[,1]))[rho$inds.cat[[j]][1]])
+    br2 <- ifelse(length(betatildemu) == 0, 0, drop(crossprod(rho$contr_theta, betatildemu[,1]))[rho$inds.cat[[j]][rho$ntheta[j]]])
+
     correction <- rho$thold_correction[[j]](betatilde, k = j, rho)[c(1, rho$ntheta[j])]
     gamma1  <- gamma[rho$ind.thresholds[[j]]]
-    a <- rho$threshold.values.fixed[[j]][1] - br[rho$inds.cat[[j]][1]] - correction[1]
-    b <- rho$threshold.values.fixed[[j]][2] - br[rho$inds.cat[[j]][rho$ntheta[j]]] - correction[2]
+    a <- rho$threshold.values.fixed[[j]][1] - br1 - correction[1]
+    b <- rho$threshold.values.fixed[[j]][2] - br2 - correction[2]
     if (!is.na(b)) {
       recursive.theta <- function(i) {
         if (i == 0) 0
@@ -342,7 +350,7 @@ transf_thresholds_fix2_firstlast <- function(gamma, rho, betatilde){
 }
 
 transf_thresholds_flexible <- function(gamma, rho, betatilde = NULL){
-  lapply(1L:rho$ndim, function(j)
+  lapply(seq_len(rho$ndim), function(j)
     if (anyNA(rho$threshold.values[[j]])){
       if (rho$ntheta[j] > 1L) {
         cumsum(c(gamma[rho$ind.thresholds[[j]][1]],
@@ -513,7 +521,7 @@ if(is.list(rho$coef.constraints)){
   }
   constraints <- lapply(seq_along(constraints), function(p) {
     colnames(constraints[[p]]) <- paste(rho$coef.names[p], seq_len(NCOL(constraints[[p]])))
-    rownames(constraints[[p]]) <- unlist(lapply(1:rho$ndim, function(j)
+    rownames(constraints[[p]]) <- unlist(lapply(seq_len(rho$ndim), function(j)
       get_labels_theta(rho, j)))
     constraints[[p]]
   })
@@ -546,12 +554,12 @@ if (all(sapply(rho$offset, is.null))) {
     tmp <- rho$coef.values
     tmp[is.na(tmp)] <- 0
     #tmp
-    lapply(1:rho$ndim, function(j){
+    lapply(seq_len(rho$ndim), function(j){
       tmp2 <- c(rho$x[[j]] %*% tmp[j,])
       tmp2[is.na(tmp2)] <- 0
       tmp2
     }
-    )} else  offset <- lapply(1:rho$ndim, function(j) rep(0, rho$n))
+    )} else  offset <- lapply(seq_len(rho$ndim), function(j) double(rho$n))
     offset
 } else rho$offset
 }
@@ -562,19 +570,19 @@ set_offset_up <- function(rho){
     if (any(rho$coef.values != 0, na.rm = TRUE)){
       tmp <- rho$coef.values
       tmp[is.na(tmp)] <- 0
-      rho$offset <- lapply(1:rho$ndim, function(j){
+      rho$offset <- lapply(seq_len(rho$ndim), function(j){
         tmp2 <- c(rho$x[[j]] %*% tmp[j,])
         tmp2[is.na(tmp2)] <- 0
         tmp2
       })
     } else {
-    rho$offset <- lapply(1:rho$ndim, function(j) rep(0, rho$n))
+    rho$offset <- lapply(seq_len(rho$ndim), function(j) double(rho$n))
     }
   }
   if (!is.null(rho$coef.values)){
   wh_fix <- which(colSums(is.na(rho$coef.values)) == 0)
   if (length(wh_fix) != 0){
-  for (j in 1:rho$ndim) {
+  for (j in seq_len(rho$ndim)) {
      attribute <- attr(rho$x[[j]], "assign")
      rho$x[[j]] <-  rho$x[[j]][, -wh_fix, drop = F]
      attr(rho$x[[j]], "assign") <- attribute[-wh_fix]
@@ -639,7 +647,7 @@ pseudo_R_squared <- function(object, adjusted = FALSE){
 
   model0 <- mvord(formula = formula,
                   data = object$rho$y,
-                  error.structure = cor_ident(~1))
+                  error.structure = cor_equi(~1, value = 0, fixed = T))
   if (adjusted){
     1 - (logLik(object) - length(object$rho$optpar)) / logLik(model0)
   } else{

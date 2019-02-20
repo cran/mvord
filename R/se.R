@@ -2,37 +2,42 @@
 ###### PL Standard Errors - no parallel    ###############
 ##########################################################
 PL_se <- function(rho){
-  if (is.null(rho$link$deriv.fun)) {
-    par <- rho$optpar
-    ## construct Jacobian
-    J <- make_jac_matrix(rho)
-    J.inv <- solve(J)
-    if(rho$control$trace != 0) cat("Computing variability and hessian matrix numerically ... \n")
-    Vi_num <- matrix(0, ncol = length(par), nrow = rho$n)
-    for (i in 1:rho$n) {
-      if (i %% 100 == 0)  cat('Computed gradient for', i, 'out of', rho$n,'subjects\n')
-      Vi_num[i, ] <- grad(function(par) neg_logPL_comp_i(par, rho, i), par, method = "Richardson")
-    }
-    cat("\n")
-    rho$Vi_num <-  Vi_num %*% J.inv
-    rho$V <- rho$n/(rho$n - length(par)) * crossprod(rho$Vi_num) # original variability matrix
-    if(rho$control$trace != 0) cat("\nComputing Hessian numerically ... \n")
-    Ht <-  hessian(function(par) PLfun(par, rho), par,
-                   method = "Richardson",
-                   method.args=list(eps=1e-6)) # Fisher matrix H(Gamma transf)
-    rho$H.inv <-   J %*%  solve(Ht) %*% t(J)
-  } else {
+  # if (is.null(rho$link$deriv.fun)) {
+  #   par <- rho$optpar
+  #   ## construct Jacobian
+  #   J <- make_jac_matrix(rho)
+  #   J.inv <- solve(J)
+  #   if(rho$control$trace != 0) cat("Computing variability and hessian matrix numerically ... \n")
+  #   Vi_num <- matrix(0, ncol = length(par), nrow = rho$n)
+  #   for (i in seq_len(rho$n)) {
+  #     if (i %% 100 == 0)  cat('Computed gradient for', i, 'out of', rho$n,'subjects\n')
+  #     Vi_num[i, ] <- grad(function(par) neg_logPL_comp_i(par, rho, i), par, method = "Richardson")
+  #   }
+  #   cat("\n")
+  #   rho$Vi_num <-  Vi_num %*% J.inv
+  #   rho$V <- rho$n/(rho$n - length(par)) * crossprod(rho$Vi_num) # original variability matrix
+  #   if(rho$control$trace != 0) cat("\nComputing Hessian numerically ... \n")
+  #   Ht <-  hessian(function(par) PLfun(par, rho), par,
+  #                  method = "Richardson",
+  #                  method.args=list(eps=1e-6)) # Fisher matrix H(Gamma transf)
+  #   rho$H.inv <-   J %*%  solve(Ht) %*% t(J)
+  # } else {
     if(rho$control$trace != 0) cat("Computing variability and hessian matrix analytically ... \n")
-    derivs_for_se <- derivs_ana(rho)
-    rho$V <- rho$n/(rho$n - NCOL(derivs_for_se$V)) * derivs_for_se$V  ## correct for degrees of freedom
-    rho$H.inv <- tryCatch(chol2inv(chol(derivs_for_se$H)))
-  }
-    rho$varGamma <- rho$H.inv %*% rho$V %*% rho$H.inv ## inverse godambe
-    rho$seGamma <- sqrt(diag(rho$varGamma))
-    if(rho$control$trace != 0) cat("Done computing the standard errors!\n")
-    rho$claic <- 2 * rho$objective + 2 * sum(diag(rho$V %*% rho$H.inv))
-    rho$clbic <- 2 * rho$objective + log(rho$n) * sum(diag(rho$V %*% rho$H.inv))
-    rho
+    if (rho$evalOnly)   {
+      rho$H.inv <- numeric(0)
+      rho$V <- numeric(0)
+    } else {
+      derivs_for_se <- derivs_ana(rho)
+      rho$V <- rho$n/(rho$n - NCOL(derivs_for_se$V)) * derivs_for_se$V  ## correct for degrees of freedom
+      rho$H.inv <- tryCatch(chol2inv(chol(derivs_for_se$H)))
+    }
+  # }
+  rho$varGamma <- rho$H.inv %*% rho$V %*% rho$H.inv ## inverse godambe
+  rho$seGamma <- sqrt(diag(rho$varGamma))
+  if(rho$control$trace != 0) cat("Done computing the standard errors!\n")
+  rho$claic <- 2 * rho$objective + 2 * sum(diag(rho$V %*% rho$H.inv))
+  rho$clbic <- 2 * rho$objective + log(rho$n) * sum(diag(rho$V %*% rho$H.inv))
+  rho
 }
 #############################################################################
 # #' @title Derivative of rectangle probability wrt correlation parameter
@@ -168,7 +173,7 @@ set_offset_threshold_u <- function(rho) {
   lapply(seq_len(rho$ndim), function(j) {
     x <- rho$threshold.values[[j]]
     x[is.na(x)] <- 0
-    ou <- c(rep(0, rho$ntheta[j]), rho$inf.value)[rho$y[, j]]
+    ou <- c(double(rho$ntheta[j]), rho$inf.value)[rho$y[, j]]
     rho$XU[[j]][, seq_along(x), drop = F] %*% x + ou - rho$offset[[j]]
   })
 }
@@ -177,7 +182,7 @@ set_offset_threshold_l <- function(rho) {
   lapply(seq_len(rho$ndim), function(j) {
     x <- rho$threshold.values[[j]]
     x[is.na(x)] <- 0
-    ol <- c(-rho$inf.value, rep(0, rho$ntheta[j]))[rho$y[, j]]
+    ol <- c(-rho$inf.value, double(rho$ntheta[j]))[rho$y[, j]]
     rho$XL[[j]][, seq_along(x), drop = F] %*% x  + ol - rho$offset[[j]]
   })
 }
@@ -200,10 +205,9 @@ derivs_ana <- function(rho){
   #theta <- unlist(theta[unique(rho$threshold.constraints)])
   theta <- unlist(theta[!duplicated(rho$threshold.constraints)])
 
-  C_beta  <- bdiag(rho$constraints)
   C_theta <- constraints_theta(rho)
-  if (length(rho$constraints) > 0){
-    rho$C <- as.matrix(bdiag(list(C_theta, C_beta)))
+  if (length(rho$constraints) > 0) {
+    rho$C <- as.matrix(bdiag(list(C_theta, bdiag(rho$constraints))))
   } else {
     rho$C <- as.matrix(C_theta)
   }
@@ -230,6 +234,7 @@ derivs_ana <- function(rho){
   psi <- rho$C %*% c(theta, rho$beta)
   ##
   npar.err <-  attr(rho$error.structure, "npar")
+  #npar.err.start <-  attr(rho$error.structure, "npar_start")
   npar.cor <-  attr(rho$error.structure, "npar.cor")
   npar.sd  <-  attr(rho$error.structure, "npar.sd")
 
@@ -238,7 +243,7 @@ derivs_ana <- function(rho){
   gamma <- par_sigma[-seq_len(npar.cor)]
   S <- attr(rho$error.structure, "covariate")
 
-  sigmas <- build_error_struct(rho$error.structure, par_sigma)
+  sigmas <- rho$build_error_struct(rho$error.structure, par_sigma)
   ###############################################
   rho$offsetu <- set_offset_threshold_u(rho)
   rho$offsetl <- set_offset_threshold_l(rho)
@@ -382,122 +387,122 @@ derivs_ana <- function(rho){
 #############################################################
 ###### neg loglikelihood component for each subject i #######
 ######                 for numeric gradient           #######
-#############################################################
-transf_par_i <- function(par, rho, i) {
-  par_sigma <- par[rho$npar.thetas + rho$npar.betas + seq_len(attr(rho$error.structure, "npar"))]
-  sigmas <- build_error_struct(rho$error.structure, par_sigma)
-  if (is.null(dim(sigmas$sdVec))){
-    sdi <- sigmas$sdVec
-  } else {
-    sdi <- sigmas$sdVec[i, ]
-  }
-  par_beta <- par[rho$npar.thetas + seq_len(rho$npar.betas)]
-  betatilde <- rho$constraints_mat %*% par_beta
-  par_theta <- rho$transf_thresholds(par[seq_len(rho$npar.thetas)], rho, betatilde)
-  thetatilde <- lapply(seq_len(rho$ndim), function(j)
-    par_theta[[j]] + rho$thold_correction[[j]](betatilde, k = j, rho = rho))
-
-  pred.upper  <- sapply(1:rho$ndim, function(j) {
-   th_u <- c(thetatilde[[j]], rho$inf.value)[rho$y[i, j]]
-   xbeta_u <- sum(rho$XcatU[[j]][i, ] * betatilde[rho$indjbeta[[j]]])
-   th_u - xbeta_u - rho$offset[[j]]
-  })/sdi
-  pred.lower  <- sapply(1:rho$ndim, function(j) {
-    th_l <- c(-rho$inf.value, thetatilde[[j]])[rho$y[i, j]]
-    xbeta_l <- sum(rho$XcatL[[j]][i, ] * betatilde[rho$indjbeta[[j]]])
-    th_l - xbeta_l - rho$offset[[j]]
-  })/sdi
-  list(U = pred.upper, L = pred.lower,
-       corr_par = sigmas$rVec[i, , drop=F])
-}
-##############
-neg_logPL_comp_i <- function(par, rho, i) {
-  # transform parameters and get upper and lower bounds
-  tmp <- transf_par_i(par, rho, i)
-  U <- tmp$U
-  L <- tmp$L
-  r_mat <- tmp$corr_par
-  q <- which(!is.na(rho$y[i, ]))
-  if (length(q) == 1){
-    pr <- rho$link$F_uni(U[q]) - rho$link$F_uni(L[q])
-    logPLi <- rho$weights[i] * log(max(pr, .Machine$double.eps))
-  } else {
-    combis <- combn(q, 2)
-    combis <- combis[,which((combis[2,] - combis[1,])  <= rho$PL.lag), drop = FALSE]
-    logPLi <- 0
-    dim(U) <- dim(L) <- c(1, length(U))
-    for (h in seq_len(ncol(combis))) {
-      r <- r_mat[, h]
-      pr <- rho$link$F_biv_rect(U = U[,combis[, h], drop = F],
-                        L = L[,combis[, h], drop = F],
-                        r)
-      logPLi <- logPLi + rho$weights[i] * log(max(pr, .Machine$double.eps))
-  }
-}
-  -logPLi
-}
-
-transf_thresholds_fix2_firstlast_jac <- function(rho, j, gamma_j, i){
-  recursive.theta <- function(i) {
-    if (i == 0) 0
-    else return ((exp(gamma_j[i]) + recursive.theta(i - 1))/(1 + exp(gamma_j[i])))
-  }
-    theta <- sapply(1:length(gamma_j), function(i)
-      recursive.theta(i))
-    theta[i]
-}
-
-
-transf_thresholds_fix2_first_jac <- function(rho,j,gamma_j,i){
-      c(0, cumsum(c(1 ,exp(gamma_j))))[i+2]
-}
-
-make_jac_matrix <- function(rho) {
-  par <- rho$optpar
-  first.ind.theta <- sapply(rho$ind.thresholds, "[", 1)
-  transf_thresholds_jac <- switch(rho$threshold,
-                                  fix2firstlast = transf_thresholds_fix2_firstlast_jac,
-                                  fix2first = transf_thresholds_fix2_first_jac)
-
-  gamma <- par[1:rho$npar.thetas]
-   if (rho$threshold == "flexible") {
-     jac <- lapply((1:rho$ndim)[which(rho$npar.theta.opt > 0)], function(j){ #rho$npar.theta
-       emat <- diag(rho$ntheta[j])
-       if (ncol(emat) >= 2) {
-         emat[,1] <- 1
-         for (k in 2:ncol(emat))
-           emat[(k:nrow(emat)), k] <-
-             exp(gamma[(first.ind.theta[j]) + seq_len(rho$ntheta[j]-1)])[k - 1]
-       }
-       emat
-       })
-   } else {
-     if (rho$threshold == "fix1first") {
-       jac <- lapply((1:rho$ndim)[which(rho$npar.theta.opt > 0)], function(j){ #rho$npar.theta
-         emat <- diag(rho$ntheta[j])
-         if (ncol(emat) >= 2) {
-           emat[,1] <- 1
-           for (k in 2:ncol(emat))
-             emat[(k:nrow(emat)), k] <-
-               exp(gamma[(first.ind.theta[j]) + seq_len(rho$npar.theta.opt[j])-1])[k - 1] #rho$npar.theta
-         }
-         emat[-1,-1]
-       })
-     } else {
-       jac <- lapply((1:rho$ndim)[which(rho$npar.theta.opt > 0)], function(j){ #rho$npar.theta
-         gamma_j <- gamma[first.ind.theta[j] + seq_len(rho$npar.theta.opt[j]) - 1] #rho$npar.theta
-         t(sapply(1:length(gamma_j),
-                  function(i) grad(function(x) transf_thresholds_jac(rho, j, x, i), x=gamma_j)))
-       })
-     }
-   }
-  ## Jacobian for BETAS: no transform
-  jac[sum(rho$npar.theta.opt > 0) + seq_len(rho$npar.betas)] <- 1
-  ## Jacobian for ERROR STRUCTURE
-  parsigma <- par[rho$npar.thetas + rho$npar.betas + seq_len(attr(rho$error.structure, "npar"))]
-  corr.jac <- corr_jac(rho$error.structure, parsigma)
-  jac[sum(rho$npar.theta.opt > 0) + rho$npar.betas + seq_along(corr.jac)] <- corr.jac #rho$npar.theta
-  ## make Jacobian matrix
-  J <- as.matrix(bdiag(jac))
-  return(J)
-}
+# #############################################################
+# transf_par_i <- function(par, rho, i) {
+#   par_sigma <- par[rho$npar.thetas + rho$npar.betas + seq_len(attr(rho$error.structure, "npar_start"))]
+#   sigmas <- build_error_struct(rho$error.structure, par_sigma)
+#   if (is.null(dim(sigmas$sdVec))){
+#     sdi <- sigmas$sdVec
+#   } else {
+#     sdi <- sigmas$sdVec[i, ]
+#   }
+#   par_beta <- par[rho$npar.thetas + seq_len(rho$npar.betas)]
+#   betatilde <- rho$constraints_mat %*% par_beta
+#   par_theta <- rho$transf_thresholds(par[seq_len(rho$npar.thetas)], rho, betatilde)
+#   thetatilde <- lapply(seq_len(rho$ndim), function(j)
+#     par_theta[[j]] + rho$thold_correction[[j]](betatilde, k = j, rho = rho))
+#
+#   pred.upper  <- sapply(seq_len(rho$ndim), function(j) {
+#    th_u <- c(thetatilde[[j]], rho$inf.value)[rho$y[i, j]]
+#    xbeta_u <- sum(rho$XcatU[[j]][i, ] * betatilde[rho$indjbeta[[j]]])
+#    th_u - xbeta_u - rho$offset[[j]]
+#   })/sdi
+#   pred.lower  <- sapply(seq_len(rho$ndim), function(j) {
+#     th_l <- c(-rho$inf.value, thetatilde[[j]])[rho$y[i, j]]
+#     xbeta_l <- sum(rho$XcatL[[j]][i, ] * betatilde[rho$indjbeta[[j]]])
+#     th_l - xbeta_l - rho$offset[[j]]
+#   })/sdi
+#   list(U = pred.upper, L = pred.lower,
+#        corr_par = sigmas$rVec[i, , drop=F])
+# }
+# ##############
+# neg_logPL_comp_i <- function(par, rho, i) {
+#   # transform parameters and get upper and lower bounds
+#   tmp <- transf_par_i(par, rho, i)
+#   U <- tmp$U
+#   L <- tmp$L
+#   r_mat <- tmp$corr_par
+#   q <- which(!is.na(rho$y[i, ]))
+#   if (length(q) == 1){
+#     pr <- rho$link$F_uni(U[q]) - rho$link$F_uni(L[q])
+#     logPLi <- rho$weights[i] * log(max(pr, .Machine$double.eps))
+#   } else {
+#     combis <- combn(q, 2)
+#     combis <- combis[,which((combis[2,] - combis[1,])  <= rho$PL.lag), drop = FALSE]
+#     logPLi <- 0
+#     dim(U) <- dim(L) <- c(1, length(U))
+#     for (h in seq_len(ncol(combis))) {
+#       r <- r_mat[, h]
+#       pr <- rho$link$F_biv_rect(U = U[,combis[, h], drop = F],
+#                         L = L[,combis[, h], drop = F],
+#                         r)
+#       logPLi <- logPLi + rho$weights[i] * log(max(pr, .Machine$double.eps))
+#   }
+# }
+#   -logPLi
+# }
+#
+# transf_thresholds_fix2_firstlast_jac <- function(rho, j, gamma_j, i){
+#   recursive.theta <- function(i) {
+#     if (i == 0) 0
+#     else return ((exp(gamma_j[i]) + recursive.theta(i - 1))/(1 + exp(gamma_j[i])))
+#   }
+#     theta <- sapply(seq_along(gamma_j), function(i)
+#       recursive.theta(i))
+#     theta[i]
+# }
+#
+#
+# transf_thresholds_fix2_first_jac <- function(rho,j,gamma_j,i){
+#       c(0, cumsum(c(1 ,exp(gamma_j))))[i+2]
+# }
+#
+# make_jac_matrix <- function(rho) {
+#   par <- rho$optpar
+#   first.ind.theta <- sapply(rho$ind.thresholds, "[", 1)
+#   transf_thresholds_jac <- switch(rho$threshold,
+#                                   fix2firstlast = transf_thresholds_fix2_firstlast_jac,
+#                                   fix2first = transf_thresholds_fix2_first_jac)
+#
+#   gamma <- par[seq_len(rho$npar.thetas)]
+#    if (rho$threshold == "flexible") {
+#      jac <- lapply((seq_len(rho$ndim))[which(rho$npar.theta.opt > 0)], function(j){ #rho$npar.theta
+#        emat <- diag(rho$ntheta[j])
+#        if (ncol(emat) >= 2) {
+#          emat[,1] <- 1
+#          for (k in 2:ncol(emat))
+#            emat[(k:nrow(emat)), k] <-
+#              exp(gamma[(first.ind.theta[j]) + seq_len(rho$ntheta[j]-1)])[k - 1]
+#        }
+#        emat
+#        })
+#    } else {
+#      if (rho$threshold == "fix1first") {
+#        jac <- lapply((seq_len(rho$ndim))[which(rho$npar.theta.opt > 0)], function(j){ #rho$npar.theta
+#          emat <- diag(rho$ntheta[j])
+#          if (ncol(emat) >= 2) {
+#            emat[,1] <- 1
+#            for (k in 2:ncol(emat))
+#              emat[(k:nrow(emat)), k] <-
+#                exp(gamma[(first.ind.theta[j]) + seq_len(rho$npar.theta.opt[j])-1])[k - 1] #rho$npar.theta
+#          }
+#          emat[-1,-1]
+#        })
+#      } else {
+#        jac <- lapply((seq_len(rho$ndim))[which(rho$npar.theta.opt > 0)], function(j){ #rho$npar.theta
+#          gamma_j <- gamma[first.ind.theta[j] + seq_len(rho$npar.theta.opt[j]) - 1] #rho$npar.theta
+#          t(sapply(1:length(gamma_j),
+#                   function(i) grad(function(x) transf_thresholds_jac(rho, j, x, i), x=gamma_j)))
+#        })
+#      }
+#    }
+#   ## Jacobian for BETAS: no transform
+#   jac[sum(rho$npar.theta.opt > 0) + seq_len(rho$npar.betas)] <- 1
+#   ## Jacobian for ERROR STRUCTURE
+#   parsigma <- par[rho$npar.thetas + rho$npar.betas + seq_len(attr(rho$error.structure, "npar"))]
+#   corr.jac <- corr_jac(rho$error.structure, parsigma)
+#   jac[sum(rho$npar.theta.opt > 0) + rho$npar.betas + seq_along(corr.jac)] <- corr.jac #rho$npar.theta
+#   ## make Jacobian matrix
+#   J <- as.matrix(bdiag(jac))
+#   return(J)
+# }

@@ -28,7 +28,7 @@
 marginal_predict <- function(object, newdata = NULL, type = "prob", subjectID = NULL, newoffset = NULL, ...){
   #NEWDATA is NULL
   ## newoffset
-  if(!(type %in% c("prob", "linpred", "class", "cum.prob", "all.prob"))) stop("invalid type!")
+  if(!(type %in% c("prob", "linpred", "class", "cum.prob", "all.prob"))) stop("Invalid type chosen. Only types 'prob','linpred', 'class', 'cum.prob' and 'all.prob' are available.")
   #  args <- list(...)
   #  exist <- "newdata" %in% names(args)
   # if(!exist) newdata <- NULL
@@ -90,7 +90,7 @@ marginal_predict <- function(object, newdata = NULL, type = "prob", subjectID = 
 predict.mvord <- function(object, newdata = NULL, type = "prob", subjectID = NULL, newoffset = NULL, ...){
   # checks
   if (is.null(object$rho$link$F_multi)) stop("Multivariate probabilities cannot be computed! Try marginal_predict()!")
-  if(!(type %in% c("prob", "class", "cum.prob"))) stop("invalid type!")
+  if(!(type %in% c("prob", "class", "cum.prob")))  stop("Invalid type chosen. Only types 'prob', 'class' and 'cum.prob' are available.")
   #NEWDATA is NULL
   #args <- list(...)
   #exist <- "newdata" %in% names(args)
@@ -278,7 +278,7 @@ prepare_newdata <- function(object, newdata, newoffset) {
                          na.action = function(x) x)
         mf[is.na(mf)] <- 0
         if (is.null(model.offset(mf))) {
-          ofs <- rep(0,nrow(y))
+          ofs <- double(NROW(y))
         } else {
           ofs <- model.offset(mf)
         }
@@ -291,7 +291,7 @@ prepare_newdata <- function(object, newdata, newoffset) {
 make_Xcat <- function(object, y, x) {
   ndim <- NCOL(y)
   ncat <- NULL
-  for (j in 1:NCOL(y)) {
+  for (j in seq_len(NCOL(y))) {
     ncat <- c(ncat, nlevels(y[, j]))
   }
   XcatU <- lapply(seq_len(ndim), function(x) integer())
@@ -446,7 +446,7 @@ pred_class_fun <-  function(object, y, x, offset, stddevs, sigma) {
       ytmp <- sapply(seq_len(ndim),
         function(j) object$rho$levels[[j]][cmbn[i,j]])
       ytmp <- matrix(ytmp, ncol = ndim, nrow = nrow(y), byrow = TRUE)
-      ytmp <-cbind.data.frame(lapply(1:object$rho$ndim, function(j){
+      ytmp <-cbind.data.frame(lapply(seq_len(object$rho$ndim), function(j){
         if (!all(ytmp[,j] %in% c(NA, levels(y[,j]))))  stop("response.cat are different from the categories in the original data set")
         else ordered(ytmp[,j], levels = levels(y[,j]))
       }))

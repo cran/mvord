@@ -71,21 +71,21 @@
 #' @export
 mvprobit <- function() {
   mvlink <- list(name = "mvprobit",
-    F_uni = pnorm,  # F_1(x)
-    F_biv = pbivnorm, # F_2(x, y, r)
-    F_biv_rect = rectbiv_norm_prob,  # Pr(L_x <= X <= U_x, L_y <= Y <= U_y|r)
-    F_multi = function(U, L, list_R) {
-      sapply(1:nrow(U), function(i) sadmvn(lower = L[i, ],
-                                           upper = U[i, ],
-                                           mean = rep(0, NCOL(U)),
-                                           varcov = list_R[[i]]))
-    },
-    deriv.fun = list(
-      dF1dx = dnorm, # dF_1(x)/dx
-      dF2dx = function(x, y, r) dnorm(x) * pnorm((y - r * x)/sqrt(1 - r^2)),
-      dF2dr = function(x, y, r){
-        1/(2 * pi * sqrt(1 - r^2)) *
-        exp(-(x^2 - 2 * r * x * y + y^2)/(2 * (1 - r^2)))})
+                 F_uni = pnorm,  # F_1(x)
+                 F_biv = pbivnorm, # F_2(x, y, r)
+                 F_biv_rect = rectbiv_norm_prob,  # Pr(L_x <= X <= U_x, L_y <= Y <= U_y|r)
+                 F_multi = function(U, L, list_R) {
+                   sapply(1:nrow(U), function(i) sadmvn(lower = L[i, ],
+                                                        upper = U[i, ],
+                                                        mean = rep.int(0, NCOL(U)),
+                                                        varcov = list_R[[i]]))
+                 },
+                 deriv.fun = list(
+                   dF1dx = dnorm, # dF_1(x)/dx
+                   dF2dx = function(x, y, r) dnorm(x) * pnorm((y - r * x)/sqrt(1 - r^2)),
+                   dF2dr = function(x, y, r){
+                     1/(2 * pi * sqrt(1 - r^2)) *
+                       exp(-(x^2 - 2 * r * x * y + y^2)/(2 * (1 - r^2)))})
   )
   class(mvlink) <- "mvlink"
   return(mvlink)
@@ -99,41 +99,41 @@ mvlogit <- function(df = 8L){
     df <- as.integer(df)
   }
   mvlink <- list(name = "mvlogit",
-    df = df,
-    sqrv = pi/sqrt(3),
-    F_uni = plogis, # F_1(x)
-    F_biv = function(x, y, r) {
-      x <- qt(plogis(x), df = df)
-      y <- qt(plogis(y), df = df)
-      sapply(seq_along(x), function(i)
-             biv_nt_prob2(nu = df,
-                          lower = c(-10000, -10000),
-                          upper = c(x[i], y[i]),
-                          r     = r[i]))},
-    F_biv_rect = function(U, L, r) {
-      U <- qt(plogis(U), df = df)
-      L <- qt(plogis(L), df = df)
-      L <- replace(L, L == -Inf, -10000)
-      U <- replace(U, U == Inf, 10000)
-      sapply(seq_len(nrow(U)), function(i)
-        biv_nt_prob2(nu = df,
-                     lower = L[i, ],
-                     upper = U[i, ],
-                     r     = r[i]))},
-    F_multi = function(U, L, list_R) {
-      U <- qt(plogis(U), df = df)
-      L <- qt(plogis(L), df = df)
-      sapply(seq_len(nrow(U)), function(i) sadmvt(df = df,
-                                           lower = L[i, ],
-                                           upper = U[i, ],
-                                           mean = rep(0, NCOL(U)),
-                                           S = list_R[[i]]))},
+                 df = df,
+                 sqrv = pi/sqrt(3),
+                 F_uni = plogis, # F_1(x)
+                 F_biv = function(x, y, r) {
+                   x <- qt(plogis(x), df = df)
+                   y <- qt(plogis(y), df = df)
+                   sapply(seq_along(x), function(i)
+                     biv_nt_prob2(nu = df,
+                                  lower = c(-10000, -10000),
+                                  upper = c(x[i], y[i]),
+                                  r     = r[i]))},
+                 F_biv_rect = function(U, L, r) {
+                   U <- qt(plogis(U), df = df)
+                   L <- qt(plogis(L), df = df)
+                   L <- replace(L, L == -Inf, -10000)
+                   U <- replace(U, U == Inf, 10000)
+                   sapply(seq_len(nrow(U)), function(i)
+                     biv_nt_prob2(nu = df,
+                                  lower = L[i, ],
+                                  upper = U[i, ],
+                                  r     = r[i]))},
+                 F_multi = function(U, L, list_R) {
+                   U <- qt(plogis(U), df = df)
+                   L <- qt(plogis(L), df = df)
+                   sapply(seq_len(nrow(U)), function(i) sadmvt(df = df,
+                                                               lower = L[i, ],
+                                                               upper = U[i, ],
+                                                               mean = rep.int(0, NCOL(U)),
+                                                               S = list_R[[i]]))},
 
-    deriv.fun =  list(
-      dF1dx = dlogis,
-      dF2dx = function(x, y, r) deriv_biv_t_copula(x, y, r, df = df) ,
-      dF2dr = function(x, y, r) deriv_corr_t_copula(x, y, r, df = df))
-      )
+                 deriv.fun =  list(
+                   dF1dx = dlogis,
+                   dF2dx = function(x, y, r) deriv_biv_t_copula(x, y, r, df = df) ,
+                   dF2dr = function(x, y, r) deriv_corr_t_copula(x, y, r, df = df))
+  )
   class(mvlink) <- "mvlink"
   return(mvlink)
 }
@@ -148,29 +148,29 @@ mvlogit <- function(df = 8L){
 
 rectbiv_norm_prob <- function(U, L, r) {
   # computes the rectangle probabilities for biv.normal-distribution
-    p1 <- pbivnorm(U[, 1], U[, 2], r)
-    p2 <- pbivnorm(L[, 1], U[, 2], r)
-    p3 <- pbivnorm(U[, 1], L[, 2], r)
-    p4 <- pbivnorm(L[, 1], L[, 2], r)
-    ## replace NaN
-    p1[is.nan(p1)] <- 0
-    p2[is.nan(p2)] <- 0
-    p3[is.nan(p3)] <- 0
-    p4[is.nan(p4)] <- 0
-    pr <- p1 - p2 - p3 + p4
-    return(pr)
+  p1 <- pbivnorm(U[, 1], U[, 2], r)
+  p2 <- pbivnorm(L[, 1], U[, 2], r)
+  p3 <- pbivnorm(U[, 1], L[, 2], r)
+  p4 <- pbivnorm(L[, 1], L[, 2], r)
+  ## replace NaN
+  p1[is.nan(p1)] <- 0
+  p2[is.nan(p2)] <- 0
+  p3[is.nan(p3)] <- 0
+  p4[is.nan(p4)] <- 0
+  pr <- p1 - p2 - p3 + p4
+  return(pr)
 }
 
 biv_nt_prob2 <-function (nu, lower, upper, mean = c(0, 0), r) {
   # computes the rectangle probabilities for biv.t-distribution
-    #nu <- df
-    rho <- as.double(r)
-    infin <- c(2, 2)
-    infin <- as.integer(infin)
-    prob <- as.double(0)
-    a <- .Fortran("smvbvt", prob, nu, lower, upper, infin, rho,
-                  PACKAGE = "mvord")
-    return(a[[1]])
+  #nu <- df
+  rho <- as.double(r)
+  infin <- c(2, 2)
+  infin <- as.integer(infin)
+  prob <- as.double(0)
+  a <- .Fortran("smvbvt", prob, nu, lower, upper, infin, rho,
+                PACKAGE = "mvord")
+  return(a[[1]])
 }
 
 deriv_biv_t_copula <- function(x, y, r, df){

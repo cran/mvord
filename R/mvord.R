@@ -753,7 +753,7 @@ mvord_finalize <- function(rho){
   est <- list()
   ## Thresholds
   est$theta <- rho$theta
-  for(j in 1:rho$ndim){
+  for(j in seq_len(rho$ndim)){
     names(est$theta[[j]]) <- get_labels_theta(rho,j)
   }
   names(est$theta) <- rho$y.names
@@ -768,7 +768,7 @@ mvord_finalize <- function(rho){
   est$error.struct <- finalize(rho$error.structure, sigma_par)
   ## If standard errors should be computed
   if (rho$se) {
-	  est$setheta <- lapply(1:rho$ndim, function(j){
+	  est$setheta <- lapply(seq_len(rho$ndim), function(j){
 	      if(rho$threshold.constraints[j] %in% rho$threshold.constraints[seq_len(j-1)]){#check threshold.constraints
 	        k <- match(rho$threshold.constraints[j], rho$threshold.constraints)
 	        tmp[[j]][!is.na(tmp[[k]])] <- 0
@@ -780,7 +780,7 @@ mvord_finalize <- function(rho){
 	      tmp[[j]]
 	    })
 	  names(est$setheta) <- rho$y.names
-	  for (j in 1:rho$ndim) names(est$setheta[[j]]) <- get_labels_theta(rho,j)
+	  for (j in seq_len(rho$ndim)) names(est$setheta[[j]]) <- get_labels_theta(rho,j)
    	  if (rho$npar.betas > 0) {
    	  	est$sebeta <- rho$seGamma[rho$npar.thetas + seq_len(rho$npar.betas)]
    	  	names(est$sebeta) <- unlist(lapply(rho$constraints, function(x) colnames(x)))
