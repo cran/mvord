@@ -1,5 +1,8 @@
 This file documents updates and changes in the package mvord
 
+changes in version 0.3.5 (2019-03-06)
+- added suppressWarnings(RNGversion("3.5.0")) in tests
+
 changes in version 0.3.4 (2019-02-20)
 - two additional arguments have been added to the error structures: value = numeric(0)
   (for initial values) and fixed = FALSE (for allowing the user to fix the parameters of the error structure to the values specified in argument

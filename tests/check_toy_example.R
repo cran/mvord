@@ -11,6 +11,7 @@ betas <- list(c(0.8,-0.5),
               c(0.8,-0.5))
 thresholds <- list(c(-1,1),c(-1,1))
 nobs <- 100
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(2017)
 errors <-  mvrnorm(n = nobs, mu = rep(0, mult.obs), Sigma = sigma)
 
@@ -557,6 +558,7 @@ mvord:::check(all.equal(BIC(res), 258.3408737360180111864, tolerance = tolerance
 
 ##########################################################################################
 ## make three responses
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(100)
 Y3 <- sample(1:3, nobs, replace = T)
 dat_3 <- cbind(Y3, data_toy_example)
@@ -676,6 +678,7 @@ mvord:::check(all.equal(AIC(res), 272.9579007590048718157, tolerance = tolerance
 mvord:::check(all.equal(BIC(res), 272.9579007590048718157, tolerance = tolerance))
 
 ## make three responses
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(100)
 Y3 <- factor(sample(1:3, nobs, replace = T), ordered = T)
 dat_3 <- cbind(Y3, data_toy_example)

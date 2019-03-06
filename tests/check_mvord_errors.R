@@ -19,6 +19,7 @@ sim <- function(obs, betas, thresholds,
                 var.error = 1,
                 var.pred = 1) {
   ## default is CMOP (with no random effects)
+  suppressWarnings(RNGversion("3.5.0"))
   if (!is.null(seed)) set.seed(seed)
   mult.obs <- length(betas)
   num.covariates <- ifelse(intercept,  length(betas[[1]]) - 1, length(betas[[1]]))
