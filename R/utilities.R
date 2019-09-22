@@ -6,8 +6,8 @@ set_threshold_type <- function(rho){
 #fix2first
   } else if (all(sapply(seq_len(rho$ndim), function(j){
     #all first two thresholds are not NA
-      (all(length(which(!is.na(rho$threshold.values[[j]])))==length(c(1,2))) && all(which(!is.na(rho$threshold.values[[j]])) == c(1,2))
-      ) || ((length(rho$threshold.values[[j]]) == 1) &&  (which(!is.na(rho$threshold.values[[j]])) == 1))
+      (all(length(which(!is.na(rho$threshold.values[[j]])))== 2) && all(which(!is.na(rho$threshold.values[[j]])) == c(1,2))
+      ) || ((length(rho$threshold.values[[j]]) == 1) &&  !is.na(rho$threshold.values[[j]])) # (which(!is.na(rho$threshold.values[[j]])) == 1))
       }))){
       if (rho$error.structure$type ==  "correlation"){
         cat("We suggest to fix only one threshold or the intercept in a correlation model.\n")
@@ -20,7 +20,7 @@ set_threshold_type <- function(rho){
   } else if (all(sapply(seq_len(rho$ndim), function(j){
       (all(length(which(!is.na(rho$threshold.values[[j]])))==length(c(1,rho$ntheta[j]))) &&
        all(which(!is.na(rho$threshold.values[[j]])) == c(1,rho$ntheta[j]))#all first and last two thresholds are not NA
-      ) || ((length(rho$threshold.values[[j]]) == 1) &&  (which(!is.na(rho$threshold.values[[j]])) == 1))
+      ) || ((length(rho$threshold.values[[j]]) == 1) &&  !is.na(rho$threshold.values[[j]])) # (which(!is.na(rho$threshold.values[[j]])) == 1))
       }))){
       if (rho$error.structure$type ==  "correlation"){
         cat("We suggest to fix only one threshold or the intercept in a correlation model.\n")
@@ -31,8 +31,9 @@ set_threshold_type <- function(rho){
       type <- "fix2firstlast"
 #fix1first
       #all first thresholds are not NA (and no additional)
-  } else if (all(sapply(seq_len(rho$ndim), function(j) (length(which(!is.na(rho$threshold.values[[j]])) >= 1) &&
-                                                 all(which(!is.na(rho$threshold.values[[j]])) == 1))))){
+  } else if (all(sapply(seq_len(rho$ndim), function(j)
+    (length(which(!is.na(rho$threshold.values[[j]])) >= 1) &&
+                                                 all(which(!is.na(rho$threshold.values[[j]])) == 1))))) {
       if ((rho$error.structure$type == "covariance") && (rho$intercept.type == "flexible")) stop("Model with cov_general is not identifiable.
                           Please either fix two thresholds or one threshold and the intercept.\n", call. = FALSE)
       if ((rho$error.structure$type == "correlation")&& (rho$intercept.type == "fixed")){
@@ -647,7 +648,7 @@ pseudo_R_squared <- function(object, adjusted = FALSE){
 
   model0 <- mvord(formula = formula,
                   data = object$rho$y,
-                  error.structure = cor_equi(~1, value = 0, fixed = T))
+                  error.structure = cor_equi(~1, value = 0, fixed = TRUE))
   if (adjusted){
     1 - (logLik(object) - length(object$rho$optpar)) / logLik(model0)
   } else{
