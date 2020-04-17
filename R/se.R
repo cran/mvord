@@ -137,7 +137,7 @@ dr_dalpha_general <- function(S, lag = NULL){
 }
 
 dr_dalpha_equi <- function(alpha, S, lag = NULL){
-  salpha <- S %*% alpha
+  salpha <- c(S %*% alpha)
   exp(2 * salpha)/(exp(2 * salpha) + 1)^2  * 4 * S
 }
 

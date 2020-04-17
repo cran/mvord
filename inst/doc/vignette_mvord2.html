@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="Rainer Hirk, Kurt Hornik and Laura Vana" />
 
-<meta name="date" content="2019-09-22" />
+<meta name="date" content="2020-04-17" />
 
 <title>mvord: Additional examples</title>
 
@@ -82,7 +81,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 
-<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
 
 
 
@@ -96,25 +95,24 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">mvord: Additional examples</h1>
 <h4 class="author">Rainer Hirk, Kurt Hornik and Laura Vana</h4>
-<h4 class="date">2019-09-22</h4>
+<h4 class="date">2020-04-17</h4>
 
 
 <div id="TOC">
 <ul>
 <li><a href="#example-1---a-simple-example-with-2-raters">Example 1 - A simple example with 2 raters</a></li>
-<li><a href="#example-2---a-simple-example-with-2-raters">Example 2 - A simple example with 2 raters</a></li>
-<li><a href="#example-3a---a-model-of-firm-ratings-assigned-by-multiple-raters-and-ig-sg-indicator">Example 3a - A model of firm ratings assigned by multiple raters and IG-SG indicator</a></li>
+<li><a href="#example-2---a-simple-example-with-3-raters">Example 2 - A simple example with 3 raters</a></li>
+<li><a href="#example-3a---a-model-of-firm-ratings-assigned-by-multiple-raters-and-an-investment-speculative-grade-indicator">Example 3a - A model of firm ratings assigned by multiple raters and an investment-speculative grade indicator</a></li>
 <li><a href="#example-3b---a-more-elaborate-model-of-ratings-assigned-by-multiple-raters">Example 3b - A more elaborate model of ratings assigned by multiple raters</a></li>
 <li><a href="#example-4---a-longitudinal-model">Example 4 - A longitudinal model</a></li>
+<li><a href="#example-5---self-reported-health-status">Example 5 - Self-reported health status</a></li>
+<li><a href="#example-6---multirater-agreement-data">Example 6 - Multirater agreement data</a></li>
+<li><a href="#references">References</a></li>
 </ul>
 </div>
 
 <p>Load package <strong>mvord</strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(mvord)</code></pre></div>
-<pre><code>## Loading required package: minqa</code></pre>
-<pre><code>## Loading required package: BB</code></pre>
-<pre><code>## Loading required package: ucminf</code></pre>
-<pre><code>## Loading required package: dfoptim</code></pre>
 <p>Load data set</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&quot;data_cr&quot;</span>)
 <span class="kw">str</span>(data_cr, <span class="dt">vec.len =</span> <span class="dv">3</span>)</code></pre></div>
@@ -130,17 +128,17 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##  $ RSIZE  : num  -6.37 -7.84 -7.98 -5.86 ...
 ##  $ BETA   : num  0.836 0.49 0.802 1.137 ...</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(data_cr, <span class="dt">n =</span> <span class="dv">3</span>)</code></pre></div>
-<pre><code>##   rater1 rater2 rater3 rater4 firm_id       LR       LEV          PR
-## 1      B      B      H      L       1 1.720041 2.1144513  0.37792213
-## 2      C      D   &lt;NA&gt;      M       2 1.836574 0.8826725 -0.15032402
-## 3      C      D   &lt;NA&gt;      M       3 2.638177 2.2997237 -0.05205389
-##       RSIZE      BETA
-## 1 -6.365053 0.8358773
-## 2 -7.839813 0.4895358
-## 3 -7.976650 0.8022900</code></pre>
+<pre><code>##   rater1 rater2 rater3 rater4 firm_id       LR       LEV          PR     RSIZE
+## 1      B      B      H      L       1 1.720041 2.1144513  0.37792213 -6.365053
+## 2      C      D   &lt;NA&gt;      M       2 1.836574 0.8826725 -0.15032402 -7.839813
+## 3      C      D   &lt;NA&gt;      M       3 2.638177 2.2997237 -0.05205389 -7.976650
+##        BETA
+## 1 0.8358773
+## 2 0.4895358
+## 3 0.8022900</code></pre>
 <div id="example-1---a-simple-example-with-2-raters" class="section level2">
 <h2>Example 1 - A simple example with 2 raters</h2>
-<p>A simple example with 2 raters (rater1 and rater2). The data set data_cr has a wide format and hence, we apply the multiple measurement object MMO2 on the left-hand side of the formula object. The covariates LR, LEV, PR, RSIZE, BETA are passed on the right-hand side of the formula. The thresholds are set equal by the argument thresholds.constraints.</p>
+<p>We introduce a simple example with 2 raters (<code>rater1</code> and <code>rater2</code>) rating a set of firms. The data set <code>data_cr</code> has a wide format and hence, we apply the multiple measurement object <code>MMO2</code> on the left-hand side of the formula object. The firm-level covariates <code>LR</code>, <code>LEV</code>, <code>PR</code>, <code>RSIZE</code>, <code>BETA</code> are passed on the right-hand side of the formula. The thresholds are set equal by the argument <code>thresholds.constraints</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_cor_probit_2raters &lt;-<span class="st"> </span><span class="kw">mvord</span>(<span class="dt">formula =</span> <span class="kw">MMO2</span>(rater1, rater2) <span class="op">~</span><span class="st"> </span><span class="dv">0</span> <span class="op">+</span><span class="st"> </span>LR <span class="op">+</span><span class="st"> </span>LEV <span class="op">+</span><span class="st"> </span>PR <span class="op">+</span><span class="st"> </span>RSIZE <span class="op">+</span><span class="st"> </span>BETA,
                                <span class="dt">threshold.constraints =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>),
                                <span class="dt">data =</span> data_cr)</code></pre></div>
@@ -191,9 +189,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##     RSIZE 1     RSIZE 2      BETA 1      BETA 2 
 ## -1.16686094 -1.18452182  1.64400769  1.74184465</code></pre>
 </div>
-<div id="example-2---a-simple-example-with-2-raters" class="section level2">
-<h2>Example 2 - A simple example with 2 raters</h2>
-<p>A simple example with 3 raters (rater1, rater2 and rater3). The regression coefficients are set equal by the argument coef.constraints.</p>
+<div id="example-2---a-simple-example-with-3-raters" class="section level2">
+<h2>Example 2 - A simple example with 3 raters</h2>
+<p>A simple example with 3 raters (<code>rater1</code>, <code>rater2</code> and <code>rater3</code>) is presented. The regression coefficients are set equal by the argument <code>coef.constraints</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_cor_probit_3raters &lt;-<span class="st"> </span><span class="kw">mvord</span>(<span class="dt">formula =</span> <span class="kw">MMO2</span>(rater1, rater2, rater <span class="dv">3</span>) <span class="op">~</span><span class="st"> </span><span class="dv">0</span> <span class="op">+</span><span class="st"> </span>LR <span class="op">+</span><span class="st"> </span>LEV <span class="op">+</span><span class="st"> </span>PR <span class="op">+</span><span class="st"> </span>RSIZE <span class="op">+</span><span class="st"> </span>BETA,
                                <span class="dt">coef.constraints =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>),
                                <span class="dt">data =</span> data_cr,
@@ -259,11 +257,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##      F|G      G|H      H|I      I|J      J|K 
 ## 14.66330 17.35099 20.73809 23.25685 25.33849</code></pre>
 </div>
-<div id="example-3a---a-model-of-firm-ratings-assigned-by-multiple-raters-and-ig-sg-indicator" class="section level2">
-<h2>Example 3a - A model of firm ratings assigned by multiple raters and IG-SG indicator</h2>
-<p>This example presents a multivariate ordinal regression model with probit link and a general correlation error structure (cor_general(~ 1)).</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_cor_probit_simple &lt;-<span class="st"> </span><span class="kw">mvord</span>(<span class="dt">formula =</span> <span class="kw">MMO2</span>(rater1, rater2, rater3,
-  rater4) <span class="op">~</span><span class="st"> </span><span class="dv">0</span> <span class="op">+</span><span class="st"> </span>LR <span class="op">+</span><span class="st"> </span>LEV <span class="op">+</span><span class="st"> </span>PR <span class="op">+</span><span class="st"> </span>RSIZE <span class="op">+</span><span class="st"> </span>BETA, <span class="dt">data =</span> data_cr)</code></pre></div>
+<div id="example-3a---a-model-of-firm-ratings-assigned-by-multiple-raters-and-an-investment-speculative-grade-indicator" class="section level2">
+<h2>Example 3a - A model of firm ratings assigned by multiple raters and an investment-speculative grade indicator</h2>
+<p>This example presents a four dimensional ordinal regression model with probit link and a general correlation error structure <code>cor_general(~ 1)</code>. The fourth rater only rates the firms on a binary scale: investment grade vs. speculative grade.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_cor_probit_simple &lt;-<span class="st"> </span><span class="kw">mvord</span>(<span class="dt">formula =</span> <span class="kw">MMO2</span>(rater1, rater2, rater3, rater4) <span class="op">~</span><span class="st"> </span><span class="dv">0</span> <span class="op">+</span><span class="st"> </span>LR <span class="op">+</span><span class="st"> </span>LEV <span class="op">+</span><span class="st"> </span>PR <span class="op">+</span><span class="st"> </span>RSIZE <span class="op">+</span><span class="st"> </span>BETA, <span class="dt">data =</span> data_cr)</code></pre></div>
 <p>The results are displayed by:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(res_cor_probit_simple)</code></pre></div>
 <pre><code>## 
@@ -349,15 +346,13 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## 13.54304</code></pre>
 <p>The regression coefficients are obtained by:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">coef</span>(res_cor_probit_simple)</code></pre></div>
-<pre><code>##       LR 1       LR 2       LR 3       LR 4      LEV 1      LEV 2 
-##  0.2083869  0.1535266  0.1806502  0.1501350  0.4305235  0.4331427 
-##      LEV 3      LEV 4       PR 1       PR 2       PR 3       PR 4 
-##  0.3996369  0.6263461 -2.5745773 -2.8290041 -2.6797255 -2.7972672 
-##    RSIZE 1    RSIZE 2    RSIZE 3    RSIZE 4     BETA 1     BETA 2 
-## -1.1305294 -1.1970173 -1.1969355 -1.5678310  1.6025757  1.8026120 
-##     BETA 3     BETA 4 
-##  1.5171782  1.9904487</code></pre>
-<p>The error structure for firm with firm_id = 11 is displayed by:</p>
+<pre><code>##       LR 1       LR 2       LR 3       LR 4      LEV 1      LEV 2      LEV 3 
+##  0.2083869  0.1535266  0.1806502  0.1501350  0.4305235  0.4331427  0.3996369 
+##      LEV 4       PR 1       PR 2       PR 3       PR 4    RSIZE 1    RSIZE 2 
+##  0.6263461 -2.5745773 -2.8290041 -2.6797255 -2.7972672 -1.1305294 -1.1970173 
+##    RSIZE 3    RSIZE 4     BETA 1     BETA 2     BETA 3     BETA 4 
+## -1.1969355 -1.5678310  1.6025757  1.8026120  1.5171782  1.9904487</code></pre>
+<p>The error structure for firm with <code>firm_id = 11</code> is displayed by:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">error_structure</span>(res_cor_probit_simple)[[<span class="dv">11</span>]]</code></pre></div>
 <pre><code>##           rater1    rater2    rater3    rater4
 ## rater1 1.0000000 0.8741830 0.9148139 0.9006967
@@ -370,8 +365,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>In this example, we extend the setting of the above example by imposing constraints on the regression as well as on the threshold parameters and changing the link function to the multivariate logit link.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_cor_logit &lt;-<span class="st"> </span><span class="kw">mvord</span>(<span class="dt">formula =</span> <span class="kw">MMO2</span>(rater1, rater2, rater3, rater4) <span class="op">~</span>
 <span class="st">    </span><span class="dv">0</span> <span class="op">+</span><span class="st"> </span>LR <span class="op">+</span><span class="st"> </span>LEV <span class="op">+</span><span class="st"> </span>PR <span class="op">+</span><span class="st"> </span>RSIZE <span class="op">+</span><span class="st"> </span>BETA, <span class="dt">data =</span> data_cr, <span class="dt">link =</span> <span class="kw">mvlogit</span>(),
-    <span class="dt">coef.constraints =</span> <span class="kw">cbind</span>(<span class="dt">LR =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>), <span class="dt">LEV =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>),
-      <span class="dt">PR =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>), <span class="dt">RSIZE =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">BETA =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)),
+    <span class="dt">coef.constraints =</span> <span class="kw">cbind</span>(<span class="dt">LR =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>), 
+                             <span class="dt">LEV =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>),
+                             <span class="dt">PR =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>), 
+                             <span class="dt">RSIZE =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>), 
+                             <span class="dt">BETA =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)),
     <span class="dt">threshold.constraints =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</code></pre></div>
 <p>The results are displayed by:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(res_cor_logit)</code></pre></div>
@@ -515,11 +513,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## I|J      0      1      0
 ## J|K      0      1      0
 ## L|M      0      0      1</code></pre>
-<p>Note that the composite likelihood information criteria can be used for model comparison. For objects of class ‘mvord’ CLAIC and CLBIC are computed by AIC() and BIC(), respectively. The model fits of examples one and two are compared by means of BIC and AIC. We observe that the model of Example 3b has a lower BIC and AIC indicating a better model fit:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">BIC</span>(res_cor_probit_simple)</code></pre></div>
-<pre><code>## [1] 6458.566</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">BIC</span>(res_cor_logit)</code></pre></div>
-<pre><code>## [1] 6293.977</code></pre>
+<p>Note that the composite likelihood information criteria can be used for model comparison. For objects of class <code>mvord</code> the composite likelihood AIC and BIC are computed by <code>AIC()</code> and <code>BIC()</code>, respectively. The model fits of examples one and two are compared by means of BIC and AIC. We observe that the model of Example 3b has a lower BIC and AIC indicating a better model fit:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">BIC</span>(res_cor_probit_simple, res_cor_logit)</code></pre></div>
+<pre><code>##                             df      BIC
+## res_cor_probit_simple 92.85905 6458.566
+## res_cor_logit         67.48687 6293.977</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">AIC</span>(res_cor_probit_simple)</code></pre></div>
 <pre><code>## [1] 6037.293</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">AIC</span>(res_cor_logit)</code></pre></div>
@@ -531,7 +529,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <pre><code>## 'log Lik.' -2926.418 (df=67.48687)</code></pre>
 <p>Marginal predictions are obtained by:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mp &lt;-<span class="st"> </span><span class="kw">marginal_predict</span>(res_cor_logit, <span class="dt">type =</span> <span class="st">&quot;class&quot;</span>)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(res_cor_logit<span class="op">$</span>rho<span class="op">$</span>y[,<span class="dv">1</span>], mp[,<span class="dv">1</span>])</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(data_cr<span class="op">$</span>rater1, mp<span class="op">$</span>rater1)</code></pre></div>
 <pre><code>##    
 ##       A   B   C   D   E
 ##   A  47  23   4   0   0
@@ -539,7 +537,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##   C   0  28 135  38   0
 ##   D   1   2  44 116  17
 ##   E   0   0   0  30  47</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(res_cor_logit<span class="op">$</span>rho<span class="op">$</span>y[,<span class="dv">2</span>], mp[,<span class="dv">2</span>])</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(data_cr<span class="op">$</span>rater2, mp<span class="op">$</span>rater2)</code></pre></div>
 <pre><code>##    
 ##       A   B   C   D   E
 ##   A  29  20   8   0   0
@@ -547,7 +545,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##   C   1  18 103  24   0
 ##   D   0   0  35 109   7
 ##   E   0   0   0  13  39</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(res_cor_logit<span class="op">$</span>rho<span class="op">$</span>y[,<span class="dv">3</span>], mp[,<span class="dv">3</span>])</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(data_cr<span class="op">$</span>rater3, mp<span class="op">$</span>rater3)</code></pre></div>
 <pre><code>##    
 ##      F  G  H  I  J  K
 ##   F 25  8  2  0  0  0
@@ -556,14 +554,16 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##   I  0  0 28 30  3  2
 ##   J  0  0  2 13 10  7
 ##   K  0  0  0  6  8 23</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(res_cor_logit<span class="op">$</span>rho<span class="op">$</span>y[,<span class="dv">4</span>], mp[,<span class="dv">4</span>])</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(data_cr<span class="op">$</span>rater4, mp<span class="op">$</span>rater4)</code></pre></div>
 <pre><code>##    
 ##       L   M
 ##   L 195  40
 ##   M  30 425</code></pre>
 <p>Joint predictions are obtained by:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">jp &lt;-<span class="st"> </span><span class="kw">joint_probabilities</span>(res_cor_logit, <span class="dt">type =</span> <span class="st">&quot;class&quot;</span>)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(res_cor_logit<span class="op">$</span>rho<span class="op">$</span>y[,<span class="dv">1</span>], jp[,<span class="dv">1</span>])</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">jp &lt;-<span class="st"> </span><span class="kw">joint_probabilities</span>(res_cor_logit, 
+                          <span class="dt">response.cat =</span> data_cr[,<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>],  
+                          <span class="dt">type =</span> <span class="st">&quot;prob&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(data_cr<span class="op">$</span>rater1, jp<span class="op">$</span>rater1)</code></pre></div>
 <pre><code>##    
 ##       A   B   C   D   E
 ##   A  50  20   4   0   0
@@ -571,7 +571,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##   C   0  36 130  35   0
 ##   D   1   2  47 112  18
 ##   E   0   0   0  25  52</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(res_cor_logit<span class="op">$</span>rho<span class="op">$</span>y[,<span class="dv">2</span>], jp[,<span class="dv">2</span>])</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(data_cr<span class="op">$</span>rater2, jp<span class="op">$</span>rater2)</code></pre></div>
 <pre><code>##    
 ##       A   B   C   D   E
 ##   A  33  17   7   0   0
@@ -579,7 +579,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##   C   1  24  99  22   0
 ##   D   0   0  39 103   9
 ##   E   0   0   0  10  42</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(res_cor_logit<span class="op">$</span>rho<span class="op">$</span>y[,<span class="dv">3</span>], jp[,<span class="dv">3</span>])</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(data_cr<span class="op">$</span>rater3, jp<span class="op">$</span>rater3)</code></pre></div>
 <pre><code>##    
 ##      F  G  H  I  J  K
 ##   F 27  7  1  0  0  0
@@ -588,7 +588,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##   I  0  0 25 35  1  2
 ##   J  0  0  2 17  3 10
 ##   K  0  0  0  9  1 27</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(res_cor_logit<span class="op">$</span>rho<span class="op">$</span>y[,<span class="dv">4</span>], jp[,<span class="dv">4</span>])</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(data_cr<span class="op">$</span>rater4, jp<span class="op">$</span>rater4)</code></pre></div>
 <pre><code>##    
 ##       L   M
 ##   L 175  60
@@ -597,7 +597,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="example-4---a-longitudinal-model" class="section level2">
 <h2>Example 4 - A longitudinal model</h2>
 <p>In this example, we present a longitudinal multivariate ordinal probit regression model with a covariate dependent AR(1) error structure using the data set data_cr_panel:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(data_cr_panel)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&quot;data_cr_panel&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;mvord&quot;</span>)
 <span class="kw">str</span>(data_cr_panel, <span class="dt">vec.len =</span> <span class="dv">3</span>)</code></pre></div>
 <pre><code>## 'data.frame':    11320 obs. of  9 variables:
 ##  $ rating : Ord.factor w/ 5 levels &quot;A&quot;&lt;&quot;B&quot;&lt;&quot;C&quot;&lt;&quot;D&quot;&lt;..: 5 3 3 3 3 1 3 3 ...
@@ -610,19 +610,22 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##  $ BETA   : num  1.148 1.693 0.761 2.24 ...
 ##  $ BSEC   : Factor w/ 8 levels &quot;BSEC1&quot;,&quot;BSEC2&quot;,..: 3 6 3 7 6 7 7 7 ...</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(data_cr_panel, <span class="dt">n =</span> <span class="dv">3</span>)</code></pre></div>
-<pre><code>##   rating firm_id  year         LR        LEV          PR     RSIZE
-## 1      E       1 year1 572.864658 1.20084294  0.14585117  1.422948
-## 2      C       2 year1   1.379547 0.03022761 -0.03962597 -1.944265
-## 3      C       3 year1   7.462706 0.15170420  0.05083517  2.024098
-##        BETA  BSEC
-## 1 1.1481020 BSEC3
-## 2 1.6926956 BSEC6
-## 3 0.7610057 BSEC3</code></pre>
+<pre><code>##   rating firm_id  year         LR        LEV          PR     RSIZE      BETA
+## 1      E       1 year1 572.864658 1.20084294  0.14585117  1.422948 1.1481020
+## 2      C       2 year1   1.379547 0.03022761 -0.03962597 -1.944265 1.6926956
+## 3      C       3 year1   7.462706 0.15170420  0.05083517  2.024098 0.7610057
+##    BSEC
+## 1 BSEC3
+## 2 BSEC6
+## 3 BSEC3</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_AR1_probit &lt;-<span class="st"> </span><span class="kw">mvord</span>(<span class="dt">formula =</span> <span class="kw">MMO</span>(rating, firm_id, year) <span class="op">~</span><span class="st"> </span>LR <span class="op">+</span><span class="st"> </span>LEV <span class="op">+</span>
-<span class="st">  </span>PR <span class="op">+</span><span class="st"> </span>RSIZE <span class="op">+</span><span class="st"> </span>BETA, <span class="dt">error.structure =</span> <span class="kw">cor_ar1</span>(<span class="op">~</span><span class="st"> </span>BSEC), <span class="dt">link =</span> <span class="kw">mvprobit</span>(),
-  <span class="dt">data =</span> data_cr_panel, <span class="dt">coef.constraints =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">4</span>), <span class="kw">rep</span>(<span class="dv">2</span>, <span class="dv">4</span>)),
-  <span class="dt">threshold.constraints =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">8</span>), <span class="dt">threshold.values =</span> <span class="kw">rep</span>(<span class="kw">list</span>(<span class="kw">c</span>(<span class="dv">0</span>, <span class="ot">NA</span>,
-    <span class="ot">NA</span>, <span class="ot">NA</span>)),<span class="dv">8</span>), <span class="kw">mvord.control</span>(<span class="dt">solver =</span> <span class="st">&quot;BFGS&quot;</span>))</code></pre></div>
+<span class="st">  </span>PR <span class="op">+</span><span class="st"> </span>RSIZE <span class="op">+</span><span class="st"> </span>BETA, 
+  <span class="dt">error.structure =</span> <span class="kw">cor_ar1</span>(<span class="op">~</span><span class="st"> </span>BSEC), <span class="dt">link =</span> <span class="kw">mvprobit</span>(),
+  <span class="dt">data =</span> data_cr_panel, 
+  <span class="dt">coef.constraints =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">4</span>), <span class="kw">rep</span>(<span class="dv">2</span>, <span class="dv">4</span>)),
+  <span class="dt">threshold.constraints =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">8</span>), 
+  <span class="dt">threshold.values =</span> <span class="kw">rep</span>(<span class="kw">list</span>(<span class="kw">c</span>(<span class="dv">0</span>, <span class="ot">NA</span>, <span class="ot">NA</span>, <span class="ot">NA</span>)),<span class="dv">8</span>),
+  <span class="dt">control =</span> <span class="kw">mvord.control</span>(<span class="dt">solver =</span> <span class="st">&quot;BFGS&quot;</span>))</code></pre></div>
 <p>The results of the model can be presented by</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(res_AR1_probit, <span class="dt">short =</span> <span class="ot">TRUE</span>, <span class="dt">call =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <pre><code>## Formula: MMO(rating, firm_id, year) ~ LR + LEV + PR + RSIZE + BETA
@@ -674,33 +677,240 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##  1.40887376 -0.48713415 -0.05512540 -0.10810818 -0.06988803 -0.59913737 
 ##   BSECBSEC7   BSECBSEC8 
 ## -0.76423929 -0.65399207</code></pre>
-<p>Correlation parameters ρ i for each firm are obtained by choosing type = “corr”</p>
+<p>Correlation parameters <span class="math inline">\(\rho_i\)</span> for each firm are obtained by choosing <code>type = &quot;corr&quot;</code> in <code>error_structure()</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(<span class="kw">error_structure</span>(res_AR1_probit, <span class="dt">type =</span> <span class="st">&quot;corr&quot;</span>), <span class="dt">n =</span> <span class="dv">3</span>)</code></pre></div>
 <pre><code>##   Correlation
 ## 1   0.8749351
 ## 2   0.6694448
 ## 3   0.8749351</code></pre>
-<p>Correlation matrices for each specific firm are obtained by choosing type = “sigmas”</p>
+<p>Correlation matrices for each specific firm are obtained by choosing <code>type = &quot;sigmas&quot;</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(<span class="kw">error_structure</span>(res_AR1_probit, <span class="dt">type =</span> <span class="st">&quot;sigmas&quot;</span>), <span class="dt">n =</span> <span class="dv">1</span>)</code></pre></div>
 <pre><code>## $`1`
-##           year1     year2     year3     year4     year5     year6
-## year1 1.0000000 0.8749351 0.7655115 0.6697729 0.5860078 0.5127188
-## year2 0.8749351 1.0000000 0.8749351 0.7655115 0.6697729 0.5860078
-## year3 0.7655115 0.8749351 1.0000000 0.8749351 0.7655115 0.6697729
-## year4 0.6697729 0.7655115 0.8749351 1.0000000 0.8749351 0.7655115
-## year5 0.5860078 0.6697729 0.7655115 0.8749351 1.0000000 0.8749351
-## year6 0.5127188 0.5860078 0.6697729 0.7655115 0.8749351 1.0000000
-## year7 0.4485957 0.5127188 0.5860078 0.6697729 0.7655115 0.8749351
-## year8 0.3924921 0.4485957 0.5127188 0.5860078 0.6697729 0.7655115
-##           year7     year8
-## year1 0.4485957 0.3924921
-## year2 0.5127188 0.4485957
-## year3 0.5860078 0.5127188
-## year4 0.6697729 0.5860078
-## year5 0.7655115 0.6697729
-## year6 0.8749351 0.7655115
-## year7 1.0000000 0.8749351
-## year8 0.8749351 1.0000000</code></pre>
+##           year1     year2     year3     year4     year5     year6     year7
+## year1 1.0000000 0.8749351 0.7655115 0.6697729 0.5860078 0.5127188 0.4485957
+## year2 0.8749351 1.0000000 0.8749351 0.7655115 0.6697729 0.5860078 0.5127188
+## year3 0.7655115 0.8749351 1.0000000 0.8749351 0.7655115 0.6697729 0.5860078
+## year4 0.6697729 0.7655115 0.8749351 1.0000000 0.8749351 0.7655115 0.6697729
+## year5 0.5860078 0.6697729 0.7655115 0.8749351 1.0000000 0.8749351 0.7655115
+## year6 0.5127188 0.5860078 0.6697729 0.7655115 0.8749351 1.0000000 0.8749351
+## year7 0.4485957 0.5127188 0.5860078 0.6697729 0.7655115 0.8749351 1.0000000
+## year8 0.3924921 0.4485957 0.5127188 0.5860078 0.6697729 0.7655115 0.8749351
+##           year8
+## year1 0.3924921
+## year2 0.4485957
+## year3 0.5127188
+## year4 0.5860078
+## year5 0.6697729
+## year6 0.7655115
+## year7 0.8749351
+## year8 1.0000000</code></pre>
+</div>
+<div id="example-5---self-reported-health-status" class="section level2">
+<h2>Example 5 - Self-reported health status</h2>
+<p>In this example we analyze longitudinal data on self-reported health status measured on a five point ordinal scale (5 = <em>poor</em>, 4 = <em>fair</em>, 3 = <em>good</em>, 2 = <em>very good</em> and 1 = <em>excellent</em>) derived from the Health and Retirement Study conducted by the University of Michigan which is available in the <strong>LMest</strong> package:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(data_SRHS_long, <span class="dt">package =</span> <span class="st">&quot;LMest&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(data_SRHS_long)</code></pre></div>
+<pre><code>## 'data.frame':    56592 obs. of  6 variables:
+##  $ id       : num  1 1 1 1 1 1 1 1 2 2 ...
+##  $ gender   : num  1 1 1 1 1 1 1 1 2 2 ...
+##  $ race     : num  1 1 1 1 1 1 1 1 1 1 ...
+##  $ education: num  3 3 3 3 3 3 3 3 5 5 ...
+##  $ age      : num  56 58 60 62 64 66 68 70 54 55 ...
+##  $ srhs     : num  4 4 3 3 4 3 3 3 3 3 ...</code></pre>
+<p>The dataset contains a self-reported health status <code>srhs</code> together with covariates such as ethnicity (<code>race</code> coded as 1 = <em>white</em>, 2 = <em>black</em>, 3 = <em>others</em>), <code>gender</code> (coded as 1 = <em>male</em>, 2 = <em>female</em>), <code>education</code> level (coded as 1 = <em>high school</em>, 2 = <em>general educational diploma</em>, 3 = <em>high school graduate</em>, 4 = <em>some college</em>, 5 = <em>college and above</em>) and <code>age</code> for 7074 subjects on 8 different (approximately equally spaced) time occasions.</p>
+<p>We add a time index to the data set:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data_SRHS_long<span class="op">$</span>time &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">8</span>, <span class="kw">length</span>(<span class="kw">unique</span>(data_SRHS_long<span class="op">$</span>id)))</code></pre></div>
+<p>We estimate a multivariate ordinal logit model similar to the one of the models employed by <span class="citation">Bartolucci, Pandolfi, and Pennoni (2017)</span>, where for every subject in the sample the errors follow an <span class="math inline">\(AR(1)\)</span> process. Moreover, the threshold and regression coefficients are equal across all years. In order to reduce the computational burden we only consider pairs of observations not more than two time points appart by setting <code>PL.lag = 2</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_srhs &lt;-<span class="st"> </span><span class="kw">mvord</span>(<span class="dt">formula =</span> <span class="kw">MMO</span>(srhs, id, time) <span class="op">~</span><span class="st"> </span><span class="dv">0</span> <span class="op">+</span><span class="st"> </span><span class="kw">factor</span>(gender) <span class="op">+</span>
+<span class="st">    </span><span class="kw">factor</span>(race) <span class="op">+</span><span class="st"> </span><span class="kw">factor</span>(education) <span class="op">+</span><span class="st"> </span>age, 
+    <span class="dt">data =</span> data_SRHS_long,
+    <span class="dt">threshold.constraints =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">8</span>), 
+    <span class="dt">coef.constraints =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">8</span>),
+    <span class="dt">error.structure =</span> <span class="kw">cor_ar1</span>(<span class="op">~</span><span class="st"> </span><span class="dv">1</span>), <span class="dt">link =</span> <span class="kw">mvlogit</span>(), 
+    <span class="dt">PL.lag =</span> <span class="dv">2</span>)</code></pre></div>
+<p>(runtime 11 minutes).</p>
+<p>The persistence in the reported health status is high. The correlation parameter in the <code>cor_ar1</code> error structure is</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">unique</span>(<span class="kw">error_structure</span>(res_srhs, <span class="dt">type =</span> <span class="st">&quot;corr&quot;</span>))</code></pre></div>
+<pre><code>##   Correlation
+## 1   0.7621568</code></pre>
+<p>The estimated parameters are shown by the function <code>summary()</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(res_srhs, <span class="dt">call =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<pre><code>## Formula: MMO(srhs, id, time) ~ 0 + factor(gender) + factor(race) + factor(education) + 
+##     age
+## 
+##    link threshold nsubjects ndim      logPL     CLAIC     CLBIC fevals
+## mvlogit  flexible      7074    8 -236814.26 473845.34 474589.46    416
+## 
+## Thresholds:
+##       Estimate Std. Error  z value Pr(&gt;|z|)    
+## 1 1|2 -1.78171    0.12730 -13.9958   &lt;2e-16 ***
+## 1 2|3 -0.10283    0.12866  -0.7993   0.4241    
+## 1 3|4  1.42587    0.13019  10.9525   &lt;2e-16 ***
+## 1 4|5  3.05552    0.13322  22.9364   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Coefficients:
+##                        Estimate Std. Error  z value  Pr(&gt;|z|)    
+## factor(gender)2 1    -0.0042032  0.0346822  -0.1212    0.9035    
+## factor(race)2 1       0.6131727  0.0504085  12.1641 &lt; 2.2e-16 ***
+## factor(race)3 1       0.5060946  0.0897595   5.6383 1.717e-08 ***
+## factor(education)2 1 -0.5348146  0.0803199  -6.6586 2.765e-11 ***
+## factor(education)3 1 -1.0149545  0.0465579 -21.7998 &lt; 2.2e-16 ***
+## factor(education)4 1 -1.3080628  0.0526356 -24.8513 &lt; 2.2e-16 ***
+## factor(education)5 1 -1.7428100  0.0542998 -32.0961 &lt; 2.2e-16 ***
+## age 1                 0.0162628  0.0019100   8.5146 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Error Structure:
+##              Estimate Std. Error z value  Pr(&gt;|z|)    
+## (Intercept) 1.0013411  0.0084935   117.9 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<p>In the logit model the coefficients can be interpreted in terms of log-odds ratios. The results suggest that being non-white increases the chances of reporting a worse health status while higher people with education levels tend to report better health. Moreover, every additional year increases the odds of reporting a worse health status by 1.64% (<span class="math inline">\(exp(0.0162628)=1.016396\)</span>).</p>
+</div>
+<div id="example-6---multirater-agreement-data" class="section level2">
+<h2>Example 6 - Multirater agreement data</h2>
+<p>The <strong>mvord</strong> package can also be employed to measure agreement among several rating sources either with or without additional relevant covariate information.</p>
+<p>We use the multirater agreement data from Chapter 5 in <span class="citation">Johnson and Albert (1999)</span>. These data consist of grades assigned to 198 essays by 5 experts, each of whom rated all essays on a 10-point scale. A score of 10 indicates an excellent essay. In addition, the average word length is also available as an essay characteristic.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">N &lt;-<span class="st"> &quot;http://www-math.bgsu.edu/~albert/ord_book/Chapter5/essay_data/N.dat&quot;</span>
+X &lt;-<span class="st"> &quot;http://www-math.bgsu.edu/~albert/ord_book/Chapter5/essay_data/X.dat&quot;</span>
+y  &lt;-<span class="st"> </span><span class="kw">read.delim</span>(<span class="kw">url</span>(N), <span class="dt">header =</span> F, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)
+wl &lt;-<span class="st"> </span><span class="kw">read.delim</span>(<span class="kw">url</span>(X), <span class="dt">header =</span> F, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)[,<span class="dv">2</span>]
+df &lt;-<span class="st"> </span><span class="kw">cbind.data.frame</span>(y, wl)
+<span class="kw">colnames</span>(df)[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>] &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;Judge&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>)</code></pre></div>
+<p>The traditional measure of agreement between raters in the social sciences is the polychoric correlation. The polychoric correlation can be assessed using the <strong>mvord</strong> package by estimating of a model with no covariates and probit link. The correlation parameters of the <code>cor_general</code> error structure are to be interpretated as the measure of agreement.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(df)</code></pre></div>
+<pre><code>##   Judge1 Judge2 Judge3 Judge4 Judge5    wl
+## 1      8      6      9     10      5 4.760
+## 2      7      5      3      5      3 4.244
+## 3      2      1      1      1      1 4.087
+## 4      5      3      4      5      3 4.355
+## 5      7      2      7      7      7 4.306
+## 6     10      6      8     10      6 4.508</code></pre>
+<p>The data is in the wide format (each ordinal response is in one column) so the <code>MMO2</code> object will be used in the <code>formula</code> object:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_essay_<span class="dv">0</span> &lt;-<span class="st"> </span><span class="kw">mvord</span>(
+  <span class="dt">formula =</span> <span class="kw">MMO2</span>(Judge1, Judge2, Judge3, Judge4, Judge5) <span class="op">~</span><span class="st"> </span><span class="op">-</span><span class="dv">1</span>,
+  <span class="dt">data =</span> df, <span class="dt">threshold.constraints =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">5</span>),
+  <span class="dt">coef.constraints =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">5</span>))</code></pre></div>
+<p>(runtime 19 seconds).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(res_essay_<span class="dv">0</span>, <span class="dt">call =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<pre><code>## Formula: MMO2(Judge1, Judge2, Judge3, Judge4, Judge5) ~ -1
+## 
+##     link threshold nsubjects ndim    logPL    CLAIC    CLBIC fevals
+## mvprobit  flexible       198    5 -8528.42 17172.01 17361.38   1661
+## 
+## Thresholds:
+##                Estimate  Std. Error  z value  Pr(&gt;|z|)    
+## Judge1 1|2  -1.24483406  0.07950626 -15.6571 &lt; 2.2e-16 ***
+## Judge1 2|3  -0.66341394  0.06768901  -9.8009 &lt; 2.2e-16 ***
+## Judge1 3|4  -0.32971161  0.06516921  -5.0593 4.208e-07 ***
+## Judge1 4|5   0.00013865  0.06328033   0.0022    0.9983    
+## Judge1 5|6   0.34966460  0.06546890   5.3409 9.247e-08 ***
+## Judge1 6|7   0.63528723  0.06688036   9.4989 &lt; 2.2e-16 ***
+## Judge1 7|8   0.99375222  0.07409651  13.4116 &lt; 2.2e-16 ***
+## Judge1 8|9   1.33448377  0.08063648  16.5494 &lt; 2.2e-16 ***
+## Judge1 9|10  1.91969997  0.10649013  18.0270 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Coefficients:
+##      Estimate Std. Error z value Pr(&gt;|z|)
+## 
+## Error Structure:
+##                    Estimate Std. Error z value  Pr(&gt;|z|)    
+## corr Judge1 Judge2 0.476079   0.061835  7.6992 1.370e-14 ***
+## corr Judge1 Judge3 0.569194   0.046682 12.1930 &lt; 2.2e-16 ***
+## corr Judge1 Judge4 0.645197   0.046595 13.8468 &lt; 2.2e-16 ***
+## corr Judge1 Judge5 0.322529   0.090318  3.5710 0.0003556 ***
+## corr Judge2 Judge3 0.396377   0.056243  7.0475 1.821e-12 ***
+## corr Judge2 Judge4 0.634421   0.046930 13.5186 &lt; 2.2e-16 ***
+## corr Judge2 Judge5 0.621900   0.041815 14.8725 &lt; 2.2e-16 ***
+## corr Judge3 Judge4 0.391911   0.072272  5.4227 5.871e-08 ***
+## corr Judge3 Judge5 0.382999   0.066020  5.8012 6.582e-09 ***
+## corr Judge4 Judge5 0.693040   0.041728 16.6087 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<p>The word length can be included as a covariate in the model:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_essay_wl &lt;-<span class="st"> </span><span class="kw">mvord</span>(
+  <span class="dt">formula =</span> <span class="kw">MMO2</span>(Judge1, Judge2, Judge3, Judge4, Judge5) <span class="op">~</span><span class="st"> </span><span class="dv">0</span> <span class="op">+</span><span class="st"> </span>wl,
+  <span class="dt">data =</span> df, <span class="dt">threshold.constraints =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">5</span>),
+  <span class="dt">coef.constraints =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">5</span>))</code></pre></div>
+<p>(runtime 1 minutes).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(res_essay_wl, <span class="dt">call =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<pre><code>## Formula: MMO2(Judge1, Judge2, Judge3, Judge4, Judge5) ~ 0 + wl
+## 
+##     link threshold nsubjects ndim    logPL    CLAIC    CLBIC fevals
+## mvprobit  flexible       198    5 -8488.74 17110.73 17329.81   2164
+## 
+## Thresholds:
+##             Estimate Std. Error z value  Pr(&gt;|z|)    
+## Judge1 1|2   1.09799    0.78039  1.4070 0.1594326    
+## Judge1 2|3   1.68728    0.78221  2.1571 0.0309994 *  
+## Judge1 3|4   2.02523    0.78287  2.5869 0.0096838 ** 
+## Judge1 4|5   2.36059    0.78294  3.0150 0.0025694 ** 
+## Judge1 5|6   2.71667    0.78472  3.4620 0.0005362 ***
+## Judge1 6|7   3.00649    0.78550  3.8275 0.0001295 ***
+## Judge1 7|8   3.36963    0.78891  4.2712 1.944e-05 ***
+## Judge1 8|9   3.71636    0.79304  4.6862 2.783e-06 ***
+## Judge1 9|10  4.31272    0.79820  5.4031 6.551e-08 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Coefficients:
+##      Estimate Std. Error z value Pr(&gt;|z|)   
+## wl 1  0.54193    0.17837  3.0382  0.00238 **
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Error Structure:
+##                    Estimate Std. Error z value  Pr(&gt;|z|)    
+## corr Judge1 Judge2 0.459154   0.062913  7.2983 2.915e-13 ***
+## corr Judge1 Judge3 0.558919   0.047414 11.7880 &lt; 2.2e-16 ***
+## corr Judge1 Judge4 0.631977   0.048175 13.1182 &lt; 2.2e-16 ***
+## corr Judge1 Judge5 0.295952   0.089837  3.2943 0.0009866 ***
+## corr Judge2 Judge3 0.382554   0.056902  6.7230 1.780e-11 ***
+## corr Judge2 Judge4 0.621086   0.048802 12.7266 &lt; 2.2e-16 ***
+## corr Judge2 Judge5 0.608996   0.043499 14.0004 &lt; 2.2e-16 ***
+## corr Judge3 Judge4 0.374733   0.073984  5.0651 4.082e-07 ***
+## corr Judge3 Judge5 0.368174   0.067220  5.4771 4.323e-08 ***
+## corr Judge4 Judge5 0.681338   0.044116 15.4442 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<p>The probabilities of agreement among all five judges which implied by the model can be computed by the function <code>joint_probabilities()</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">agree_prob_list &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="cf">function</span>(i)
+  <span class="kw">joint_probabilities</span>(res_essay_wl, <span class="kw">rep</span>(i, <span class="dv">5</span>)))
+agree_prob &lt;-<span class="st"> </span><span class="kw">Reduce</span>(<span class="st">&quot;+&quot;</span>, agree_prob_list)
+<span class="kw">summary</span>(agree_prob)</code></pre></div>
+<pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## 0.005150 0.006445 0.008724 0.009701 0.011795 0.023869</code></pre>
+<p>In order to assess the relationship between the average word length and the agreement probabilities, we plot the probabilities of agreement implied by the model against the word length.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(df<span class="op">$</span>wl, agree_prob,
+  <span class="dt">xlab =</span> <span class="st">&quot;word length&quot;</span>, <span class="dt">ylab =</span> <span class="st">&quot;probability of agreement&quot;</span>)</code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+<!-- \begin{center} -->
+<!-- \begin{figure}[!h] -->
+<!-- \caption{Probabilities of agreement between the five raters and word length} -->
+<!-- <<echo=F, fig=T>>= -->
+<!-- plot(df$wl, agree_prob, -->
+<!--   xlab = "word length", ylab = "probability of agreement") -->
+<!-- ``` -->
+<!-- \label{fig:agree} -->
+<!-- \end{figure} -->
+<!-- \end{center} -->
+<p>The graphic suggests that the judges tend to agree more on the quality of essays with lower average word length than on the essays with larger average word length.</p>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references">
+<div id="ref-Bartolucci14">
+<p>Bartolucci, Francesco, Silvia Pandolfi, and Fulvia Pennoni. 2017. “LMest: An R Package for Latent Markov Models for Longitudinal Categorical Data.” <em>Journal of Statistical Software</em> 81 (4): 1–38. doi:<a href="https://doi.org/10.18637/jss.v081.i04">10.18637/jss.v081.i04</a>.</p>
+</div>
+<div id="ref-johnson1999ordinal">
+<p>Johnson, Valen E, and J Albert. 1999. <em>Ordinal Data Modeling</em>. Statistics for Social Science and Public Policy. Springer-Verlag New York Incorporated.</p>
+</div>
+</div>
 </div>
 
 

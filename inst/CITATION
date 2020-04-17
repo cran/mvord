@@ -1,0 +1,21 @@
+bibentry(bibtype = "Article",
+  title        = "{mvord}: An {R} Package for Fitting Multivariate Ordinal Regression Models",
+  author       = c(person(given = "Rainer",
+                          family = "Hirk",
+                          email = "Rainer.Hirk@wu.ac.at"),
+                   person(given = "Kurt",
+                          family = "Hornik",
+                          email = "Kurt.Hornik@wu.ac.at"),
+                   person(given = "Laura",
+                          family = "Vana",
+                          email = "Laura.Vana@wu.ac.at")),
+  journal      = "Journal of Statistical Software",
+  year         = "2020",
+  volume       = "93",
+  number       = "4",
+  pages        = "1--41",
+  doi          = "10.18637/jss.v093.i04",
+
+  header       = "To cite mvord in publications use:"
+)
+

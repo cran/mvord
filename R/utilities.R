@@ -67,7 +67,7 @@ check_args_error.structure <- function(error.structure, data){
   allmeth <- c("cor_general",  "cov_general",  "cor_ar1", "cor_equi", "cor_ident", "cor_rel_var")
   if (!(as.character(error.structure[[1]]) %in% allmeth)) stop("error.structure not among allowed methods in mvord.")
 
-  if(!class(error.structure[[2]]) == "formula") stop("formula in error.structure has to be of class formula.", call. = FALSE)
+  if(!inherits(error.structure[[2]], "formula")) stop("formula in error.structure has to be of class formula.", call. = FALSE)
 
   if(any(!(all.vars(error.structure[[2]]) %in% colnames(data)))) stop("All variables in error.structure have to exist in data.", call. = FALSE)
 

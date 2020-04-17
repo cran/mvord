@@ -1,5 +1,8 @@
 This file documents updates and changes in the package mvord
 
+changes in version 1.0.0 (2020-04-17)
+- publication in Journal of Statistical Software
+
 changes in version 0.3.6 (2019-09-22)
 - fixed bug in thresholds checks for two binary responses
 

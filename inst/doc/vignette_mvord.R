@@ -2,13 +2,13 @@
 ### Encoding: UTF-8
 
 ###################################################
-### code chunk number 1: vignette_mvord.Rnw:77-78
+### code chunk number 1: vignette_mvord.Rnw:55-56
 ###################################################
 options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
 
 
 ###################################################
-### code chunk number 2: vignette_mvord.Rnw:82-86
+### code chunk number 2: vignette_mvord.Rnw:61-65
 ###################################################
 library("mvord")
 data("data_cr_panel")
@@ -17,14 +17,14 @@ cache <- TRUE
 
 
 ###################################################
-### code chunk number 3: vignette_mvord.Rnw:746-748
+### code chunk number 3: vignette_mvord.Rnw:813-815
 ###################################################
-data("data_mvord_toy")
+data("data_mvord_toy", package = "mvord")
 str(data_mvord_toy)
 
 
 ###################################################
-### code chunk number 4: vignette_mvord.Rnw:751-755
+### code chunk number 4: vignette_mvord.Rnw:818-822
 ###################################################
 data_toy_long <- cbind.data.frame(i = rep(1:100,2),
   j = rep(1:2,each = 100), Y = c(data_mvord_toy$Y1, data_mvord_toy$Y2),
@@ -33,19 +33,19 @@ data_toy_long <- cbind.data.frame(i = rep(1:100,2),
 
 
 ###################################################
-### code chunk number 5: vignette_mvord.Rnw:757-758
+### code chunk number 5: vignette_mvord.Rnw:830-831
 ###################################################
 str(data_toy_long)
 
 
 ###################################################
-### code chunk number 6: vignette_mvord.Rnw:763-764 (eval = FALSE)
+### code chunk number 6: vignette_mvord.Rnw:836-837 (eval = FALSE)
 ###################################################
 ## res <- mvord(formula = MMO(Y, i, j) ~ 0 + X1 + X2, data = data_toy_long)
 
 
 ###################################################
-### code chunk number 7: vignette_mvord.Rnw:766-778
+### code chunk number 7: vignette_mvord.Rnw:839-851
 ###################################################
 FILE <- "res1.rda"
 if (cache & file.exists(FILE)) {
@@ -62,13 +62,13 @@ res <- mvord:::reduce_size.mvord(res)
 
 
 ###################################################
-### code chunk number 8: vignette_mvord.Rnw:841-842 (eval = FALSE)
+### code chunk number 8: vignette_mvord.Rnw:950-951 (eval = FALSE)
 ###################################################
 ## res <- mvord(formula = MMO2(Y1, Y2) ~ 0 + X1 + X2, data = data_mvord_toy)
 
 
 ###################################################
-### code chunk number 9: vignette_mvord.Rnw:844-856
+### code chunk number 9: vignette_mvord.Rnw:953-965
 ###################################################
 FILE <- "res2.rda"
 if (cache & file.exists(FILE)) {
@@ -85,40 +85,40 @@ res <- mvord:::reduce_size2.mvord(res)
 
 
 ###################################################
-### code chunk number 10: vignette_mvord.Rnw:1176-1177
+### code chunk number 10: vignette_mvord.Rnw:1328-1329
 ###################################################
 names_constraints(formula = Y ~ 0 + X1 + X2 + f2, data = data_mvord_toy)
 
 
 ###################################################
-### code chunk number 11: vignette_mvord.Rnw:1195-1197
+### code chunk number 11: vignette_mvord.Rnw:1352-1354
 ###################################################
 formula <- MMO2(Y1, Y2) ~ 1 + X1 : X2 + f1 + f2 * X1
 names_constraints(formula, data = data_mvord_toy)
 
 
 ###################################################
-### code chunk number 12: vignette_mvord.Rnw:1312-1313
+### code chunk number 12: vignette_mvord.Rnw:1496-1497
 ###################################################
 predict(res, subjectID =  1:6)
 
 
 ###################################################
-### code chunk number 13: vignette_mvord.Rnw:1316-1317
+### code chunk number 13: vignette_mvord.Rnw:1500-1501
 ###################################################
 predict(res, type = "cum.prob", subjectID =  1:6)
 
 
 ###################################################
-### code chunk number 14: vignette_mvord.Rnw:1320-1321
+### code chunk number 14: vignette_mvord.Rnw:1504-1505
 ###################################################
 predict(res, type = "class", subjectID =  1:6)
 
 
 ###################################################
-### code chunk number 15: vignette_mvord.Rnw:1358-1361
+### code chunk number 15: vignette_mvord.Rnw:1577-1580
 ###################################################
-data("data_cr")
+data("data_cr", package = "mvord")
 head(data_cr, n = 3)
 str(data_cr, vec.len = 2.9)
 
@@ -142,14 +142,14 @@ par(op)
 
 
 ###################################################
-### code chunk number 17: vignette_mvord.Rnw:1392-1394 (eval = FALSE)
+### code chunk number 17: vignette_mvord.Rnw:1618-1620 (eval = FALSE)
 ###################################################
 ## res_cor_probit_simple <- mvord(formula = MMO2(rater1, rater2, rater3,
 ##   rater4) ~ 0 + LR + LEV + PR + RSIZE + BETA, data = data_cr)
 
 
 ###################################################
-### code chunk number 18: vignette_mvord.Rnw:1396-1410
+### code chunk number 18: vignette_mvord.Rnw:1622-1636
 ###################################################
 FILE <- "res_cor_probit_simple.rda"
 if (cache & file.exists(FILE)) {
@@ -168,31 +168,31 @@ res_cor_probit_simple <- mvord:::reduce_size.mvord(res_cor_probit_simple)
 
 
 ###################################################
-### code chunk number 19: vignette_mvord.Rnw:1416-1417
+### code chunk number 19: vignette_mvord.Rnw:1642-1643
 ###################################################
 summary(res_cor_probit_simple, call = FALSE)
 
 
 ###################################################
-### code chunk number 20: vignette_mvord.Rnw:1429-1430
+### code chunk number 20: vignette_mvord.Rnw:1668-1669
 ###################################################
 thresholds(res_cor_probit_simple)
 
 
 ###################################################
-### code chunk number 21: vignette_mvord.Rnw:1433-1434
+### code chunk number 21: vignette_mvord.Rnw:1672-1673
 ###################################################
 coef(res_cor_probit_simple)
 
 
 ###################################################
-### code chunk number 22: vignette_mvord.Rnw:1437-1438
+### code chunk number 22: vignette_mvord.Rnw:1677-1678
 ###################################################
 error_structure(res_cor_probit_simple)[[11]]
 
 
 ###################################################
-### code chunk number 23: vignette_mvord.Rnw:1456-1461 (eval = FALSE)
+### code chunk number 23: vignette_mvord.Rnw:1713-1718 (eval = FALSE)
 ###################################################
 ## res_cor_logit <- mvord(formula = MMO2(rater1, rater2, rater3, rater4) ~
 ##   0 + LR + LEV + PR + RSIZE + BETA, data = data_cr, link = mvlogit(),
@@ -202,7 +202,7 @@ error_structure(res_cor_probit_simple)[[11]]
 
 
 ###################################################
-### code chunk number 24: vignette_mvord.Rnw:1464-1485
+### code chunk number 24: vignette_mvord.Rnw:1721-1742
 ###################################################
 FILE <- "res_cor_logit.rda"
 if (cache & file.exists(FILE)) {
@@ -228,13 +228,13 @@ res_cor_logit <- mvord:::reduce_size2.mvord(res_cor_logit)
 
 
 ###################################################
-### code chunk number 25: vignette_mvord.Rnw:1490-1491
+### code chunk number 25: vignette_mvord.Rnw:1747-1748
 ###################################################
 summary(res_cor_logit, call = FALSE)
 
 
 ###################################################
-### code chunk number 26: vignette_mvord.Rnw:1497-1498
+### code chunk number 26: vignette_mvord.Rnw:1771-1772
 ###################################################
 constraints(res_cor_logit)$BETA
 
@@ -332,7 +332,7 @@ par(op)
 
 
 ###################################################
-### code chunk number 28: vignette_mvord.Rnw:1604-1612
+### code chunk number 28: vignette_mvord.Rnw:1885-1894
 ###################################################
 BICvec <- c(BIC(res_cor_probit_simple), BIC(res_cor_logit))
 AICvec <- c(AIC(res_cor_probit_simple), AIC(res_cor_logit))
@@ -340,12 +340,13 @@ loglikvec <- c(logLik(res_cor_probit_simple), logLik(res_cor_logit))
 tab <- cbind(loglikvec, BICvec, AICvec)
 colnames(tab) <- c("logLik", "BIC", "AIC")
 rownames(tab) <- c("Example 1", "Example 2")
-print(xtable::xtable(tab, label = "tab:bic"),
-  only.contents = T, math.style.negative = T, include.colnames = F)
+print(xtable::xtable(tab),
+   only.contents = TRUE, math.style.negative = TRUE,
+   include.colnames = FALSE)
 
 
 ###################################################
-### code chunk number 29: vignette_mvord.Rnw:1623-1626
+### code chunk number 29: vignette_mvord.Rnw:1907-1910
 ###################################################
 data("data_cr_panel")
 str(data_cr_panel, vec.len = 3)
@@ -353,17 +354,17 @@ head(data_cr_panel, n = 3)
 
 
 ###################################################
-### code chunk number 30: vignette_mvord.Rnw:1656-1661 (eval = FALSE)
+### code chunk number 30: vignette_mvord.Rnw:1964-1969 (eval = FALSE)
 ###################################################
 ## res_AR1_probit <- mvord(formula = MMO(rating, firm_id, year) ~ LR + LEV +
 ##   PR + RSIZE + BETA, error.structure = cor_ar1(~ BSEC), link = mvprobit(),
 ##   data = data_cr_panel, coef.constraints = c(rep(1, 4), rep(2, 4)),
 ##   threshold.constraints = rep(1, 8), threshold.values = rep(list(c(0, NA,
-##     NA, NA)),8), mvord.control(solver = "BFGS"))
+##     NA, NA)),8), control = mvord.control(solver = "BFGS"))
 
 
 ###################################################
-### code chunk number 31: vignette_mvord.Rnw:1663-1684
+### code chunk number 31: vignette_mvord.Rnw:1971-1992
 ###################################################
 FILE <- "res_AR1_probit.rda"
 if (cache & file.exists(FILE)) {
@@ -389,189 +390,26 @@ res_AR1_probit <- mvord(
 
 
 ###################################################
-### code chunk number 32: vignette_mvord.Rnw:1690-1691
+### code chunk number 32: vignette_mvord.Rnw:1998-1999
 ###################################################
 summary(res_AR1_probit, short = TRUE, call = FALSE)
 
 
 ###################################################
-### code chunk number 33: vignette_mvord.Rnw:1697-1698
+### code chunk number 33: vignette_mvord.Rnw:2005-2006
 ###################################################
 error_structure(res_AR1_probit)
 
 
 ###################################################
-### code chunk number 34: vignette_mvord.Rnw:1701-1702
+### code chunk number 34: vignette_mvord.Rnw:2009-2010
 ###################################################
 head(error_structure(res_AR1_probit, type = "corr"), n = 3)
 
 
 ###################################################
-### code chunk number 35: vignette_mvord.Rnw:1705-1706
+### code chunk number 35: vignette_mvord.Rnw:2013-2014
 ###################################################
 head(error_structure(res_AR1_probit, type = "sigmas"), n = 1)
-
-
-###################################################
-### code chunk number 36: vignette_mvord.Rnw:1717-1718
-###################################################
-load("data_SRHS_long.rda")
-
-
-###################################################
-### code chunk number 37: vignette_mvord.Rnw:1720-1721 (eval = FALSE)
-###################################################
-## data(data_SRHS_long, package = "LMest")
-
-
-###################################################
-### code chunk number 38: vignette_mvord.Rnw:1723-1724
-###################################################
-str(data_SRHS_long)
-
-
-###################################################
-### code chunk number 39: echo
-###################################################
-data_SRHS_long$time <- rep(1:8, length(unique(data_SRHS_long$id)))
-
-
-###################################################
-### code chunk number 40: vignette_mvord.Rnw:1744-1748 (eval = FALSE)
-###################################################
-## res_srhs <- mvord(formula = MMO(srhs, id, time) ~ 0 + factor(gender) +
-## 	factor(race) + factor(education) + age, data = data_SRHS_long,
-##     threshold.constraints = rep(1, 8), coef.constraints = rep(1, 8),
-##     error.structure = cor_ar1(~ 1), link = mvlogit(), PL.lag = 2)
-
-
-###################################################
-### code chunk number 41: vignette_mvord.Rnw:1750-1768
-###################################################
-FILE <- "res_srhs.rda"
-if (cache & file.exists(FILE)) {
-  load(FILE)
-} else {
-  if (cache) {
-    res_srhs <- mvord(formula = MMO(srhs, id, time) ~ 0 +  factor(gender) +
-   	    factor(race) + factor(education) + age,
-                  data = data_SRHS_long,
-                  link = mvlogit(),
-                  threshold.constraints = rep(1, 8),
-                  coef.constraints = rep(1, 8),
-                  error.structure = cor_ar1(~1), PL.lag = 2)
-   res_srhs <- mvord:::reduce_size.mvord(res_srhs)
-    save(res_srhs, file  = FILE)
-  } else {
-      if(file.exists(FILE)) file.remove(FILE)
-  }
-}
-
-
-###################################################
-### code chunk number 42: vignette_mvord.Rnw:1774-1775
-###################################################
-unique(error_structure(res_srhs, type = "corr"))
-
-
-###################################################
-### code chunk number 43: vignette_mvord.Rnw:1778-1779
-###################################################
-summary(res_srhs, call = FALSE)
-
-
-###################################################
-### code chunk number 44: vignette_mvord.Rnw:1798-1804
-###################################################
-N <- "http://www-math.bgsu.edu/~albert/ord_book/Chapter5/essay_data/N.dat"
-X <- "http://www-math.bgsu.edu/~albert/ord_book/Chapter5/essay_data/X.dat"
-y  <- read.delim(url(N), header = F, sep = "")
-wl <- read.delim(url(X), header = F, sep = "")[,2]
-df <- cbind.data.frame(y, wl)
-colnames(df)[1:5] <- paste0("Judge", 1:5)
-
-
-###################################################
-### code chunk number 45: vignette_mvord.Rnw:1812-1813
-###################################################
-head(df)
-
-
-###################################################
-### code chunk number 46: vignette_mvord.Rnw:1818-1822 (eval = FALSE)
-###################################################
-## res_essay_0 <- mvord(
-##   formula = MMO2(Judge1, Judge2, Judge3, Judge4, Judge5) ~ -1,
-##   data = df, threshold.constraints = rep(1, 5),
-##   coef.constraints = rep(1, 5))
-
-
-###################################################
-### code chunk number 47: vignette_mvord.Rnw:1824-1844
-###################################################
-FILE <- "res_essay.rda"
-if (cache & file.exists(FILE)) {
-  load(FILE)
-} else {
-  if (cache) {
-    res_essay_wl <- mvord(
-      formula = MMO2(Judge1, Judge2, Judge3, Judge4, Judge5) ~ 0 + wl,
-      data = df, threshold.constraints = rep(1, 5),
-      coef.constraints = rep(1, 5))
-    res_essay_wl <- mvord:::reduce_size2.mvord(res_essay_wl)
-    res_essay_0 <- mvord(
-      formula = MMO2(Judge1, Judge2, Judge3, Judge4, Judge5) ~ -1,
-      data = df, threshold.constraints = rep(1, 5),
-      coef.constraints = rep(1,5))
-    res_essay_0 <- mvord:::reduce_size.mvord(res_essay_0)
-    save(res_essay_0, res_essay_wl, file  = FILE)
-  } else {
-      if(file.exists(FILE)) file.remove(FILE)
-  }
-}
-
-
-###################################################
-### code chunk number 48: vignette_mvord.Rnw:1847-1848
-###################################################
-summary(res_essay_0, call = FALSE)
-
-
-###################################################
-### code chunk number 49: vignette_mvord.Rnw:1851-1855 (eval = FALSE)
-###################################################
-## res_essay_wl <- mvord(
-##   formula = MMO2(Judge1, Judge2, Judge3, Judge4, Judge5) ~ 0 + wl,
-##   data = df, threshold.constraints = rep(1, 5),
-##   coef.constraints = rep(1, 5))
-
-
-###################################################
-### code chunk number 50: vignette_mvord.Rnw:1858-1859
-###################################################
-summary(res_essay_wl, call = FALSE)
-
-
-###################################################
-### code chunk number 51: vignette_mvord.Rnw:1862-1866
-###################################################
-agree_prob_list <- lapply(1:10, function(i)
-  joint_probabilities(res_essay_wl, rep(i, 5)))
-agree_prob <- Reduce("+", agree_prob_list)
-summary(agree_prob)
-
-
-###################################################
-### code chunk number 52: vignette_mvord.Rnw:1870-1872 (eval = FALSE)
-###################################################
-## plot(df$wl, agree_prob,
-##   xlab = "word length", ylab = "probability of agreement")
-
-
-###################################################
-### code chunk number 53: vignette_mvord.Rnw:1877-1879
-###################################################
-plot(df$wl, agree_prob,
-  xlab = "word length", ylab = "probability of agreement")
 
 
