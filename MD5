@@ -1,6 +1,6 @@
-ed536339f6313d0132d60882a2ca94f1 *DESCRIPTION
+a29f0dbaa8d18271891d980ff49c551d *DESCRIPTION
 5b90336111be69f2135b24c66eb32e75 *NAMESPACE
-0ffc52f5b7afa0b8b165be1dbd0ed04e *NEWS
+195c5f2a2123ed939b9fd5160863acc4 *NEWS
 0a1813dade4cf149aa5fe2386474a283 *R/MMO.R
 1f0f907006f28c5b494588613cede3c8 *R/error_struct.R
 3a6e73bec3086528ec654a11f98eea7c *R/mvlinks.R
@@ -19,10 +19,10 @@ fff82ea042a6a3e8f77a56c28d9e4c69 *data/data_mvord_panel.rda
 96353c81090c8f1eed5691eb8f15c147 *inst/CITATION
 5e49494bfa95c38bc6d6c5101b01bb7e *inst/doc/vignette_mvord.R
 1bde78d5fdc48718021f6853da57eed1 *inst/doc/vignette_mvord.Rnw
-085c312ce2ed17ffe7a29d213bf728b6 *inst/doc/vignette_mvord.pdf
-be6ab8ba27b958a81dd8fdf67121dde7 *inst/doc/vignette_mvord2.R
-6681f43d8cb4213f9f8e68b3cbb8e5cd *inst/doc/vignette_mvord2.Rmd
-7c3b60552f34821ede42a0a0b273c815 *inst/doc/vignette_mvord2.html
+777376819b1118507a52e3a884de2a8f *inst/doc/vignette_mvord.pdf
+1fac5735689524820c8cd657dec4eff5 *inst/doc/vignette_mvord2.R
+4d257d5a2c43a4da712f8f1c200bf6f3 *inst/doc/vignette_mvord2.Rmd
+37711ddf2c32571a365b13ec0f70b45c *inst/doc/vignette_mvord2.html
 d5f9372cc0fede38278ceca527e0a033 *man/coef.mvord.Rd
 de8fd357a02cd61c3daf2636cdfa865e *man/constraints.Rd
 36ea3f17db4c54106a0187cef8a0aab7 *man/data_cr.Rd
@@ -59,10 +59,11 @@ c05ccbc950d04bd350b8f203e8fb7aad *tests/check_methods.R
 76196be4e54894517709354e972e2a09 *tests/check_mvord_data.R
 454836a4bbf2283ab45530ce00ea8bc6 *tests/check_mvord_errors.R
 52e357fa9b323d4de408a45ec9a086c5 *tests/check_set_threshold_type.R
-90918cd55589d6f1673efd3c09de298e *tests/check_toy_example.R
+2d35541b5342151441fea824ac280d15 *tests/check_toy_example.R
 53a3f15a11f7e3099c432a2adca58c0f *tests/check_transf_sigmas.R
 d8d45facc44dd838dc4b770c641fee2d *tests/check_transf_thresholds.R
 5b1b8ea3b34b9c12aa585bfb1cb22f3e *vignettes/data_SRHS_long.rda
+264f5da8bc688c02556414e0dc9c81fd *vignettes/df.rda
 ea0a5846fcc6a6b294c5a887975453de *vignettes/jp.rda
 50223fd72aa7ad05afac01c84b99bef8 *vignettes/mvord.bib
 0d4786dafb672b770ec17eb3d406e2e0 *vignettes/mvord_old.bib
@@ -80,4 +81,4 @@ d2f762cebae82f16b66853e02ed5095f *vignettes/res_cor_probit_3raters.rda
 0c39a278c237f8e65f66476eb9fd80f5 *vignettes/vignette_mvord-053.pdf
 c68668d7bbd10be0cc24c70dc77f4143 *vignettes/vignette_mvord-054.pdf
 1bde78d5fdc48718021f6853da57eed1 *vignettes/vignette_mvord.Rnw
-6681f43d8cb4213f9f8e68b3cbb8e5cd *vignettes/vignette_mvord2.Rmd
+4d257d5a2c43a4da712f8f1c200bf6f3 *vignettes/vignette_mvord2.Rmd

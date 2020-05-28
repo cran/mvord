@@ -12,7 +12,7 @@
 
 <meta name="author" content="Rainer Hirk, Kurt Hornik and Laura Vana" />
 
-<meta name="date" content="2020-04-17" />
+<meta name="date" content="2020-05-27" />
 
 <title>mvord: Additional examples</title>
 
@@ -95,7 +95,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">mvord: Additional examples</h1>
 <h4 class="author">Rainer Hirk, Kurt Hornik and Laura Vana</h4>
-<h4 class="date">2020-04-17</h4>
+<h4 class="date">2020-05-27</h4>
 
 
 <div id="TOC">
@@ -779,7 +779,8 @@ X &lt;-<span class="st"> &quot;http://www-math.bgsu.edu/~albert/ord_book/Chapter
 y  &lt;-<span class="st"> </span><span class="kw">read.delim</span>(<span class="kw">url</span>(N), <span class="dt">header =</span> F, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)
 wl &lt;-<span class="st"> </span><span class="kw">read.delim</span>(<span class="kw">url</span>(X), <span class="dt">header =</span> F, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)[,<span class="dv">2</span>]
 df &lt;-<span class="st"> </span><span class="kw">cbind.data.frame</span>(y, wl)
-<span class="kw">colnames</span>(df)[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>] &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;Judge&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>)</code></pre></div>
+<span class="kw">colnames</span>(df)[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>] &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;Judge&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>)
+<span class="kw">save</span>(df, <span class="dt">file =</span>  <span class="st">&quot;df.rda&quot;</span>)</code></pre></div>
 <p>The traditional measure of agreement between raters in the social sciences is the polychoric correlation. The polychoric correlation can be assessed using the <strong>mvord</strong> package by estimating of a model with no covariates and probit link. The correlation parameters of the <code>cor_general</code> error structure are to be interpretated as the measure of agreement.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(df)</code></pre></div>
 <pre><code>##   Judge1 Judge2 Judge3 Judge4 Judge5    wl

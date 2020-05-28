@@ -1,5 +1,8 @@
 This file documents updates and changes in the package mvord
 
+changes in version 1.0.1 (2020-05-27)
+- changes in checks due to new treatment when combining ordered factors in R 4.0.1.
+
 changes in version 1.0.0 (2020-04-17)
 - publication in Journal of Statistical Software
 

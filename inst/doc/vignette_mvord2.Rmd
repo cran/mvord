@@ -400,14 +400,19 @@ We use the multirater agreement data from Chapter 5 in
 198 essays by 5 experts, each of whom rated all essays on a 10-point
 scale. A score of 10 indicates an excellent essay. In addition, the
 average word length is also available as an essay characteristic.
-```{r}
+```{r eval=FALSE, include=TRUE}
 N <- "http://www-math.bgsu.edu/~albert/ord_book/Chapter5/essay_data/N.dat"
 X <- "http://www-math.bgsu.edu/~albert/ord_book/Chapter5/essay_data/X.dat"
 y  <- read.delim(url(N), header = F, sep = "")
 wl <- read.delim(url(X), header = F, sep = "")[,2]
 df <- cbind.data.frame(y, wl)
 colnames(df)[1:5] <- paste0("Judge", 1:5)
+save(df, file =  "df.rda")
 ```
+```{r include=FALSE}
+load(file =  "df.rda")
+```
+
 The traditional measure of agreement between raters in the social
 sciences is the polychoric correlation.  The polychoric correlation
 can be assessed using the **mvord** package by estimating of a model

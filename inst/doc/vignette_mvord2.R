@@ -279,13 +279,17 @@ unique(error_structure(res_srhs, type = "corr"))
 ## -----------------------------------------------------------------------------
 summary(res_srhs, call = FALSE)
 
-## -----------------------------------------------------------------------------
-N <- "http://www-math.bgsu.edu/~albert/ord_book/Chapter5/essay_data/N.dat"
-X <- "http://www-math.bgsu.edu/~albert/ord_book/Chapter5/essay_data/X.dat"
-y  <- read.delim(url(N), header = F, sep = "")
-wl <- read.delim(url(X), header = F, sep = "")[,2]
-df <- cbind.data.frame(y, wl)
-colnames(df)[1:5] <- paste0("Judge", 1:5)
+## ----eval=FALSE, include=TRUE-------------------------------------------------
+#  N <- "http://www-math.bgsu.edu/~albert/ord_book/Chapter5/essay_data/N.dat"
+#  X <- "http://www-math.bgsu.edu/~albert/ord_book/Chapter5/essay_data/X.dat"
+#  y  <- read.delim(url(N), header = F, sep = "")
+#  wl <- read.delim(url(X), header = F, sep = "")[,2]
+#  df <- cbind.data.frame(y, wl)
+#  colnames(df)[1:5] <- paste0("Judge", 1:5)
+#  save(df, file =  "df.rda")
+
+## ----include=FALSE------------------------------------------------------------
+load(file =  "df.rda")
 
 ## -----------------------------------------------------------------------------
 head(df)
