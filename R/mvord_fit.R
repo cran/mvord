@@ -46,12 +46,13 @@ mvord.fit <- function(rho){
 
   rho$coef.names <- attributes(rho$x[[1]])$dimnames[[2]]
 
+  rho$coef.constraints
   rho$constraints <- get_constraints(rho)
   # vector of number of parameters for each coefficient
-  npar.beta <- 0
-  if (length(rho$constraints) > 0) npar.beta <- sapply(rho$constraints, NCOL)
+  rho$npar.beta <- 0
+  if (length(rho$constraints) > 0) rho$npar.beta <- sapply(rho$constraints, NCOL)
    #number of total coefficients
-  rho$npar.betas <- sum(npar.beta)
+  rho$npar.betas <- sum(rho$npar.beta)
 
   check_args_constraints(rho)
 
@@ -97,7 +98,7 @@ mvord.fit <- function(rho){
   #################################
   ## make covariate matrices
   #################################
-  rho$p <- NCOL(rho$x[[1]])
+   rho$p <- NCOL(rho$x[[1]])
   rho$inds.cat <- lapply(seq_len(rho$ndim), function(j)
     seq_len(rho$ntheta[j]) +  rho$ncat.first.ind[j] - 1)
   rho$indjbeta <- lapply(seq_len(rho$ndim), function(j) {
@@ -106,6 +107,13 @@ mvord.fit <- function(rho){
 
   dim_ind <- rep.int(seq_len(rho$ndim), rho$ntheta)
   x_new <- rho$x
+  # x_new[[4]][416,]
+  # rho$XcatU[[4]][416,]
+  # x_new[[4]][2,]
+  # rho$XcatU[[4]][1,]
+  # rho$XcatU[[2]][5,]
+  # rho$y[416,]
+  # rho$y[1:10,]
   if(rho$p > 0) {
       x_center <- vector("list", rho$ndim)
       x_scale <- vector("list", rho$ndim)
@@ -190,21 +198,66 @@ mvord.fit <- function(rho){
   ## for which subjects is q_i = 1
   ind_i <- rowSums(!is.na(rho$y)) == 1
   rho$ind_univ <- which(!is.na(rho$y) & ind_i, arr.ind=T)
+  rho$n_univ <- NROW(rho$ind_univ)
   ## index for subjects containing pair c(k,l)
   rho$ind_kl <- lapply(rho$combis, function(kl)
     rowSums(!is.na(rho$y[, kl])) == 2)
+
+  rho$ind_i <- lapply(seq_along(rho$combis), function(h)  which(rho$ind_kl[[h]]))
+  rho$combis_fast <- lapply(seq_along(rho$combis),function(h){
+      list("combis" = rho$combis[[h]],
+           "ind_i" = rho$ind_i[[h]],
+           "r" = rep(h,length(rho$ind_i[[h]])))
+  })
+
+  rho$n_biv <- sum(sapply(rho$ind_i, length))
+
+  rho$weights_fast <- rho$weights[c(unlist(rho$ind_i), rho$ind_univ[,1])]
+
+  ### fast ###
+  if(("cor_general" %in% class(rho$error.structure)) & is.null(rho$coef.values_input) & (rho$coef.constraints_VGAM == FALSE) &
+     attr(rho$error.structure, "formula")[[2]] == 1 & !isTRUE(rho$error.structure$fixed) &
+     !anyNA(rho$coef.constraints_input) &
+     all(sapply(seq_len(length(rho$x)-1), function(j){
+    if((NCOL(rho$x[[j]]) == 0) & (NCOL(rho$x[[j + 1]]) == 0)) {TRUE
+      }else if(any(sapply(rho$x, anyNA))) FALSE else{
+    rho$x[[j]] == rho$x[[j + 1]]
+    }
+  }))){
+    rho$fast_fit <- TRUE
+  } else rho$fast_fit <- FALSE
+  #rho$fast_fit <- FALSE #TODO at the moment always use PL_fun
+
+  if(rho$fast_fit){
+    #TODO for constraints
+    rho$indjbeta_mat <-  do.call("cbind",lapply(rho$constraints, function(x){x[rho$ncat.first.ind,] == 1
+    }))
+    rho$indjbeta_fast <- lapply(seq_len(rho$ndim), function(j) {
+      j + (seq_len(rho$p)-1) * rho$npar.beta
+    })
+    rho$fi_scale_fast <- rho$fi_scale[1 + (seq_len(rho$p)-1) * rho$ndim]
+    rho$fi_center_fast <- rho$fi_center[1 + (seq_len(rho$p)-1) * rho$ndim]
+    rho$xfast <- x_new[[1]]
+  }
   ##############################################
   ## OPTIMIZE PAIRWISE LIKELIHOOD ##############
   ##############################################
   if (rho$evalOnly) {
     rho$optpar <- numeric(0)
-    rho$objective <- c(value = PLfun(rho$start , rho))
+    rho$objective <- c(value = PLfun_old(rho$start , rho))
   } else {
     if (is.character(rho$solver)) {
-      rho$optRes <- suppressWarnings(optimx(rho$start, function(x) PLfun(x, rho),
-                                            method = rho$solver,
-                                            hessian = FALSE,
-                                            control = rho$control))
+      if(rho$fast_fit){
+        rho$optRes <- suppressWarnings(optimx(rho$start, function(x) PLfun_fast(x, rho),
+                                              method = rho$solver,
+                                              hessian = FALSE,
+                                              control = rho$control))
+      } else{
+        rho$optRes <- suppressWarnings(optimx(rho$start, function(x) PLfun(x, rho),
+                                              method = rho$solver,
+                                              hessian = FALSE,
+                                              control = rho$control))
+      }
       rho$optpar <- unlist(rho$optRes[1:length(rho$start)])
       rho$objective <- unlist(rho$optRes["value"])
     }
@@ -309,6 +362,44 @@ mvord.fit <- function(rho){
 # par <- rho$start
 PLfun <- function(par, rho){
   tmp <- transf_par(par, rho)
+  ## check for q_i = 1
+  pr <- double(rho[["n_univ"]])
+  pr <- rho[["link"]][["F_uni"]](tmp[["U_univ"]]) -
+    rho[["link"]][["F_uni"]](tmp[["L_univ"]])
+  pr[pr < .Machine$double.eps] <- .Machine$double.eps
+  ## iterate over bivariate pairs
+  prh <- double(rho[["n_biv"]])
+  prh <- rho[["link"]][["F_biv_rect"]](
+    U = tmp[["U"]],
+    L = tmp[["L"]],
+    r = tmp[["corr_par"]])
+  prh[prh < .Machine$double.eps] <- .Machine$double.eps
+  # return(-(sum(log(prh)) + sum(log(pr))))
+ # -sum(log(c(prh, pr)))
+  -sum(rho[["weights_fast"]] * log(c(prh, pr)))
+    # - sum(rho$weights * logp)
+}
+# PLfun <- function(par, rho){
+#   tmp <- transf_par(par, rho)
+#   #r_mat <- tmp[["corr_par"]]#[, rho$dummy_pl_lag == 1, drop = F]
+#   logp <- double(rho[["n"]])
+#   ## check for q_i = 1
+#   pr <- rho[["link"]][["F_uni"]](tmp[["U_univ"]]) -
+#     rho[["link"]][["F_uni"]](tmp[["L_univ"]])
+#   pr[pr < .Machine$double.eps] <- .Machine$double.eps
+#   logp[rho[["ind_univ"]][,1]] <- log(pr)
+#   ## iterate over bivariate pairs
+#   prh <- rho[["link"]][["F_biv_rect"]](
+#     U = tmp[["U"]],
+#     L = tmp[["L"]],
+#     r = tmp[["corr_par"]])
+#   prh[prh < .Machine$double.eps] <- .Machine$double.eps
+#   #logp[ind_i] <- logp[ind_i] +  log(prh)
+#   -sum(log(c(prh, pr)))
+#   #  - sum(rho$weights * logp)
+# }
+PLfun_old <- function(par, rho){
+  tmp <- transf_par_old(par, rho)
   pred.upper <- tmp$U
   pred.lower <- tmp$L
   r_mat <- tmp$corr_par[, rho$dummy_pl_lag == 1, drop = F]

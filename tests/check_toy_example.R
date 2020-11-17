@@ -21,8 +21,10 @@ X2 <- rnorm(nobs, 0, 1)
 pred <- cbind(X1, X2)
 
 y <- sapply(1:mult.obs, function(j) pred %*% betas[[j]] + errors[, j], simplify = "array")
-y.ord <- sapply(1:mult.obs, function(j) cut(y[, , j], c(min(y[, , j]) - 1, c(thresholds[[j]]), max(y[, , j]) + 1),
-                                            labels = FALSE), simplify = "array")
+y.ord <- sapply(1:mult.obs, function(j) cut(y[, , j], c(min(y[, , j]) - 1,
+  c(thresholds[[j]]), max(y[, , j]) + 1),
+  labels = FALSE), simplify = "array")
+
 predictors.fixed <- lapply(1:mult.obs, function(j) pred)
 y <- as.data.frame(y.ord)
 
@@ -46,9 +48,11 @@ df <- cbind.data.frame("i" = rep(1:100,2),
                        "Y" = c(data_toy_example$Y1, data_toy_example$Y2),
                        "X1" = rep(data_toy_example$X1,2),
                        "X2" = rep(data_toy_example$X2,2),
-                       "f1" = factor(sample(rep(data_toy_example$Y2,2)), ordered =FALSE),
-                       "f2" = factor(rep(data_toy_example$Y1,2), ordered=FALSE),
-                       w=rep(w,2))
+                       "f1" = factor(sample(rep(data_toy_example$Y2,2)),
+                                     ordered = FALSE),
+                       "f2" = factor(rep(data_toy_example$Y1,2), ordered = FALSE),
+                       w    = rep(w,2))
+df$X3 <- cut(df$X2, c(-Inf, -0.2, 0.2, Inf))
 
 
 
@@ -66,7 +70,7 @@ df <- cbind.data.frame("i" = rep(1:100,2),
 #
 #
 #
-res <- mvord:::mvord(formula = MMO(Y) ~  0 + X1 + X2,
+res <- mvord::mvord(formula = MMO(Y) ~  0 + X1 + X2,
                      data = df,
                      link = mvprobit(),
                      error.structure = cor_general(~1),
@@ -93,7 +97,7 @@ mvord:::check(all.equal(AIC(res), 280.3436634512001433, tolerance = tolerance))
 mvord:::check(all.equal(BIC(res), 294.05508548271637892, tolerance = tolerance))
 
 
-res2 <- mvord:::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
+res2 <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
                      data = df,
                      link = mvprobit(),
                      control = mvord.control(solver = "BFGS"),
@@ -105,7 +109,7 @@ mvord:::check(all.equal(res$beta, res2$beta, tolerance = tolerance))
 mvord:::check(all.equal(res$sebeta, res2$sebeta, tolerance = tolerance))
 ########################################################################
 ## No coefficients
-res <- mvord:::mvord(formula = MMO(Y) ~ -1,
+res <- mvord::mvord(formula = MMO(Y) ~ -1,
                       data = df,
                       link = mvprobit(),
                       error.structure = cor_general(~1),
@@ -123,7 +127,7 @@ mvord:::check(all.equal(AIC(res), 313.51350940088383368, tolerance = tolerance))
 mvord:::check(all.equal(BIC(res), 321.57073678022845797, tolerance = tolerance))
 
 #polychor
-res <- mvord:::mvord(formula = MMO(Y) ~ 1,
+res <- mvord::mvord(formula = MMO(Y) ~ 1,
                      data = df,
                      link = mvprobit(),
                      error.structure = cor_general(~1),
@@ -142,7 +146,7 @@ mvord:::check(all.equal(AIC(res), 315.46144651087109878, tolerance = tolerance))
 mvord:::check(all.equal(BIC(res), 326.31632228582151356, tolerance = tolerance))
 #######################################################################
 ## cor_general(~factor)
-res <- mvord:::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
+res <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
                      data = df,
                      link = mvprobit(),
                      control = mvord.control(solver = "BFGS"),
@@ -173,7 +177,7 @@ mvord:::check(all.equal(AIC(res), 283.39468697504094052, tolerance = tolerance))
 mvord:::check(all.equal(BIC(res), 303.00349482656417877, tolerance = tolerance))
 
 ##################################################################################
-res <- mvord:::mvord(formula = MMO(Y, i, j) ~  0 + X1 + X2,
+res <- mvord::mvord(formula = MMO(Y, i, j) ~  0 + X1 + X2,
                      data = df,
                      link = mvlogit(df = 8L),
                      error.structure = cor_general(~1))
@@ -197,7 +201,7 @@ options(digits = 22)
 # mvord:::check(all.equal(BIC(res), 295.07104409780789, tolerance = tolerance))
 
 ##################################################################################
-res <- mvord:::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
+res <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
                      data = df,
                      #index = c("i", "j"),
                      link = mvprobit(),
@@ -225,7 +229,7 @@ mvord:::check(all.equal(logLik(res)[[1]], -134.6391112878561102661, tolerance = 
 mvord:::check(all.equal(AIC(res), 282.0441800225207202857, tolerance = tolerance))
 mvord:::check(all.equal(BIC(res), 298.6729258905298252103, tolerance = tolerance))
 ########################################################################################
-res <- mvord:::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
+res <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
                      data = df,
                      #index = c("i", "j"),
                      link = mvprobit(),
@@ -251,7 +255,7 @@ mvord:::check(all.equal(logLik(res)[[1]], -134.8432321319771745038, tolerance = 
 mvord:::check(all.equal(AIC(res), 282.4524217107628487611, tolerance = tolerance))
 mvord:::check(all.equal(BIC(res), 299.0811675787719536856, tolerance = tolerance))
 
-res2 <- mvord:::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
+res2 <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
                       data = df,
                       #index = c("i", "j"),
                       link = mvprobit(),
@@ -265,7 +269,7 @@ mvord:::check(all.equal(res$beta, res2$beta, tolerance = tolerance))
 mvord:::check(all.equal(res$sebeta, res2$sebeta, tolerance = tolerance))
 
 ########################################################################################
-res <- mvord:::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
+res <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
                      data = df,
                      link = mvprobit(),
                      control = mvord.control(solver = "BFGS"),
@@ -290,7 +294,7 @@ mvord:::check(all.equal(logLik(res)[[1]], -133.938827675498004055, tolerance = t
 mvord:::check(all.equal(AIC(res), 280.6436127978045078635, tolerance = tolerance))
 mvord:::check(all.equal(BIC(res), 297.272358665813612788, tolerance = tolerance))
 
-res2 <- mvord:::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
+res2 <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
                       data = df,
                       #index = c("i", "j"),
                       link = mvprobit(),
@@ -332,7 +336,7 @@ mvord:::check(all.equal(AIC(res), 288.064880536023622426, tolerance = tolerance)
 mvord:::check(all.equal(BIC(res), 304.6936264040327273506, tolerance = tolerance))
 
 
-res2 <- mvord:::mvord(formula = MMO2(Y1,Y2) ~ 0 + X1 + X2,
+res2 <- mvord::mvord(formula = MMO2(Y1,Y2) ~ 0 + X1 + X2,
                        data = data_toy_example,
                        link = mvprobit(),
                        control = mvord.control(solver = "BFGS"),
@@ -346,7 +350,7 @@ mvord:::check(all.equal(res$beta, res2$beta, tolerance = tolerance))
 mvord:::check(all.equal(res$sebeta, res2$sebeta, tolerance = tolerance))
 
 ########################################################################################
-res <- mvord:::mvord(formula = MMO(Y) ~ 0 + X1 + offset(X2),
+res <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 + offset(X2),
                       data = df,
                       #index = c("i", "j"),
                       link = mvprobit(),
@@ -373,7 +377,7 @@ mvord:::check(all.equal(logLik(res)[[1]], -194.3258468555947047207, tolerance = 
 mvord:::check(all.equal(AIC(res), 403.705457152049632441, tolerance = tolerance))
 mvord:::check(all.equal(BIC(res), 423.314265003572927526, tolerance = tolerance))
 
-res2 <- mvord:::mvord(formula = MMO(Y) ~ 0 + X1,
+res2 <- mvord::mvord(formula = MMO(Y) ~ 0 + X1,
                      offset = list(df$X2[1:100], df$X2[101:200]),
                      data = df,
                      link = mvprobit(),
@@ -385,7 +389,7 @@ res2 <- mvord:::mvord(formula = MMO(Y) ~ 0 + X1,
 mvord:::check(all.equal(res$beta, res2$beta, tolerance = tolerance))
 mvord:::check(all.equal(res$sebeta, res2$sebeta, tolerance = tolerance))
 
-res3 <- mvord:::mvord(formula = MMO2(Y1,Y2) ~ 0 + X1 + offset(X2),
+res3 <- mvord::mvord(formula = MMO2(Y1,Y2) ~ 0 + X1 + offset(X2),
                        data = data_toy_example,
                        link = mvprobit(),
                        control = mvord.control(solver = "BFGS"),
@@ -397,7 +401,7 @@ mvord:::check(all.equal(res$beta, res3$beta, tolerance = tolerance))
 mvord:::check(all.equal(res$sebeta, res3$sebeta, tolerance = tolerance))
 
 ########################################################################################
-res <- mvord:::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
+res <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
               data = df,
               #index = c("i", "j"),
               link = mvlogit(),
@@ -425,7 +429,7 @@ mvord:::check(all.equal(logLik(res)[[1]], -135.5210996495467554723, tolerance = 
 mvord:::check(all.equal(AIC(res), 281.568515088567210114, tolerance = tolerance2))
 mvord:::check(all.equal(BIC(res), 295.2799371200834457341, tolerance = tolerance2))
 
-# res1 <- mvord:::mvord(formula = MMO(Y) ~ 1 + X1 + X2,
+# res1 <- mvord::mvord(formula = MMO(Y) ~ 1 + X1 + X2,
 #                       data = df,
 #                       index = c("i", "j"),
 #                       link = mvprobit(),
@@ -438,9 +442,7 @@ mvord:::check(all.equal(BIC(res), 295.2799371200834457341, tolerance = tolerance
 
 
 ########################################################################################
-df$X3 <- cut(df$X2, c(-Inf, -0.2, 0.2, Inf))
-
-res <- mvord:::mvord(formula = MMO(Y) ~ 0 + X1 + X3,
+res <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 + X3,
                      data = df,
                      #index = c("i", "j"),
                      link = mvprobit(),
@@ -463,7 +465,7 @@ mvord:::check(all.equal(logLik(res)[[1]], -136.0526219854373835005, tolerance = 
 mvord:::check(all.equal(AIC(res), 284.8712014176832667545, tolerance = tolerance))
 mvord:::check(all.equal(BIC(res), 301.499947285692371679, tolerance = tolerance))
 ########################################################################################
-res <- mvord:::mvord(formula = MMO(Y) ~ 1 + X1 * X2,
+res <- mvord::mvord(formula = MMO(Y) ~ 1 + X1 * X2,
                      data = df,
                      #index = c("i", "j"),
                      link = mvprobit(),
@@ -492,7 +494,7 @@ mvord:::check(all.equal(BIC(res), 298.6458240663615129051, tolerance = tolerance
 df_NA <- df[-c(1,90:110),]
 
 
-res <- mvord:::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
+res <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
                      data = df_NA,
                      link = mvprobit(),
                      control = mvord.control(solver = "BFGS"),
@@ -517,6 +519,34 @@ mvord:::check(all.equal(res.summary$error.structure$`Std. Error`, c(0.0705535660
 mvord:::check(all.equal(logLik(res)[[1]], -119.4526280916837492896, tolerance = tolerance))
 mvord:::check(all.equal(AIC(res),  258.7052561833675099479, tolerance = tolerance))
 mvord:::check(all.equal(BIC(res), 284.3969426996999345647, tolerance = tolerance))
+
+#weights
+df_NA$weights <- 0.5
+res <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
+                    data = df_NA,
+                    link = mvprobit(),
+                    weights.name = "weights",
+                    error.structure = cor_general(~1),
+                    threshold.constraints = c(1,2))
+
+res.summary <- summary(res, short = FALSE)
+
+options(digits = 22)
+
+# paste(format(res.summary$thresholds$Estimate), collapse = ",")
+# paste(format(res.summary$coefficients$Estimate), collapse = ",")
+# paste(format(res.summary$error.structure$Estimate), collapse = ",")
+mvord:::check(all.equal(res.summary$thresholds$Estimate,
+                        c(-1.0201283793713198377873,  1.1418048707357395521456, -0.9066161533747665313143,  0.9994581570190742558779), tolerance = tolerance))
+mvord:::check(all.equal(res.summary$coefficients$Estimate, c(0.8373332969208180376341,  0.4982136050008418859392, -0.4474066175154422508875, -0.3539061566757252808024),
+                        tolerance = tolerance))
+mvord:::check(all.equal(res.summary$error.structure$Estimate, c(0.9106469196938988819312), tolerance = tolerance))
+mvord:::check(all.equal(res.summary$thresholds$`Std. Error`, c(0.3999331442401471981007, 0.4475833313547766811880, 0.3811935020996289336104, 0.3480606771313752845209), tolerance = tolerance))
+mvord:::check(all.equal(res.summary$coefficients$`Std. Error`, c(0.3779704499331774103510, 0.3326083385001772918521, 0.3752721890043577146479, 0.2897924558296670061175), tolerance = tolerance))
+mvord:::check(all.equal(res.summary$error.structure$`Std. Error`, c(0.1411107414052604758226), tolerance = tolerance))
+mvord:::check(all.equal(logLik(res)[[1]], -59.72631403934757088336, tolerance = tolerance))
+mvord:::check(all.equal(AIC(res),  139.2526280786951531354, tolerance = tolerance))
+mvord:::check(all.equal(BIC(res), 164.944314595027606174, tolerance = tolerance))
 ##########################################################################################
 df_23 <- df
 
@@ -527,7 +557,7 @@ df_23$Y[which(df_23$Y[1:100] == 3)] <- 2
 ## Must be converted to integer. Ordered factor is not OK, as we have diff number of responses.
 df_23$Y <- as.integer(df_23$Y)
 
-res <- mvord:::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
+res <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
                      data = df_23,
                      link = mvprobit(),
                      control = mvord.control(solver = "BFGS"),
@@ -555,7 +585,7 @@ suppressWarnings(RNGversion("3.5.0"))
 set.seed(100)
 Y3 <- sample(1:3, nobs, replace = TRUE)
 dat_3 <- cbind(Y3, data_toy_example)
-res <- mvord:::mvord(formula = MMO2(Y1, Y2, Y3) ~ 0,
+res <- mvord::mvord(formula = MMO2(Y1, Y2, Y3) ~ 0,
                      data = dat_3,
                      link = mvprobit(),
                      error.structure = cor_general(~1),
@@ -578,7 +608,7 @@ mvord:::check(all.equal(BIC(res), 1205.960928690734590418, tolerance = tolerance
 ##########################################
 ### fixed coefs fixed thresholds
 ###########################################
-res <- mvord:::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
+res <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
                      data = df_NA,
                      link = mvprobit(),
                      error.structure = cor_general(~1),
@@ -600,7 +630,7 @@ mvord:::check(all.equal(BIC(res), 253.9016800682576047166, tolerance = tolerance
 ### fixed cor_general
 ###########################################
 #polychor
-res <- mvord:::mvord(formula = MMO(Y) ~ 1,
+res <- mvord::mvord(formula = MMO(Y) ~ 1,
                      data = df,
                      link = mvprobit(),
                      error.structure = cor_general(~1, value = rep(0.5, 100), fixed = TRUE),
@@ -619,7 +649,7 @@ mvord:::check(all.equal(BIC(res), 350.2040268579602866339, tolerance = tolerance
 ##########################################
 ### fixed cor_equi
 ###########################################
-res <- mvord:::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
+res <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
                      data = df,
                      #index = c("i", "j"),
                      link = mvprobit(),
@@ -645,7 +675,7 @@ mvord:::check(all.equal(BIC(res), 347.5010250482303604258, tolerance = tolerance
 ##########################################
 ### try all fixed
 ###########################################
-res <- mvord:::mvord(formula = MMO(Y) ~ 0,
+res <- mvord::mvord(formula = MMO(Y) ~ 0,
                      data = df,
                      link = mvprobit(),
                      control = mvord.control(solver = "BFGS"),
@@ -657,7 +687,7 @@ mvord:::check(all.equal(logLik(res)[[1]], -179.9334335736217553858, tolerance = 
 mvord:::check(all.equal(AIC(res), 359.8668671472435107717, tolerance = tolerance))
 mvord:::check(all.equal(BIC(res), 359.8668671472435107717, tolerance = tolerance))
 
-res <- mvord:::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
+res <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 + X2,
                      data = df,
                      link = mvprobit(),
                      control = mvord.control(solver = "BFGS"),
@@ -675,7 +705,7 @@ set.seed(100)
 Y3 <- factor(sample(1:3, nobs, replace = TRUE), ordered = TRUE)
 dat_3 <- cbind(Y3, data_toy_example)
 Rfixed <- matrix(c(1,0.9,0.2, 0.9, 1, 0.5, 0.2,0.5,1), nrow = 3)
-res <- mvord:::mvord(formula = MMO2(Y1, Y2, Y3) ~ 0,
+res <- mvord::mvord(formula = MMO2(Y1, Y2, Y3) ~ 0,
                      data = dat_3,
                      link = mvprobit(),
                      error.structure = cor_general(~1, value = Rfixed[lower.tri(Rfixed)], fixed = TRUE),
@@ -685,4 +715,229 @@ res <- mvord:::mvord(formula = MMO2(Y1, Y2, Y3) ~ 0,
 mvord:::check(all.equal(logLik(res)[[1]], -647.8423017485074524302, tolerance = tolerance))
 mvord:::check(all.equal(AIC(res),  1295.68460349701490486, tolerance = tolerance))
 mvord:::check(all.equal(BIC(res),  1295.68460349701490486, tolerance = tolerance))
+
+###############################
+# tests for predict functions #
+###############################
+data_toy_example$X3 <- cut(data_toy_example$X2, c(-Inf, -0.2, 0.2, Inf))
+
+dat_train <- data_toy_example[1:90, ]
+dat_test  <- data_toy_example[-c(1:90), ]
+
+## mvord2
+### example with factor covariates
+res_train <- mvord::mvord(formula = MMO2(Y1, Y2) ~ 0 + X1 + X2 + X3,
+                     data = dat_train,
+                     link = mvprobit(),
+                     contrasts = list(X3 = "contr.sum"))
+tolerance <- 0.00001
+#### predict in sample
+phat_in_mvord2 <- predict(res_train)
+mvord:::check(all.equal(
+  unname(phat_in_mvord2[1:10]), c(0.1464235557313708635530, 0.4321397714843485116099, 0.5968270247741616074677,
+                        0.0166994091681152423412, 0.5854390261665686212567, 0.1371096523508007203329,
+                        0.1675153858158427988556, 0.5777761575951960715258, 0.5680673832081621910106,
+                        0.2403876149104018367098),  tolerance = tolerance))
+
+pjhat_in_mvord2 <- joint_probabilities(res_train, response.cat = c(1,2))
+mvord:::check(all.equal(
+  unname(pjhat_in_mvord2[1:10]), c(0.0414494114970503091388565, 0.0007763727128762831775077, 0.0258791356876044154056160,
+                                   0.0166994147132800141442033, 0.0468724891285079159342075, 0.0021647187725574168482012,
+                                   0.0172638911663273442176347, 0.0094837831334130262561644, 0.0190099916431371585012755,
+                                   0.0051418125225030086866695),  tolerance = tolerance))
+
+pmhat_in_mvord2 <- marginal_predict(res_train)
+mvord:::check(all.equal(
+  unname(c(pmhat_in_mvord2[1:5,1:2])), c(0.16369555938725077748330, 0.51206442964897258551815, 0.70085752018010938346748,
+                                         0.07780827569973108870371, 0.68584056337028265204481, 0.23658538526249328626250,
+                                         0.62104312126876426436439, 0.65391318126703112945108, 0.62425836768740627924501,
+                                         0.64830276740170678095865),  tolerance = tolerance))
+
+
+
+#### predict with newdata
+phat_new_mvord2 <- predict(res_train, newdata = dat_test)
+mvord:::check(all.equal(
+  unname(phat_new_mvord2), c(0.50788676686680833682885, 0.53701228897073405299523, 0.41931860775657509021741,
+                  0.56837451159716412263379, 0.46158948077333511461617, 0.02998639798438534898040,
+                  0.06314648572131303927435, 0.21981855723244725364651, 0.57800150278644024659513,
+                  0.57873631730860186639376),  tolerance = tolerance))
+
+pjhat_new_mvord2 <- joint_probabilities(res_train, response.cat = c(1,2), newdata = dat_test)
+mvord:::check(all.equal(
+  unname(pjhat_new_mvord2), c(0.098893552409077684073324, 0.007494474951204033175145, 0.223630828339767884216371,
+                              0.012572935869544998865877, 0.125624085603978530301106, 0.021774380504568757732642,
+                              0.063146525118494334360975, 0.000117581041524150720079, 0.017153034070206046868279,
+                              0.049461049315582095164956),  tolerance = tolerance))
+
+pmhat_new_mvord2 <- marginal_predict(res_train, newdata = dat_test)
+mvord:::check(all.equal(
+  unname(c(pmhat_new_mvord2[1:5, 1:2])), c(0.5879858728748059704117, 0.6245339414959365509361, 0.6429603932672183219665,
+                                           0.6645168757663386660539, 0.5872139451846044577721, 0.6110788197600012239263,
+                                           0.6185525371757517598681, 0.4254630210115252220149, 0.6355172734548747426331,
+                                           0.4875151835646630571475),  tolerance = tolerance))
+
+
+### example with offsets
+res_train2 <- mvord::mvord(formula = MMO2(Y1, Y2) ~ 0 + X1 + offset(X2) + X3,
+                            data = dat_train,
+                            link = mvprobit(),
+                            contrasts = list(X3 = "contr.sum"))
+#### predict in sample
+phat_in_offset_mvord2 <- predict(res_train2)
+mvord:::check(all.equal(
+  unname(phat_in_offset_mvord2[1:10]), c(0.04651187641465470007374, 0.37252604618539558734014, 0.52685355820976886853657,
+                                         0.01765062793667723783919, 0.56828750653284465510495, 0.13097924136563171559899,
+                                         0.01252594308629018104995, 0.55895559865178667813268, 0.57808854222406069744977,
+                                         0.47885651300164144839044),  tolerance = tolerance))
+
+pjhat_in_mvord2 <- joint_probabilities(res_train, response.cat = c(1,2))
+mvord:::check(all.equal(
+  unname(pjhat_in_mvord2[1:10]), c(0.0414494114970503091388565, 0.0007763727128762831775077, 0.0258791356876044154056160,
+                                  0.0166994147132800141442033, 0.0468724891285079159342075, 0.0021647187725574168482012,
+                                  0.0172638911663273442176347, 0.0094837831334130262561644, 0.0190099916431371585012755,
+                                  0.0051418125225030086866695),  tolerance = tolerance))
+
+pmhat_in_mvord2 <- marginal_predict(res_train)
+mvord:::check(all.equal(
+  unname(c(pmhat_in_mvord2[1:5,1:2])), c(0.16369555938725077748330, 0.51206442964897258551815, 0.70085752018010938346748,
+                                        0.07780827569973108870371, 0.68584056337028265204481, 0.23658538526249328626250,
+                                        0.62104312126876426436439, 0.65391318126703112945108, 0.62425836768740627924501,
+                                        0.64830276740170678095865),  tolerance = tolerance))
+
+
+
+#### predict with newdata
+phat_new_offset_mvord2 <- predict(res_train2, newdata = dat_test)
+mvord:::check(all.equal(
+  unname(phat_new_offset_mvord2), c(0.53788568792038271570988, 0.47226651862936941395077, 0.59736906923858912321634,
+                                    0.51730764069679358030385, 0.18750767549430336078586, 0.01993645212535863353587,
+                                    0.05609361865051418205574, 0.15695387935814331115125, 0.57079407463923570453801,
+                                    0.46447453401393973271283),  tolerance = tolerance))
+
+
+pjhat_new_offset_mvord2 <- joint_probabilities(res_train2, response.cat = c(1,2),
+                                               newdata = dat_test)
+mvord:::check(all.equal(
+  unname(pjhat_new_offset_mvord2), c(0.0839907843603347747940546, 0.0053737551172480801930931, 0.1657125298469289131908511,
+                                      0.0095039724989203211436006, 0.1110141336202859763115924, 0.0308028085793187883512090,
+                                      0.0560936429791563384572584, 0.0000659201973896017534571, 0.0161492922521473680763648,
+                                      0.0556615607647627450016437),  tolerance = tolerance))
+
+pmhat_new_offset_mvord2 <- marginal_predict(res_train2, newdata = dat_test)
+mvord:::check(all.equal(
+  unname(c(pmhat_new_offset_mvord2[1:5, 1:2])), c(0.6410297683731078777214, 0.5530240404054447278526, 0.7630836817892157064591,
+                                                  0.6103504462453783752096, 0.2985228989322880055468, 0.6269027239883980806567,
+                                                  0.5461645309760024824541, 0.6047542519330054711091, 0.5786243958547179211394,
+                                                  0.2011002687374978670221),  tolerance = tolerance))
+
+## mvord
+dat_train <- df[df$i %in% 1:90, ]
+dat_test  <- df[!(df$i %in% 1:90), ]
+
+res_train <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 + X2 + X3,
+                           data = dat_train,
+                           link = mvprobit(),
+                           contrasts = list(X3 = "contr.sum"))
+### example with factor covariates
+#### predictions in sample
+phat_in_mvord <- predict(res_train)
+mvord:::check(all.equal(
+  unname(phat_in_mvord[1:10]), c(0.1464235557313708635530, 0.4321397714843485116099, 0.5968270247741616074677,
+                                 0.0166994091681152423412, 0.5854390261665686212567, 0.1371096523508007203329,
+                                 0.1675153858158427988556, 0.5777761575951960715258, 0.5680673832081621910106,
+                                 0.2403876149104018367098),  tolerance = tolerance))
+
+pjhat_in_mvord <- joint_probabilities(res_train, response.cat = c(1,2))
+mvord:::check(all.equal(
+  unname(pjhat_in_mvord[1:10]), c(0.0414494114970503091388565, 0.0007763727128762831775077, 0.0258791356876044154056160,
+                                  0.0166994147132800141442033, 0.0468724891285079159342075, 0.0021647187725574168482012,
+                                  0.0172638911663273442176347, 0.0094837831334130262561644, 0.0190099916431371585012755,
+                                  0.0051418125225030086866695),  tolerance = tolerance))
+
+pmhat_in_mvord <- marginal_predict(res_train)
+mvord:::check(all.equal(
+  unname(c(pmhat_in_mvord[1:5,1:2])), c(0.16369555938725077748330, 0.51206442964897258551815, 0.70085752018010938346748,
+                                     0.07780827569973108870371, 0.68584056337028265204481, 0.23658538526249328626250,
+                                     0.62104312126876426436439, 0.65391318126703112945108, 0.62425836768740627924501,
+                                     0.64830276740170678095865),  tolerance = tolerance))
+
+
+#### predict with newdata
+phat_new_mvord <- predict(res_train, newdata = dat_test)
+mvord:::check(all.equal(
+  unname(phat_new_mvord), c(0.50788676686680833682885, 0.53701228897073405299523, 0.41931860775657509021741,
+                            0.56837451159716412263379, 0.46158948077333511461617, 0.02998639798438534898040,
+                            0.06314648572131303927435, 0.21981855723244725364651, 0.57800150278644024659513,
+                            0.57873631730860186639376),  tolerance = tolerance))
+
+pjhat_new_mvord <- joint_probabilities(res_train, response.cat = c(1,2), newdata = dat_test)
+mvord:::check(all.equal(
+  unname(pjhat_new_mvord), c(0.098893552409077684073324, 0.007494474951204033175145, 0.223630828339767884216371,
+                             0.012572935869544998865877, 0.125624085603978530301106, 0.021774380504568757732642,
+                             0.063146525118494334360975, 0.000117581041524150720079, 0.017153034070206046868279,
+                             0.049461049315582095164956),  tolerance = tolerance))
+
+pmhat_new_mvord <- marginal_predict(res_train, newdata = dat_test)
+mvord:::check(all.equal(
+  unname(c(pmhat_new_mvord[1:5,1:2])),
+  c(0.5879858728748059704117, 0.6245339414959365509361, 0.6429603932672183219665,
+    0.6645168757663386660539, 0.5872139451846044577721, 0.6110788197600012239263,
+    0.6185525371757517598681, 0.4254630210115252220149, 0.6355172734548747426331,
+    0.4875151835646630571475),  tolerance = tolerance))
+
+
+
+### example with offsets
+res_train2 <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 + offset(X2) + X3,
+                            data = dat_train,
+                            link = mvprobit(),
+                            contrasts = list(X3 = "contr.sum"))
+
+#### predict in sample
+phat_in_offset_mvord <- predict(res_train2)
+mvord:::check(all.equal(
+  unname(phat_in_offset_mvord[1:10]), c(0.04651187641465470007374, 0.37252604618539558734014, 0.52685355820976886853657,
+                                        0.01765062793667723783919, 0.56828750653284465510495, 0.13097924136563171559899,
+                                        0.01252594308629018104995, 0.55895559865178667813268, 0.57808854222406069744977,
+                                        0.47885651300164144839044),  tolerance = tolerance))
+
+pjhat_in_offset_mvord <- joint_probabilities(res_train2, response.cat = c(1,2))
+mvord:::check(all.equal(
+  unname(pjhat_in_offset_mvord[1:10]), c(0.0472419001589241827065990, 0.0005045621079537432329687, 0.0160654878216455188066902,
+                                         0.0176506444778379567583926, 0.0349580018370856671072744, 0.0017616969113226077503498,
+                                         0.0043762331129306719645911, 0.0079872301725372740754949, 0.0211556317124290127473785,
+                                         0.0023057907016680312395351),  tolerance = tolerance))
+
+pmhat_in_offset_mvord <- marginal_predict(res_train2)
+mvord:::check(all.equal(
+  unname(c(pmhat_in_offset_mvord[1:5, 1:2])), c(0.05687801748367393717132, 0.43314394646591181103901, 0.63410255320208053220199,
+                                                0.11659868247577427624595, 0.68287284549406501721336, 0.07832694375364634975512,
+                                                0.55065457504773962504885, 0.57624707519535223188001, 0.62708167599782682621878,
+                                                0.62089949532970512002805),  tolerance = tolerance))
+
+
+## predict with newdata
+phat_new_offset_mvord <- predict(res_train2, newdata = dat_test)
+mvord:::check(all.equal(
+  unname(phat_new_offset_mvord), c(0.53788568792038271570988, 0.47226651862936941395077, 0.59736906923858912321634,
+                                   0.51730764069679358030385, 0.18750767549430336078586, 0.01993645212535863353587,
+                                   0.05609361865051418205574, 0.15695387935814331115125, 0.57079407463923570453801,
+                                   0.46447453401393973271283),  tolerance = tolerance))
+
+pjhat_new_offset_mvord <- joint_probabilities(res_train2, response.cat = c(1,2), newdata = dat_test)
+mvord:::check(all.equal(
+  unname(pjhat_new_offset_mvord), c(0.0839907843603347747940546, 0.0053737551172480801930931, 0.1657125298469289131908511,
+                                    0.0095039724989203211436006, 0.1110141336202859763115924, 0.0308028085793187883512090,
+                                    0.0560936429791563384572584, 0.0000659201973896017534571, 0.0161492922521473680763648,
+                                    0.0556615607647627450016437),  tolerance = tolerance))
+
+pmhat_new_offset_mvord <- marginal_predict(res_train2, newdata = dat_test)
+mvord:::check(all.equal(
+  unname(c(pmhat_new_offset_mvord[1:5,1:2])), c(
+    0.6410297683731078777214, 0.5530240404054447278526, 0.7630836817892157064591,
+    0.6103504462453783752096, 0.2985228989322880055468, 0.6269027239883980806567,
+    0.5461645309760024824541, 0.6047542519330054711091, 0.5786243958547179211394,
+    0.2011002687374978670221),  tolerance = tolerance))
+
 

@@ -184,7 +184,7 @@ NULL
 
 ##IMPORTS
 #' @importFrom optimx optimx
-#' @importFrom stats formula update model.frame model.matrix coef as.formula cov2cor dnorm dt pnorm pt terms.formula plogis dlogis qt nobs predict terms printCoefmat model.offset na.omit logLik binomial glm.fit sd
+#' @importFrom stats formula update model.frame model.matrix coef as.formula cov2cor dnorm dt pnorm pt terms.formula plogis dlogis qt nobs predict terms printCoefmat model.offset na.omit logLik binomial glm.fit sd na.pass
 #' @importFrom pbivnorm pbivnorm
 #' @importFrom MASS polr
 #' @importFrom utils combn data write.table
@@ -705,8 +705,8 @@ mvord <- function(formula,
   rho$start.values <- control$start.values
   rho$threshold.constraints <- threshold.constraints
   rho$threshold.values <- threshold.values
-  rho$coef.constraints <- coef.constraints
-  rho$coef.values <- coef.values
+  rho$coef.constraints_input <- coef.constraints
+  rho$coef.values_input <- coef.values
   rho$formula.input <- formula
   rho$PL.lag <- PL.lag
   rho$solver <- control$solver
@@ -717,6 +717,7 @@ mvord <- function(formula,
   rho$weights.name <- weights.name
   rho$response.levels <- response.levels
   rho$offset <- offset
+  #rho$fast_fit <- fast
   if (!all(names(contrasts) %in% c(labels(terms(rho$formula.input)), labels(terms(error.structure$formula))))) {
     Terms <- c(labels(terms(rho$formula.input)), labels(terms(error.structure$formula)))
     id_tmp <- which(!(names(contrasts) %in% Terms))

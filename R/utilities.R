@@ -88,7 +88,7 @@ check_args_thresholds <- function(rho){
 }
 
 check_args_coef <- function(rho){
-  if (nrow(rho$coef.constraints) != rho$ndim) stop("Row dimension of coef.constraints and outcome dimension do not match.", call. = FALSE)
+  if (NROW(rho$coef.constraints) != rho$ndim) stop("Row dimension of coef.constraints and outcome dimension do not match.", call. = FALSE)
   if (NCOL(rho$coef.constraints) != NCOL(rho$x[[1]])) stop("Column dimension of coef.constraints and number of columns in model matrix do not match.
                                                            Maybe (Intercept) is included or specify constraints for factors or interaction terms accordingly.", call. = FALSE)
 
@@ -180,32 +180,42 @@ check_rank <- function(j,rho){
 }
 
 ###################################################################################################
+#rho$coef.constraints <- NULL
 set_args_other <- function(rho) {
   ## coef contraints
   ## can be null, matrix, vector, list
+  if(is.list(rho$coef.constraints_input)){
+    rho$coef.constraints_VGAM <- TRUE
+    rho$coef.constraints <- rho$coef.constraints_input
+    } else rho$coef.constraints_VGAM <- FALSE
   ## if null set to matrix
-  if(is.null(rho$coef.constraints)){
+  if(is.null(rho$coef.constraints_input)){
     if(NCOL(rho$x[[1]]) > 0){
       rho$coef.constraints <- matrix(seq_len(rho$ndim), ncol = NCOL(rho$x[[1]]), nrow = rho$ndim)
     } else {
       rho$coef.constraints <- matrix(integer(), ncol = 0, nrow = rho$ndim)
     }
+    if(is.null(rho$coef.values_input)){
+      rho$coef.values <- matrix(NA, ncol = ncol(rho$coef.constraints),
+                                nrow = nrow(rho$coef.constraints))
+      rho$coef.values[is.na(rho$coef.constraints)] <- 0 #default 0
+    } else rho$coef.values <- rho$coef.values_input
   }
   ## list and coef values can't be used
-  if(is.list(rho$coef.constraints) && !is.null(rho$coef.values)) stop("This coef.constraints design requires offsets instead of coef.values.", call.=FALSE)
-  if(!is.list(rho$coef.constraints) & NCOL(rho$coef.constraints) > 0){
-      if(is.vector(rho$coef.constraints)) {
+  if(is.list(rho$coef.constraints_input) && !is.null(rho$coef.values_input)) stop("This coef.constraints design requires offsets instead of coef.values.", call.=FALSE)
+  if(!is.list(rho$coef.constraints_input) & NCOL(rho$coef.constraints_input) > 0){
+      if(is.vector(rho$coef.constraints_input)) {
         if(NCOL(rho$x[[1]]) > 0){
-          rho$coef.constraints <- matrix(rho$coef.constraints, ncol = NCOL(rho$x[[1]]), nrow = rho$ndim)
+          rho$coef.constraints <- matrix(rho$coef.constraints_input, ncol = NCOL(rho$x[[1]]), nrow = rho$ndim)
         } else {
           rho$coef.constraints <- matrix(integer(), ncol = 0, nrow = rho$ndim)
         }
-      }
-    if(is.null(rho$coef.values)){
+      } else if(is.matrix(rho$coef.constraints_input)) rho$coef.constraints <- rho$coef.constraints_input#if matrix
+    if(is.null(rho$coef.values_input)){
     rho$coef.values <- matrix(NA, ncol = ncol(rho$coef.constraints),
       nrow = nrow(rho$coef.constraints))
     rho$coef.values[is.na(rho$coef.constraints)] <- 0 #default 0
-    }
+    } else rho$coef.values <- rho$coef.values_input
     #check if coef.values fit to coef.constraints
     check_args_coef(rho)
     # set coef.constraints NA  coef.values are set
@@ -260,6 +270,46 @@ build_correction_thold_fun0 <- function(j, rho) {
 }
 
 transf_par <- function(par, rho) {
+  par_sigma <- par[rho[["npar.thetas"]] + rho[["npar.betas"]] +
+                     seq_len(attr(rho[["error.structure"]], "npar"))]
+  sigmas <- rho[["build_error_struct"]](rho[["error.structure"]], par_sigma)
+  par_beta <- par[rho[["npar.thetas"]] + seq_len(rho[["npar.betas"]])]
+  betatilde <- rho[["constraints_mat"]] %*% par_beta
+  par_theta <- rho[["transf_thresholds"]](par[seq_len(rho[["npar.thetas"]])], rho,
+                                          betatilde)
+
+  thetatilde <- lapply(seq_len(rho[["ndim"]]), function(j)
+    par_theta[[j]] + rho[["thold_correction"]][[j]](betatilde, k = j, rho = rho))
+
+  pred.upper  <- vapply(seq_len(rho[["ndim"]]), function(j) {
+    th_u <- c(thetatilde[[j]], rho[["inf.value"]])[rho[["y"]][, j]]
+    xbeta_u <- as.double(rho[["XcatU"]][[j]] %*% betatilde[rho[["indjbeta"]][[j]]])
+    th_u - xbeta_u - rho[["offset"]][[j]]
+  }, FUN.VALUE =  double(rho[["n"]]))/sigmas[["sdVec"]]
+  pred.lower  <- vapply(seq_len(rho[["ndim"]]), function(j) {
+    th_l <- c(-rho[["inf.value"]], thetatilde[[j]])[rho[["y"]][, j]]
+    xbeta_l <- as.double(rho[["XcatL"]][[j]] %*% betatilde[rho[["indjbeta"]][[j]]])
+    th_l - xbeta_l - rho[["offset"]][[j]]
+  }, FUN.VALUE =  double(rho[["n"]]))/sigmas[["sdVec"]]
+
+  predu <- do.call("rbind",lapply(rho[["combis_fast"]], function(h){
+    pred.upper[h[["ind_i"]], h[["combis"]], drop = F]
+  }))
+  predl <- do.call("rbind",lapply(rho[["combis_fast"]], function(h){
+    pred.lower[h[["ind_i"]], h[["combis"]], drop = F]
+  }))
+  predr <- unlist(lapply(rho[["combis_fast"]], function(h){
+    sigmas$rVec[h[["ind_i"]],h[["r"]][1]]
+  }))
+  predu_univ <- pred.upper[rho[["ind_univ"]]]
+  predl_univ <- pred.lower[rho[["ind_univ"]]]
+
+
+  list(U = predu, L = predl, U_univ = predu_univ, L_univ = predl_univ,
+       corr_par = predr)
+}
+
+transf_par_old <- function(par, rho) {
   par_sigma <- par[rho$npar.thetas + rho$npar.betas +
     seq_len(attr(rho$error.structure, "npar"))]
   sigmas <- rho$build_error_struct(rho$error.structure, par_sigma)
@@ -491,34 +541,29 @@ is.offset <- function(expr) {
 }
 
 get_constraints <- function(rho){
-if(is.list(rho$coef.constraints)){
-  ## check if nrow is sum(ncat_j - 1)
-  if(!(all(sapply(rho$coef.constraints, nrow) == rho$nthetas))) stop("The constraint matrices must have nrow equal to sum(ncat_j - 1).", call. = FALSE)
-  if(is.null(names(rho$coef.constraints))) names(rho$coef.constraints) <- rho$coef.names
-  if (!all(rho$coef.names %in% names(rho$coef.constraints))) stop("coef.constraints need to be specified for all covariates
+  if(is.list(rho$coef.constraints)){
+    ## check if nrow is sum(ncat_j - 1)
+    if(!(all(sapply(rho$coef.constraints, nrow) == rho$nthetas))) stop("The constraint matrices must have nrow equal to sum(ncat_j - 1).", call. = FALSE)
+    if(is.null(names(rho$coef.constraints))) names(rho$coef.constraints) <- rho$coef.names
+    if (!all(rho$coef.names %in% names(rho$coef.constraints))) stop("coef.constraints need to be specified for all covariates
                                                                     and intercept if included.", call. = FALSE)
-  constraints <- rho$coef.constraints[match(rho$coef.names, names(rho$coef.constraints))]
-  constraints <- lapply(constraints, as.matrix)
-} else{ #matrix to VGAM
-  constraints <- lapply(seq_len(NCOL(rho$coef.constraints)), function(p) {
-    tmp <- matrix(0,
-      ncol = sum(!is.na(unique(rho$coef.constraints[, p]))),
-      nrow = rho$nthetas)
-    if(!is.na(rho$coef.constraints[1, p])) tmp[seq_len(rho$ntheta[1]), 1] <- 1
-    for (j in 2:nrow(rho$coef.constraints)){
-      if (is.na(rho$coef.constraints[j, p])){
-        tmp <- tmp
-      } else if (rho$coef.constraints[j, p] %in% rho$coef.constraints[1:(j-1), p]){
-        tmp[rho$ncat.first.ind[j]:sum(rho$ntheta[seq_len(j)]),
-            which(rho$coef.constraints[j, p] %in% rho$coef.constraints[1:(j-1), p])] <- 1
-      } else{
-        tmp[rho$ncat.first.ind[j]:sum(rho$ntheta[seq_len(j)]),
-            sum(!is.na(unique(rho$coef.constraints[1:(j-1),p]))) + 1] <- 1
+    constraints <- rho$coef.constraints[match(rho$coef.names, names(rho$coef.constraints))]
+    constraints <- lapply(constraints, as.matrix)
+  } else{ #matrix to VGAM#
+    b <- model.matrix(~ 0 + factor(rep(1:nrow(rho$coef.constraints), rho$ntheta)))
+    constraints <- lapply(seq_len(NCOL(rho$coef.constraints)), function(p) {
+      ff <- factor(rho$coef.constraints[,p])
+      if (nlevels(ff) > 0) {
+        a <- if (nlevels(ff) == 1) { cbind(ff) }  else {
+          model.matrix(~0 + ff, model.frame(~ ~0 + ff, na.action = na.pass))}
+        a[is.na(a)] <- 0
+        b %*% a
       }
+    })
+    if (length(constraints) > 0) {
+      id_nonnull <- sapply(constraints, function(i) !is.null(i))
+      constraints <- constraints[id_nonnull]
     }
-    tmp
-  })
-  constraints <- constraints[sapply(constraints,NCOL)!=0]
   }
   constraints <- lapply(seq_along(constraints), function(p) {
     colnames(constraints[[p]]) <- paste(rho$coef.names[p], seq_len(NCOL(constraints[[p]])))
@@ -530,6 +575,47 @@ if(is.list(rho$coef.constraints)){
   names(constraints) <- rho$coef.names
   constraints
 }
+
+# get_constraints <- function(rho){
+# if(is.list(rho$coef.constraints)){
+#   ## check if nrow is sum(ncat_j - 1)
+#   if(!(all(sapply(rho$coef.constraints, nrow) == rho$nthetas))) stop("The constraint matrices must have nrow equal to sum(ncat_j - 1).", call. = FALSE)
+#   if(is.null(names(rho$coef.constraints))) names(rho$coef.constraints) <- rho$coef.names
+#   if (!all(rho$coef.names %in% names(rho$coef.constraints))) stop("coef.constraints need to be specified for all covariates
+#                                                                     and intercept if included.", call. = FALSE)
+#   constraints <- rho$coef.constraints[match(rho$coef.names, names(rho$coef.constraints))]
+#   constraints <- lapply(constraints, as.matrix)
+# } else{ #matrix to VGAM
+#   constraints <- lapply(seq_len(NCOL(rho$coef.constraints)), function(p) {
+#     tmp <- matrix(0,
+#       ncol = sum(!is.na(unique(rho$coef.constraints[, p]))),
+#       nrow = rho$nthetas)
+#     if(!is.na(rho$coef.constraints[1, p])) tmp[seq_len(rho$ntheta[1]), 1] <- 1
+#     for (j in 2:nrow(rho$coef.constraints)){
+#       if (is.na(rho$coef.constraints[j, p])){
+#         tmp <- tmp
+#       } else if (rho$coef.constraints[j, p] %in% rho$coef.constraints[1:(j-1), p]){
+#         tmp[rho$ncat.first.ind[j]:sum(rho$ntheta[seq_len(j)]),
+#             which(rho$coef.constraints[j, p] %in% rho$coef.constraints[1:(j-1), p])] <- 1
+#       } else{
+#         tmp[rho$ncat.first.ind[j]:sum(rho$ntheta[seq_len(j)]),
+#             sum(!is.na(unique(rho$coef.constraints[1:(j-1),p]))) + 1] <- 1
+#       }
+#     }
+#     tmp
+#   })
+#   constraints <- constraints[sapply(constraints,NCOL)!=0]
+#   }
+#   constraints <- lapply(seq_along(constraints), function(p) {
+#     colnames(constraints[[p]]) <- paste(rho$coef.names[p], seq_len(NCOL(constraints[[p]])))
+#     rownames(constraints[[p]]) <- unlist(lapply(seq_len(rho$ndim), function(j)
+#       get_labels_theta(rho, j)))
+#     constraints[[p]]
+#   })
+#   if (NCOL(rho$coef.constraints) == 0) constraints <- NULL
+#   names(constraints) <- rho$coef.names
+#   constraints
+# }
 
 get_ind_coef <- function(constraints, rho){
   lapply(seq_len(rho$ndim), function(j){

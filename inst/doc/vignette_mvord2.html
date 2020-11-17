@@ -12,7 +12,7 @@
 
 <meta name="author" content="Rainer Hirk, Kurt Hornik and Laura Vana" />
 
-<meta name="date" content="2020-05-27" />
+<meta name="date" content="2020-11-17" />
 
 <title>mvord: Additional examples</title>
 
@@ -95,7 +95,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">mvord: Additional examples</h1>
 <h4 class="author">Rainer Hirk, Kurt Hornik and Laura Vana</h4>
-<h4 class="date">2020-05-27</h4>
+<h4 class="date">2020-11-17</h4>
 
 
 <div id="TOC">
@@ -151,29 +151,29 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## Formula: MMO2(rater1, rater2) ~ 0 + LR + LEV + PR + RSIZE + BETA
 ## 
 ##     link threshold nsubjects ndim   logPL   CLAIC   CLBIC fevals
-## mvprobit  flexible       690    2 -799.84 1630.35 1699.91   3218
+## mvprobit  flexible       690    2 -799.84 1630.35 1699.91   4476
 ## 
 ## Thresholds:
 ##            Estimate Std. Error z value  Pr(&gt;|z|)    
-## rater1 A|B  8.40534    0.39600  21.225 &lt; 2.2e-16 ***
-## rater1 B|C  9.87575    0.42661  23.149 &lt; 2.2e-16 ***
-## rater1 C|D 11.68479    0.46471  25.145 &lt; 2.2e-16 ***
-## rater1 D|E 14.00772    0.53773  26.050 &lt; 2.2e-16 ***
+## rater1 A|B  8.40533    0.39600  21.225 &lt; 2.2e-16 ***
+## rater1 B|C  9.87574    0.42661  23.149 &lt; 2.2e-16 ***
+## rater1 C|D 11.68478    0.46471  25.145 &lt; 2.2e-16 ***
+## rater1 D|E 14.00771    0.53773  26.050 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Coefficients:
 ##          Estimate Std. Error  z value  Pr(&gt;|z|)    
-## LR 1     0.191815   0.059864   3.2042  0.001354 ** 
-## LR 2     0.089980   0.069426   1.2961  0.194953    
-## LEV 1    0.456827   0.039714  11.5028 &lt; 2.2e-16 ***
-## LEV 2    0.441118   0.044323   9.9523 &lt; 2.2e-16 ***
-## PR 1    -2.626682   0.174938 -15.0149 &lt; 2.2e-16 ***
-## PR 2    -2.761411   0.203692 -13.5568 &lt; 2.2e-16 ***
-## RSIZE 1 -1.166861   0.050982 -22.8878 &lt; 2.2e-16 ***
-## RSIZE 2 -1.184522   0.050259 -23.5685 &lt; 2.2e-16 ***
+## LR 1     0.191816   0.059864   3.2042  0.001354 ** 
+## LR 2     0.089982   0.069426   1.2961  0.194945    
+## LEV 1    0.456824   0.039714  11.5027 &lt; 2.2e-16 ***
+## LEV 2    0.441115   0.044323   9.9522 &lt; 2.2e-16 ***
+## PR 1    -2.626680   0.174938 -15.0149 &lt; 2.2e-16 ***
+## PR 2    -2.761407   0.203692 -13.5567 &lt; 2.2e-16 ***
+## RSIZE 1 -1.166859   0.050982 -22.8877 &lt; 2.2e-16 ***
+## RSIZE 2 -1.184520   0.050259 -23.5685 &lt; 2.2e-16 ***
 ## BETA 1   1.644008   0.100520  16.3550 &lt; 2.2e-16 ***
-## BETA 2   1.741845   0.128535  13.5515 &lt; 2.2e-16 ***
+## BETA 2   1.741845   0.128536  13.5515 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -185,9 +185,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>The coefficients can be extracted by:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">coef</span>(res_cor_probit_2raters)</code></pre></div>
 <pre><code>##        LR 1        LR 2       LEV 1       LEV 2        PR 1        PR 2 
-##  0.19181519  0.08998022  0.45682662  0.44111809 -2.62668211 -2.76141092 
+##  0.19181645  0.08998178  0.45682446  0.44111540 -2.62668045 -2.76140750 
 ##     RSIZE 1     RSIZE 2      BETA 1      BETA 2 
-## -1.16686094 -1.18452182  1.64400769  1.74184465</code></pre>
+## -1.16685941 -1.18452031  1.64400778  1.74184468</code></pre>
 </div>
 <div id="example-2---a-simple-example-with-3-raters" class="section level2">
 <h2>Example 2 - A simple example with 3 raters</h2>
@@ -206,33 +206,33 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## Formula: MMO2(rater1, rater2, rater3) ~ 0 + LR + LEV + PR + RSIZE + BETA
 ## 
 ##    link threshold nsubjects ndim   logPL   CLAIC   CLBIC fevals
-## mvlogit  flexible       690    3 -1561.4 3194.64 3357.58   4222
+## mvlogit  flexible       690    3 -1561.4 3194.64 3357.58   4199
 ## 
 ## Thresholds:
 ##            Estimate Std. Error z value  Pr(&gt;|z|)    
-## rater1 A|B 14.71273    0.84962  17.317 &lt; 2.2e-16 ***
-## rater1 B|C 17.46132    0.92699  18.837 &lt; 2.2e-16 ***
-## rater1 C|D 20.65829    1.03917  19.880 &lt; 2.2e-16 ***
-## rater1 D|E 24.68645    1.20698  20.453 &lt; 2.2e-16 ***
-## rater2 A|B 14.87020    0.85299  17.433 &lt; 2.2e-16 ***
-## rater2 B|C 17.43897    0.93096  18.732 &lt; 2.2e-16 ***
-## rater2 C|D 20.47189    1.04358  19.617 &lt; 2.2e-16 ***
-## rater2 D|E 24.80045    1.22174  20.299 &lt; 2.2e-16 ***
+## rater1 A|B 14.71274    0.84962  17.317 &lt; 2.2e-16 ***
+## rater1 B|C 17.46133    0.92699  18.837 &lt; 2.2e-16 ***
+## rater1 C|D 20.65831    1.03917  19.880 &lt; 2.2e-16 ***
+## rater1 D|E 24.68647    1.20698  20.453 &lt; 2.2e-16 ***
+## rater2 A|B 14.87021    0.85299  17.433 &lt; 2.2e-16 ***
+## rater2 B|C 17.43898    0.93096  18.732 &lt; 2.2e-16 ***
+## rater2 C|D 20.47191    1.04358  19.617 &lt; 2.2e-16 ***
+## rater2 D|E 24.80047    1.22174  20.299 &lt; 2.2e-16 ***
 ## rater3 F|G 14.66330    0.86375  16.976 &lt; 2.2e-16 ***
-## rater3 G|H 17.35099    0.92572  18.743 &lt; 2.2e-16 ***
-## rater3 H|I 20.73809    1.04700  19.807 &lt; 2.2e-16 ***
-## rater3 I|J 23.25685    1.15044  20.216 &lt; 2.2e-16 ***
-## rater3 J|K 25.33849    1.22854  20.625 &lt; 2.2e-16 ***
+## rater3 G|H 17.35100    0.92572  18.743 &lt; 2.2e-16 ***
+## rater3 H|I 20.73811    1.04700  19.807 &lt; 2.2e-16 ***
+## rater3 I|J 23.25687    1.15044  20.216 &lt; 2.2e-16 ***
+## rater3 J|K 25.33851    1.22854  20.625 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Coefficients:
 ##          Estimate Std. Error  z value  Pr(&gt;|z|)    
 ## LR 1     0.333598   0.112624   2.9621  0.003056 ** 
-## LEV 1    0.746847   0.076165   9.8057 &lt; 2.2e-16 ***
-## PR 1    -4.930267   0.356519 -13.8289 &lt; 2.2e-16 ***
-## RSIZE 1 -2.073425   0.108014 -19.1958 &lt; 2.2e-16 ***
-## BETA 1   3.021152   0.222735  13.5639 &lt; 2.2e-16 ***
+## LEV 1    0.746848   0.076165   9.8057 &lt; 2.2e-16 ***
+## PR 1    -4.930273   0.356518 -13.8289 &lt; 2.2e-16 ***
+## RSIZE 1 -2.073427   0.108014 -19.1958 &lt; 2.2e-16 ***
+## BETA 1   3.021155   0.222735  13.5639 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -240,22 +240,22 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##                    Estimate Std. Error z value  Pr(&gt;|z|)    
 ## corr rater1 rater2 0.866603   0.027446  31.575 &lt; 2.2e-16 ***
 ## corr rater1 rater3 0.903774   0.024724  36.554 &lt; 2.2e-16 ***
-## corr rater2 rater3 0.822653   0.045875  17.933 &lt; 2.2e-16 ***
+## corr rater2 rater3 0.822652   0.045875  17.933 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <p>The threshold parameters are presented by:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">thresholds</span>(res_cor_probit_3raters)</code></pre></div>
 <pre><code>## $rater1
 ##      A|B      B|C      C|D      D|E 
-## 14.71273 17.46132 20.65829 24.68645 
+## 14.71274 17.46133 20.65831 24.68647 
 ## 
 ## $rater2
 ##      A|B      B|C      C|D      D|E 
-## 14.87020 17.43897 20.47189 24.80045 
+## 14.87021 17.43898 20.47191 24.80047 
 ## 
 ## $rater3
 ##      F|G      G|H      H|I      I|J      J|K 
-## 14.66330 17.35099 20.73809 23.25685 25.33849</code></pre>
+## 14.66330 17.35100 20.73811 23.25687 25.33851</code></pre>
 </div>
 <div id="example-3a---a-model-of-firm-ratings-assigned-by-multiple-raters-and-an-investment-speculative-grade-indicator" class="section level2">
 <h2>Example 3a - A model of firm ratings assigned by multiple raters and an investment-speculative grade indicator</h2>
@@ -271,94 +271,94 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##     BETA
 ## 
 ##     link threshold nsubjects ndim    logPL   CLAIC   CLBIC fevals
-## mvprobit  flexible       690    4 -2925.79 6037.29 6458.57   6139
+## mvprobit  flexible       690    4 -2925.83 6037.38 6458.64  15701
 ## 
 ## Thresholds:
 ##            Estimate Std. Error z value  Pr(&gt;|z|)    
-## rater1 A|B  8.05308    0.44312  18.174 &lt; 2.2e-16 ***
-## rater1 B|C  9.57196    0.47384  20.201 &lt; 2.2e-16 ***
-## rater1 C|D 11.35469    0.51753  21.940 &lt; 2.2e-16 ***
-## rater1 D|E 13.52181    0.60134  22.486 &lt; 2.2e-16 ***
-## rater2 A|B  8.59974    0.49820  17.262 &lt; 2.2e-16 ***
-## rater2 B|C 10.06007    0.53930  18.654 &lt; 2.2e-16 ***
-## rater2 C|D 11.86508    0.59726  19.866 &lt; 2.2e-16 ***
-## rater2 D|E 14.34057    0.70069  20.466 &lt; 2.2e-16 ***
-## rater3 F|G  8.24546    0.51708  15.946 &lt; 2.2e-16 ***
-## rater3 G|H  9.77754    0.55527  17.608 &lt; 2.2e-16 ***
-## rater3 H|I 11.70957    0.62261  18.807 &lt; 2.2e-16 ***
-## rater3 I|J 13.09715    0.68735  19.055 &lt; 2.2e-16 ***
-## rater3 J|K 14.17708    0.72080  19.669 &lt; 2.2e-16 ***
-## rater4 L|M 13.54304    1.00738  13.444 &lt; 2.2e-16 ***
+## rater1 A|B  8.04920    0.44306  18.167 &lt; 2.2e-16 ***
+## rater1 B|C  9.56783    0.47381  20.194 &lt; 2.2e-16 ***
+## rater1 C|D 11.34991    0.51747  21.933 &lt; 2.2e-16 ***
+## rater1 D|E 13.51638    0.60129  22.479 &lt; 2.2e-16 ***
+## rater2 A|B  8.59513    0.49834  17.247 &lt; 2.2e-16 ***
+## rater2 B|C 10.05454    0.53941  18.640 &lt; 2.2e-16 ***
+## rater2 C|D 11.85857    0.59749  19.847 &lt; 2.2e-16 ***
+## rater2 D|E 14.33336    0.70092  20.450 &lt; 2.2e-16 ***
+## rater3 F|G  8.24303    0.51775  15.921 &lt; 2.2e-16 ***
+## rater3 G|H  9.77659    0.55593  17.586 &lt; 2.2e-16 ***
+## rater3 H|I 11.70601    0.62343  18.777 &lt; 2.2e-16 ***
+## rater3 I|J 13.09380    0.68810  19.029 &lt; 2.2e-16 ***
+## rater3 J|K 14.17279    0.72153  19.643 &lt; 2.2e-16 ***
+## rater4 L|M 13.52691    1.00085  13.515 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Coefficients:
 ##          Estimate Std. Error  z value  Pr(&gt;|z|)    
-## LR 1     0.208387   0.067996   3.0647  0.002179 ** 
-## LR 2     0.153527   0.073349   2.0931  0.036340 *  
-## LR 3     0.180650   0.078391   2.3045  0.021195 *  
-## LR 4     0.150135   0.112011   1.3404  0.180128    
-## LEV 1    0.430524   0.043758   9.8388 &lt; 2.2e-16 ***
-## LEV 2    0.433143   0.050132   8.6400 &lt; 2.2e-16 ***
-## LEV 3    0.399637   0.050768   7.8719 3.493e-15 ***
-## LEV 4    0.626346   0.074278   8.4325 &lt; 2.2e-16 ***
-## PR 1    -2.574577   0.194047 -13.2678 &lt; 2.2e-16 ***
-## PR 2    -2.829004   0.216932 -13.0410 &lt; 2.2e-16 ***
-## PR 3    -2.679726   0.222574 -12.0397 &lt; 2.2e-16 ***
-## PR 4    -2.797267   0.281530  -9.9360 &lt; 2.2e-16 ***
-## RSIZE 1 -1.130529   0.056380 -20.0518 &lt; 2.2e-16 ***
-## RSIZE 2 -1.197017   0.061751 -19.3845 &lt; 2.2e-16 ***
-## RSIZE 3 -1.196935   0.066398 -18.0266 &lt; 2.2e-16 ***
-## RSIZE 4 -1.567831   0.116397 -13.4696 &lt; 2.2e-16 ***
-## BETA 1   1.602576   0.110842  14.4581 &lt; 2.2e-16 ***
-## BETA 2   1.802612   0.140077  12.8687 &lt; 2.2e-16 ***
-## BETA 3   1.517178   0.139209  10.8985 &lt; 2.2e-16 ***
-## BETA 4   1.990449   0.204850   9.7166 &lt; 2.2e-16 ***
+## LR 1     0.208652   0.068020   3.0675  0.002159 ** 
+## LR 2     0.153212   0.073420   2.0868  0.036906 *  
+## LR 3     0.180531   0.078643   2.2956  0.021700 *  
+## LR 4     0.150887   0.111750   1.3502  0.176944    
+## LEV 1    0.430213   0.043774   9.8281 &lt; 2.2e-16 ***
+## LEV 2    0.432842   0.050129   8.6346 &lt; 2.2e-16 ***
+## LEV 3    0.399459   0.050826   7.8594 3.861e-15 ***
+## LEV 4    0.624967   0.074146   8.4289 &lt; 2.2e-16 ***
+## PR 1    -2.573616   0.194046 -13.2629 &lt; 2.2e-16 ***
+## PR 2    -2.827056   0.217061 -13.0242 &lt; 2.2e-16 ***
+## PR 3    -2.678170   0.222705 -12.0257 &lt; 2.2e-16 ***
+## PR 4    -2.793063   0.279732  -9.9848 &lt; 2.2e-16 ***
+## RSIZE 1 -1.129967   0.056379 -20.0424 &lt; 2.2e-16 ***
+## RSIZE 2 -1.196432   0.061776 -19.3671 &lt; 2.2e-16 ***
+## RSIZE 3 -1.196481   0.066503 -17.9914 &lt; 2.2e-16 ***
+## RSIZE 4 -1.565903   0.115749 -13.5285 &lt; 2.2e-16 ***
+## BETA 1   1.602187   0.110868  14.4513 &lt; 2.2e-16 ***
+## BETA 2   1.801526   0.140123  12.8567 &lt; 2.2e-16 ***
+## BETA 3   1.517633   0.139319  10.8932 &lt; 2.2e-16 ***
+## BETA 4   1.988644   0.203338   9.7800 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Error Structure:
 ##                    Estimate Std. Error z value  Pr(&gt;|z|)    
-## corr rater1 rater2 0.874183   0.024864  35.158 &lt; 2.2e-16 ***
-## corr rater1 rater3 0.914814   0.023171  39.481 &lt; 2.2e-16 ***
-## corr rater1 rater4 0.900697   0.031939  28.201 &lt; 2.2e-16 ***
-## corr rater2 rater3 0.837847   0.041416  20.230 &lt; 2.2e-16 ***
-## corr rater2 rater4 0.926213   0.031728  29.192 &lt; 2.2e-16 ***
-## corr rater3 rater4 0.845626   0.060134  14.062 &lt; 2.2e-16 ***
+## corr rater1 rater2 0.875996   0.024554  35.677 &lt; 2.2e-16 ***
+## corr rater1 rater3 0.913588   0.023462  38.940 &lt; 2.2e-16 ***
+## corr rater1 rater4 0.896170   0.033495  26.755 &lt; 2.2e-16 ***
+## corr rater2 rater3 0.831679   0.042740  19.459 &lt; 2.2e-16 ***
+## corr rater2 rater4 0.926139   0.031808  29.117 &lt; 2.2e-16 ***
+## corr rater3 rater4 0.866521   0.051285  16.896 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <p>The threshold coefficients can be extracted by:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">thresholds</span>(res_cor_probit_simple)</code></pre></div>
 <pre><code>## $rater1
 ##       A|B       B|C       C|D       D|E 
-##  8.053083  9.571962 11.354686 13.521806 
+##  8.049203  9.567831 11.349908 13.516375 
 ## 
 ## $rater2
 ##       A|B       B|C       C|D       D|E 
-##  8.599739 10.060068 11.865083 14.340568 
+##  8.595126 10.054536 11.858567 14.333362 
 ## 
 ## $rater3
 ##       F|G       G|H       H|I       I|J       J|K 
-##  8.245461  9.777541 11.709568 13.097152 14.177082 
+##  8.243027  9.776591 11.706012 13.093799 14.172787 
 ## 
 ## $rater4
 ##      L|M 
-## 13.54304</code></pre>
+## 13.52691</code></pre>
 <p>The regression coefficients are obtained by:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">coef</span>(res_cor_probit_simple)</code></pre></div>
 <pre><code>##       LR 1       LR 2       LR 3       LR 4      LEV 1      LEV 2      LEV 3 
-##  0.2083869  0.1535266  0.1806502  0.1501350  0.4305235  0.4331427  0.3996369 
+##  0.2086517  0.1532119  0.1805309  0.1508872  0.4302126  0.4328417  0.3994591 
 ##      LEV 4       PR 1       PR 2       PR 3       PR 4    RSIZE 1    RSIZE 2 
-##  0.6263461 -2.5745773 -2.8290041 -2.6797255 -2.7972672 -1.1305294 -1.1970173 
+##  0.6249669 -2.5736158 -2.8270564 -2.6781697 -2.7930627 -1.1299673 -1.1964316 
 ##    RSIZE 3    RSIZE 4     BETA 1     BETA 2     BETA 3     BETA 4 
-## -1.1969355 -1.5678310  1.6025757  1.8026120  1.5171782  1.9904487</code></pre>
+## -1.1964814 -1.5659034  1.6021871  1.8015260  1.5176327  1.9886441</code></pre>
 <p>The error structure for firm with <code>firm_id = 11</code> is displayed by:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">error_structure</span>(res_cor_probit_simple)[[<span class="dv">11</span>]]</code></pre></div>
 <pre><code>##           rater1    rater2    rater3    rater4
-## rater1 1.0000000 0.8741830 0.9148139 0.9006967
-## rater2 0.8741830 1.0000000 0.8378465 0.9262133
-## rater3 0.9148139 0.8378465 1.0000000 0.8456261
-## rater4 0.9006967 0.9262133 0.8456261 1.0000000</code></pre>
+## rater1 1.0000000 0.8759965 0.9135876 0.8961703
+## rater2 0.8759965 1.0000000 0.8316790 0.9261393
+## rater3 0.9135876 0.8316790 1.0000000 0.8665213
+## rater4 0.8961703 0.9261393 0.8665213 1.0000000</code></pre>
 </div>
 <div id="example-3b---a-more-elaborate-model-of-ratings-assigned-by-multiple-raters" class="section level2">
 <h2>Example 3b - A more elaborate model of ratings assigned by multiple raters</h2>
@@ -384,47 +384,47 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##     BETA
 ## 
 ##    link threshold nsubjects ndim    logPL   CLAIC   CLBIC fevals
-## mvlogit  flexible       690    4 -2926.42 5987.81 6293.98  10626
+## mvlogit  flexible       690    4 -2926.42 5987.81 6293.98   9338
 ## 
 ## Thresholds:
 ##            Estimate Std. Error z value  Pr(&gt;|z|)    
 ## rater1 A|B 15.04918    0.82409  18.262 &lt; 2.2e-16 ***
-## rater1 B|C 17.75219    0.89727  19.785 &lt; 2.2e-16 ***
-## rater1 C|D 20.97822    1.00773  20.817 &lt; 2.2e-16 ***
-## rater1 D|E 25.13048    1.17487  21.390 &lt; 2.2e-16 ***
+## rater1 B|C 17.75218    0.89728  19.785 &lt; 2.2e-16 ***
+## rater1 C|D 20.97821    1.00773  20.817 &lt; 2.2e-16 ***
+## rater1 D|E 25.13047    1.17487  21.390 &lt; 2.2e-16 ***
 ## rater3 F|G 14.47061    0.83922  17.243 &lt; 2.2e-16 ***
 ## rater3 G|H 17.17327    0.89515  19.185 &lt; 2.2e-16 ***
-## rater3 H|I 20.56635    1.01119  20.339 &lt; 2.2e-16 ***
-## rater3 I|J 23.00524    1.11045  20.717 &lt; 2.2e-16 ***
-## rater3 J|K 24.97259    1.18725  21.034 &lt; 2.2e-16 ***
-## rater4 L|M 23.92769    1.63196  14.662 &lt; 2.2e-16 ***
+## rater3 H|I 20.56634    1.01119  20.339 &lt; 2.2e-16 ***
+## rater3 I|J 23.00523    1.11045  20.717 &lt; 2.2e-16 ***
+## rater3 J|K 24.97258    1.18725  21.034 &lt; 2.2e-16 ***
+## rater4 L|M 23.92770    1.63196  14.662 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Coefficients:
 ##          Estimate Std. Error  z value  Pr(&gt;|z|)    
 ## LR 1     0.340210   0.110547   3.0775  0.002087 ** 
-## LEV 1    0.784295   0.075977  10.3228 &lt; 2.2e-16 ***
-## LEV 2    0.779695   0.078364   9.9497 &lt; 2.2e-16 ***
-## LEV 3    0.718330   0.093425   7.6889 1.484e-14 ***
+## LEV 1    0.784294   0.075977  10.3228 &lt; 2.2e-16 ***
+## LEV 2    0.779694   0.078364   9.9496 &lt; 2.2e-16 ***
+## LEV 3    0.718329   0.093425   7.6888 1.485e-14 ***
 ## LEV 4    1.107836   0.123681   8.9572 &lt; 2.2e-16 ***
-## PR 1    -4.917965   0.343464 -14.3187 &lt; 2.2e-16 ***
-## RSIZE 1 -2.093379   0.103690 -20.1889 &lt; 2.2e-16 ***
-## RSIZE 2 -2.746162   0.188731 -14.5507 &lt; 2.2e-16 ***
-## BETA 1   3.135693   0.221944  14.1283 &lt; 2.2e-16 ***
-## BETA 2   2.733086   0.252960  10.8044 &lt; 2.2e-16 ***
-## BETA 3   3.572688   0.349493  10.2225 &lt; 2.2e-16 ***
+## PR 1    -4.917963   0.343464 -14.3187 &lt; 2.2e-16 ***
+## RSIZE 1 -2.093378   0.103690 -20.1889 &lt; 2.2e-16 ***
+## RSIZE 2 -2.746163   0.188731 -14.5507 &lt; 2.2e-16 ***
+## BETA 1   3.135692   0.221944  14.1283 &lt; 2.2e-16 ***
+## BETA 2   2.733088   0.252960  10.8044 &lt; 2.2e-16 ***
+## BETA 3   3.572691   0.349493  10.2225 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Error Structure:
 ##                    Estimate Std. Error z value  Pr(&gt;|z|)    
-## corr rater1 rater2 0.859773   0.027907  30.808 &lt; 2.2e-16 ***
+## corr rater1 rater2 0.859776   0.027907  30.809 &lt; 2.2e-16 ***
 ## corr rater1 rater3 0.908834   0.024636  36.891 &lt; 2.2e-16 ***
-## corr rater1 rater4 0.903959   0.031857  28.375 &lt; 2.2e-16 ***
-## corr rater2 rater3 0.834910   0.044258  18.865 &lt; 2.2e-16 ***
-## corr rater2 rater4 0.932243   0.032172  28.977 &lt; 2.2e-16 ***
-## corr rater3 rater4 0.856221   0.058398  14.662 &lt; 2.2e-16 ***
+## corr rater1 rater4 0.903956   0.031858  28.374 &lt; 2.2e-16 ***
+## corr rater2 rater3 0.834904   0.044259  18.864 &lt; 2.2e-16 ***
+## corr rater2 rater4 0.932242   0.032173  28.976 &lt; 2.2e-16 ***
+## corr rater3 rater4 0.856234   0.058392  14.664 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <p>The constraints are displayed by:</p>
@@ -516,15 +516,15 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>Note that the composite likelihood information criteria can be used for model comparison. For objects of class <code>mvord</code> the composite likelihood AIC and BIC are computed by <code>AIC()</code> and <code>BIC()</code>, respectively. The model fits of examples one and two are compared by means of BIC and AIC. We observe that the model of Example 3b has a lower BIC and AIC indicating a better model fit:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">BIC</span>(res_cor_probit_simple, res_cor_logit)</code></pre></div>
 <pre><code>##                             df      BIC
-## res_cor_probit_simple 92.85905 6458.566
+## res_cor_probit_simple 92.85637 6458.641
 ## res_cor_logit         67.48687 6293.977</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">AIC</span>(res_cor_probit_simple)</code></pre></div>
-<pre><code>## [1] 6037.293</code></pre>
+<pre><code>## [1] 6037.38</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">AIC</span>(res_cor_logit)</code></pre></div>
 <pre><code>## [1] 5987.81</code></pre>
 <p>The value of the pairwise log-likelihood of the two models can be extracted by:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">logLik</span>(res_cor_probit_simple)</code></pre></div>
-<pre><code>## 'log Lik.' -2925.788 (df=92.85905)</code></pre>
+<pre><code>## 'log Lik.' -2925.834 (df=92.85637)</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">logLik</span>(res_cor_logit)</code></pre></div>
 <pre><code>## 'log Lik.' -2926.418 (df=67.48687)</code></pre>
 <p>Marginal predictions are obtained by:</p>
@@ -631,78 +631,78 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <pre><code>## Formula: MMO(rating, firm_id, year) ~ LR + LEV + PR + RSIZE + BETA
 ## 
 ##     link threshold nsubjects ndim     logPL     CLAIC     CLBIC fevals
-## mvprobit fix1first      1415    8 -77843.09 156104.49 157203.55    189
+## mvprobit fix1first      1415    8 -74805.56 150098.19 151377.93    181
 ## 
 ## Thresholds:
 ##           Estimate Std. Error z value  Pr(&gt;|z|)    
 ## year1 A|B 0.000000   0.000000      NA        NA    
-## year1 B|C 0.984647   0.025802  38.162 &lt; 2.2e-16 ***
-## year1 C|D 2.364711   0.039873  59.306 &lt; 2.2e-16 ***
-## year1 D|E 3.728002   0.055724  66.901 &lt; 2.2e-16 ***
+## year1 B|C 1.016137   0.026379  38.521 &lt; 2.2e-16 ***
+## year1 C|D 2.444887   0.041170  59.385 &lt; 2.2e-16 ***
+## year1 D|E 3.891073   0.058843  66.127 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Coefficients:
-##                  Estimate  Std. Error  z value  Pr(&gt;|z|)    
-## (Intercept) 1  1.42471225  0.04556961  31.2645 &lt; 2.2e-16 ***
-## (Intercept) 2  1.49164394  0.05786976  25.7759 &lt; 2.2e-16 ***
-## LR 1           0.02142909  0.00054203  39.5346 &lt; 2.2e-16 ***
-## LR 2           0.02959425  0.00096574  30.6442 &lt; 2.2e-16 ***
-## LEV 1          0.01114252  0.00052558  21.2004 &lt; 2.2e-16 ***
-## LEV 2          0.01390128  0.00081658  17.0238 &lt; 2.2e-16 ***
-## PR 1          -0.87154954  0.03320032 -26.2512 &lt; 2.2e-16 ***
-## PR 2          -0.67501624  0.04542960 -14.8585 &lt; 2.2e-16 ***
-## RSIZE 1       -0.34752657  0.00995679 -34.9035 &lt; 2.2e-16 ***
-## RSIZE 2       -0.35102290  0.01354452 -25.9162 &lt; 2.2e-16 ***
-## BETA 1         0.04802612  0.02197463   2.1855  0.028850 *  
-## BETA 2         0.08627324  0.03090444   2.7916  0.005245 ** 
+##                 Estimate Std. Error  z value  Pr(&gt;|z|)    
+## (Intercept) 1  1.4190682  0.0532243  26.6620 &lt; 2.2e-16 ***
+## (Intercept) 2  1.4975500  0.0494038  30.3124 &lt; 2.2e-16 ***
+## LR 1           0.0193546  0.0006938  27.8966 &lt; 2.2e-16 ***
+## LR 2           0.0323230  0.0010102  31.9955 &lt; 2.2e-16 ***
+## LEV 1          0.0268125  0.0019263  13.9191 &lt; 2.2e-16 ***
+## LEV 2          0.0180050  0.0013143  13.6993 &lt; 2.2e-16 ***
+## PR 1          -1.0930080  0.0427073 -25.5930 &lt; 2.2e-16 ***
+## PR 2          -0.7411681  0.0372295 -19.9081 &lt; 2.2e-16 ***
+## RSIZE 1       -0.3676665  0.0114038 -32.2407 &lt; 2.2e-16 ***
+## RSIZE 2       -0.3608979  0.0115297 -31.3016 &lt; 2.2e-16 ***
+## BETA 1         0.0541624  0.0296028   1.8296    0.0673 .  
+## BETA 2         0.1099998  0.0236754   4.6462 3.382e-06 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Error Structure:
 ##              Estimate Std. Error  z value  Pr(&gt;|z|)    
-## (Intercept)  1.408874   0.054179  26.0042 &lt; 2.2e-16 ***
-## BSECBSEC2   -0.487134   0.071649  -6.7989 1.054e-11 ***
-## BSECBSEC3   -0.055125   0.064215  -0.8585   0.39064    
-## BSECBSEC4   -0.108108   0.062361  -1.7336   0.08299 .  
-## BSECBSEC5   -0.069888   0.079575  -0.8783   0.37980    
-## BSECBSEC6   -0.599137   0.069668  -8.5999 &lt; 2.2e-16 ***
-## BSECBSEC7   -0.764239   0.067277 -11.3597 &lt; 2.2e-16 ***
-## BSECBSEC8   -0.653992   0.078939  -8.2848 &lt; 2.2e-16 ***
+## (Intercept)  1.490395   0.051540  28.9173 &lt; 2.2e-16 ***
+## BSECBSEC2   -0.552317   0.069241  -7.9767 1.503e-15 ***
+## BSECBSEC3   -0.062028   0.066553  -0.9320    0.3513    
+## BSECBSEC4   -0.085592   0.065126  -1.3142    0.1888    
+## BSECBSEC5   -0.066598   0.085692  -0.7772    0.4371    
+## BSECBSEC6   -0.683429   0.069184  -9.8785 &lt; 2.2e-16 ***
+## BSECBSEC7   -0.863911   0.064855 -13.3206 &lt; 2.2e-16 ***
+## BSECBSEC8   -0.757997   0.078506  -9.6553 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <p>The default error structure output for AR(1) models:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">error_structure</span>(res_AR1_probit)</code></pre></div>
-<pre><code>## (Intercept)   BSECBSEC2   BSECBSEC3   BSECBSEC4   BSECBSEC5   BSECBSEC6 
-##  1.40887376 -0.48713415 -0.05512540 -0.10810818 -0.06988803 -0.59913737 
-##   BSECBSEC7   BSECBSEC8 
-## -0.76423929 -0.65399207</code></pre>
+<pre><code>##         V16         V17         V18         V19         V20         V21 
+##  1.49039489 -0.55231725 -0.06202790 -0.08559155 -0.06659849 -0.68342920 
+##         V22         V23 
+## -0.86391149 -0.75799729</code></pre>
 <p>Correlation parameters <span class="math inline">\(\rho_i\)</span> for each firm are obtained by choosing <code>type = &quot;corr&quot;</code> in <code>error_structure()</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(<span class="kw">error_structure</span>(res_AR1_probit, <span class="dt">type =</span> <span class="st">&quot;corr&quot;</span>), <span class="dt">n =</span> <span class="dv">3</span>)</code></pre></div>
 <pre><code>##   Correlation
-## 1   0.8749351
-## 2   0.6694448
-## 3   0.8749351</code></pre>
+## 1   0.8913315
+## 2   0.6679130
+## 3   0.8913315</code></pre>
 <p>Correlation matrices for each specific firm are obtained by choosing <code>type = &quot;sigmas&quot;</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(<span class="kw">error_structure</span>(res_AR1_probit, <span class="dt">type =</span> <span class="st">&quot;sigmas&quot;</span>), <span class="dt">n =</span> <span class="dv">1</span>)</code></pre></div>
 <pre><code>## $`1`
 ##           year1     year2     year3     year4     year5     year6     year7
-## year1 1.0000000 0.8749351 0.7655115 0.6697729 0.5860078 0.5127188 0.4485957
-## year2 0.8749351 1.0000000 0.8749351 0.7655115 0.6697729 0.5860078 0.5127188
-## year3 0.7655115 0.8749351 1.0000000 0.8749351 0.7655115 0.6697729 0.5860078
-## year4 0.6697729 0.7655115 0.8749351 1.0000000 0.8749351 0.7655115 0.6697729
-## year5 0.5860078 0.6697729 0.7655115 0.8749351 1.0000000 0.8749351 0.7655115
-## year6 0.5127188 0.5860078 0.6697729 0.7655115 0.8749351 1.0000000 0.8749351
-## year7 0.4485957 0.5127188 0.5860078 0.6697729 0.7655115 0.8749351 1.0000000
-## year8 0.3924921 0.4485957 0.5127188 0.5860078 0.6697729 0.7655115 0.8749351
+## year1 1.0000000 0.8913315 0.7944718 0.7081377 0.6311854 0.5625954 0.5014590
+## year2 0.8913315 1.0000000 0.8913315 0.7944718 0.7081377 0.6311854 0.5625954
+## year3 0.7944718 0.8913315 1.0000000 0.8913315 0.7944718 0.7081377 0.6311854
+## year4 0.7081377 0.7944718 0.8913315 1.0000000 0.8913315 0.7944718 0.7081377
+## year5 0.6311854 0.7081377 0.7944718 0.8913315 1.0000000 0.8913315 0.7944718
+## year6 0.5625954 0.6311854 0.7081377 0.7944718 0.8913315 1.0000000 0.8913315
+## year7 0.5014590 0.5625954 0.6311854 0.7081377 0.7944718 0.8913315 1.0000000
+## year8 0.4469662 0.5014590 0.5625954 0.6311854 0.7081377 0.7944718 0.8913315
 ##           year8
-## year1 0.3924921
-## year2 0.4485957
-## year3 0.5127188
-## year4 0.5860078
-## year5 0.6697729
-## year6 0.7655115
-## year7 0.8749351
+## year1 0.4469662
+## year2 0.5014590
+## year3 0.5625954
+## year4 0.6311854
+## year5 0.7081377
+## year6 0.7944718
+## year7 0.8913315
 ## year8 1.0000000</code></pre>
 </div>
 <div id="example-5---self-reported-health-status" class="section level2">
@@ -728,44 +728,44 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
     <span class="dt">coef.constraints =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">8</span>),
     <span class="dt">error.structure =</span> <span class="kw">cor_ar1</span>(<span class="op">~</span><span class="st"> </span><span class="dv">1</span>), <span class="dt">link =</span> <span class="kw">mvlogit</span>(), 
     <span class="dt">PL.lag =</span> <span class="dv">2</span>)</code></pre></div>
-<p>(runtime 11 minutes).</p>
+<p>(runtime 12 minutes).</p>
 <p>The persistence in the reported health status is high. The correlation parameter in the <code>cor_ar1</code> error structure is</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">unique</span>(<span class="kw">error_structure</span>(res_srhs, <span class="dt">type =</span> <span class="st">&quot;corr&quot;</span>))</code></pre></div>
 <pre><code>##   Correlation
-## 1   0.7621568</code></pre>
+## 1   0.8820163</code></pre>
 <p>The estimated parameters are shown by the function <code>summary()</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(res_srhs, <span class="dt">call =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <pre><code>## Formula: MMO(srhs, id, time) ~ 0 + factor(gender) + factor(race) + factor(education) + 
 ##     age
 ## 
 ##    link threshold nsubjects ndim      logPL     CLAIC     CLBIC fevals
-## mvlogit  flexible      7074    8 -236814.26 473845.34 474589.46    416
+## mvlogit  flexible      7074    8 -239860.22 479933.65 480665.42    404
 ## 
 ## Thresholds:
 ##       Estimate Std. Error  z value Pr(&gt;|z|)    
-## 1 1|2 -1.78171    0.12730 -13.9958   &lt;2e-16 ***
-## 1 2|3 -0.10283    0.12866  -0.7993   0.4241    
-## 1 3|4  1.42587    0.13019  10.9525   &lt;2e-16 ***
-## 1 4|5  3.05552    0.13322  22.9364   &lt;2e-16 ***
+## 1 1|2 -1.78119    0.11595 -15.3621   &lt;2e-16 ***
+## 1 2|3 -0.11563    0.11679  -0.9901   0.3221    
+## 1 3|4  1.40676    0.11857  11.8644   &lt;2e-16 ***
+## 1 4|5  3.03358    0.12245  24.7741   &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Coefficients:
 ##                        Estimate Std. Error  z value  Pr(&gt;|z|)    
-## factor(gender)2 1    -0.0042032  0.0346822  -0.1212    0.9035    
-## factor(race)2 1       0.6131727  0.0504085  12.1641 &lt; 2.2e-16 ***
-## factor(race)3 1       0.5060946  0.0897595   5.6383 1.717e-08 ***
-## factor(education)2 1 -0.5348146  0.0803199  -6.6586 2.765e-11 ***
-## factor(education)3 1 -1.0149545  0.0465579 -21.7998 &lt; 2.2e-16 ***
-## factor(education)4 1 -1.3080628  0.0526356 -24.8513 &lt; 2.2e-16 ***
-## factor(education)5 1 -1.7428100  0.0542998 -32.0961 &lt; 2.2e-16 ***
-## age 1                 0.0162628  0.0019100   8.5146 &lt; 2.2e-16 ***
+## factor(gender)2 1    -0.0059763  0.0382602  -0.1562    0.8759    
+## factor(race)2 1       0.6083505  0.0560734  10.8492 &lt; 2.2e-16 ***
+## factor(race)3 1       0.5050706  0.0994654   5.0779 3.817e-07 ***
+## factor(education)2 1 -0.5344365  0.0889470  -6.0085 1.873e-09 ***
+## factor(education)3 1 -1.0114449  0.0516341 -19.5887 &lt; 2.2e-16 ***
+## factor(education)4 1 -1.3037171  0.0583832 -22.3304 &lt; 2.2e-16 ***
+## factor(education)5 1 -1.7340257  0.0603490 -28.7333 &lt; 2.2e-16 ***
+## age 1                 0.0161467  0.0016881   9.5649 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Error Structure:
 ##              Estimate Std. Error z value  Pr(&gt;|z|)    
-## (Intercept) 1.0013411  0.0084935   117.9 &lt; 2.2e-16 ***
+## (Intercept) 1.3847764  0.0088376  156.69 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <p>In the logit model the coefficients can be interpreted in terms of log-odds ratios. The results suggest that being non-white increases the chances of reporting a worse health status while higher people with education levels tend to report better health. Moreover, every additional year increases the odds of reporting a worse health status by 1.64% (<span class="math inline">\(exp(0.0162628)=1.016396\)</span>).</p>
@@ -795,24 +795,24 @@ df &lt;-<span class="st"> </span><span class="kw">cbind.data.frame</span>(y, wl)
   <span class="dt">formula =</span> <span class="kw">MMO2</span>(Judge1, Judge2, Judge3, Judge4, Judge5) <span class="op">~</span><span class="st"> </span><span class="op">-</span><span class="dv">1</span>,
   <span class="dt">data =</span> df, <span class="dt">threshold.constraints =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">5</span>),
   <span class="dt">coef.constraints =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">5</span>))</code></pre></div>
-<p>(runtime 19 seconds).</p>
+<p>(runtime 14 seconds).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(res_essay_<span class="dv">0</span>, <span class="dt">call =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <pre><code>## Formula: MMO2(Judge1, Judge2, Judge3, Judge4, Judge5) ~ -1
 ## 
 ##     link threshold nsubjects ndim    logPL    CLAIC    CLBIC fevals
-## mvprobit  flexible       198    5 -8528.42 17172.01 17361.38   1661
+## mvprobit  flexible       198    5 -8528.42 17172.01 17361.38   1443
 ## 
 ## Thresholds:
-##                Estimate  Std. Error  z value  Pr(&gt;|z|)    
-## Judge1 1|2  -1.24483406  0.07950626 -15.6571 &lt; 2.2e-16 ***
-## Judge1 2|3  -0.66341394  0.06768901  -9.8009 &lt; 2.2e-16 ***
-## Judge1 3|4  -0.32971161  0.06516921  -5.0593 4.208e-07 ***
-## Judge1 4|5   0.00013865  0.06328033   0.0022    0.9983    
-## Judge1 5|6   0.34966460  0.06546890   5.3409 9.247e-08 ***
-## Judge1 6|7   0.63528723  0.06688036   9.4989 &lt; 2.2e-16 ***
-## Judge1 7|8   0.99375222  0.07409651  13.4116 &lt; 2.2e-16 ***
-## Judge1 8|9   1.33448377  0.08063648  16.5494 &lt; 2.2e-16 ***
-## Judge1 9|10  1.91969997  0.10649013  18.0270 &lt; 2.2e-16 ***
+##               Estimate Std. Error  z value  Pr(&gt;|z|)    
+## Judge1 1|2  -1.2448340  0.0795063 -15.6571 &lt; 2.2e-16 ***
+## Judge1 2|3  -0.6634138  0.0676890  -9.8009 &lt; 2.2e-16 ***
+## Judge1 3|4  -0.3297115  0.0651692  -5.0593 4.208e-07 ***
+## Judge1 4|5   0.0001387  0.0632803   0.0022    0.9983    
+## Judge1 5|6   0.3496646  0.0654689   5.3409 9.247e-08 ***
+## Judge1 6|7   0.6352872  0.0668804   9.4989 &lt; 2.2e-16 ***
+## Judge1 7|8   0.9937520  0.0740965  13.4116 &lt; 2.2e-16 ***
+## Judge1 8|9   1.3344835  0.0806365  16.5494 &lt; 2.2e-16 ***
+## Judge1 9|10  1.9196999  0.1064901  18.0270 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -821,16 +821,16 @@ df &lt;-<span class="st"> </span><span class="kw">cbind.data.frame</span>(y, wl)
 ## 
 ## Error Structure:
 ##                    Estimate Std. Error z value  Pr(&gt;|z|)    
-## corr Judge1 Judge2 0.476079   0.061835  7.6992 1.370e-14 ***
+## corr Judge1 Judge2 0.476080   0.061835  7.6992 1.369e-14 ***
 ## corr Judge1 Judge3 0.569194   0.046682 12.1930 &lt; 2.2e-16 ***
-## corr Judge1 Judge4 0.645197   0.046595 13.8468 &lt; 2.2e-16 ***
-## corr Judge1 Judge5 0.322529   0.090318  3.5710 0.0003556 ***
+## corr Judge1 Judge4 0.645198   0.046595 13.8468 &lt; 2.2e-16 ***
+## corr Judge1 Judge5 0.322528   0.090319  3.5710 0.0003556 ***
 ## corr Judge2 Judge3 0.396377   0.056243  7.0475 1.821e-12 ***
-## corr Judge2 Judge4 0.634421   0.046930 13.5186 &lt; 2.2e-16 ***
+## corr Judge2 Judge4 0.634422   0.046930 13.5186 &lt; 2.2e-16 ***
 ## corr Judge2 Judge5 0.621900   0.041815 14.8725 &lt; 2.2e-16 ***
 ## corr Judge3 Judge4 0.391911   0.072272  5.4227 5.871e-08 ***
-## corr Judge3 Judge5 0.382999   0.066020  5.8012 6.582e-09 ***
-## corr Judge4 Judge5 0.693040   0.041728 16.6087 &lt; 2.2e-16 ***
+## corr Judge3 Judge5 0.382999   0.066020  5.8013 6.582e-09 ***
+## corr Judge4 Judge5 0.693040   0.041727 16.6087 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <p>The word length can be included as a covariate in the model:</p>
@@ -838,12 +838,12 @@ df &lt;-<span class="st"> </span><span class="kw">cbind.data.frame</span>(y, wl)
   <span class="dt">formula =</span> <span class="kw">MMO2</span>(Judge1, Judge2, Judge3, Judge4, Judge5) <span class="op">~</span><span class="st"> </span><span class="dv">0</span> <span class="op">+</span><span class="st"> </span>wl,
   <span class="dt">data =</span> df, <span class="dt">threshold.constraints =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">5</span>),
   <span class="dt">coef.constraints =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">5</span>))</code></pre></div>
-<p>(runtime 1 minutes).</p>
+<p>(runtime 0 minutes).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(res_essay_wl, <span class="dt">call =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <pre><code>## Formula: MMO2(Judge1, Judge2, Judge3, Judge4, Judge5) ~ 0 + wl
 ## 
 ##     link threshold nsubjects ndim    logPL    CLAIC    CLBIC fevals
-## mvprobit  flexible       198    5 -8488.74 17110.73 17329.81   2164
+## mvprobit  flexible       198    5 -8488.74 17110.73 17329.81   2161
 ## 
 ## Thresholds:
 ##             Estimate Std. Error z value  Pr(&gt;|z|)    
@@ -868,14 +868,14 @@ df &lt;-<span class="st"> </span><span class="kw">cbind.data.frame</span>(y, wl)
 ## Error Structure:
 ##                    Estimate Std. Error z value  Pr(&gt;|z|)    
 ## corr Judge1 Judge2 0.459154   0.062913  7.2983 2.915e-13 ***
-## corr Judge1 Judge3 0.558919   0.047414 11.7880 &lt; 2.2e-16 ***
+## corr Judge1 Judge3 0.558919   0.047414 11.7881 &lt; 2.2e-16 ***
 ## corr Judge1 Judge4 0.631977   0.048175 13.1182 &lt; 2.2e-16 ***
-## corr Judge1 Judge5 0.295952   0.089837  3.2943 0.0009866 ***
+## corr Judge1 Judge5 0.295951   0.089837  3.2943 0.0009866 ***
 ## corr Judge2 Judge3 0.382554   0.056902  6.7230 1.780e-11 ***
 ## corr Judge2 Judge4 0.621086   0.048802 12.7266 &lt; 2.2e-16 ***
 ## corr Judge2 Judge5 0.608996   0.043499 14.0004 &lt; 2.2e-16 ***
-## corr Judge3 Judge4 0.374733   0.073984  5.0651 4.082e-07 ***
-## corr Judge3 Judge5 0.368174   0.067220  5.4771 4.323e-08 ***
+## corr Judge3 Judge4 0.374731   0.073984  5.0651 4.083e-07 ***
+## corr Judge3 Judge5 0.368174   0.067220  5.4772 4.322e-08 ***
 ## corr Judge4 Judge5 0.681338   0.044116 15.4442 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
@@ -889,7 +889,7 @@ agree_prob &lt;-<span class="st"> </span><span class="kw">Reduce</span>(<span cl
 <p>In order to assess the relationship between the average word length and the agreement probabilities, we plot the probabilities of agreement implied by the model against the word length.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(df<span class="op">$</span>wl, agree_prob,
   <span class="dt">xlab =</span> <span class="st">&quot;word length&quot;</span>, <span class="dt">ylab =</span> <span class="st">&quot;probability of agreement&quot;</span>)</code></pre></div>
-<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
 <!-- \begin{center} -->
 <!-- \begin{figure}[!h] -->
 <!-- \caption{Probabilities of agreement between the five raters and word length} -->

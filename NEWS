@@ -1,5 +1,13 @@
 This file documents updates and changes in the package mvord
 
+changes in version 1.1.0 (2020-11-17)
+- speed up in PL_fun - minimal changes in the 10+ decimal places for some specific lead to minimal deviations in the optimization results of the general purpose optimizers. In some cases more evaluation steps are needed.
+- implementation of PL_fast
+- fixed bug in vector constraints for coef
+
+changes in version 1.0.2 (2020-08-31)
+- fixed bug in prediction with categorial variables with newdata
+
 changes in version 1.0.1 (2020-05-27)
 - changes in checks due to new treatment when combining ordered factors in R 4.0.1.
 
