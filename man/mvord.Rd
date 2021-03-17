@@ -481,7 +481,7 @@ head(error_structure(res_cor))
 
 }
 \references{
-Hirk R, Hornik K, Vana L (2020). “\pkg{mvord}: An \strong{R} Package for Fitting Multivariate Ordinal Regression Models.” \emph{Journal of Statistical Software}, \strong{93}(4), 1–41. doi: 10.18637/jss.v093.i04 (URL: \url{https://doi.org/10.18637/jss.v093.i04}).
+Hirk R, Hornik K, Vana L (2020). “\pkg{mvord}: An \strong{R} Package for Fitting Multivariate Ordinal Regression Models.” \emph{Journal of Statistical Software}, \strong{93}(4), 1–41, \doi{10.18637/jss.v093.i04}.
 }
 \seealso{
 %\code{\link{predict.mvord}},

@@ -170,7 +170,8 @@ finalize.error_struct <-
   function(eobj, tpar)
   {
     eobj <- finalize_fun(eobj, tpar)
-    eobj$value_tmp <- NULL
+
+    #eobj$value_tmp <- NULL #comment 26.02.2021
 
     #  attr(eobj, "subjnames") <- NULL
     #attr(eobj, "ynames") <- NULL
@@ -192,6 +193,7 @@ start_values.cov_general <- function(eobj) {
   ## TODO for the given values
   tmp
 }
+
 init_fun.cov_general <-
   function(eobj,  data, contrasts)
   {
@@ -511,21 +513,20 @@ init_fun.cor_ar1 <-
   }
 
 
+#eobj <- rho[["error.structure"]]
 build_error_struct_fixed.cor_ar1 <-
   ## builds the correlation matrix when fixed = T of cor_ar1 objects
-  function(eobj, tpar = NULL)
-  {
+  function(eobj, tpar = NULL){
     r <- eobj$value_tmp
     ndim <- attr(eobj, "ndim")
     npar1 <- ndim * (ndim - 1)/2
-    corr_pars <- sapply(seq_along(r), function(i){
+    corr_pars <- do.call(rbind, lapply(seq_along(r), function(i){
       sigma <- diag(ndim)
       sigma[lower.tri(sigma)]  <- r[i]^sequence((ndim-1):1)
       sigma <- sigma + t(sigma) - diag(ndim)
       sigma[lower.tri(sigma)]
-    })
-    if (is.null(ncol(corr_pars)))
-      dim(corr_pars) <- c(length(corr_pars), 1)
+    }))
+    if (is.null(ncol(corr_pars))) dim(corr_pars) <- c(length(corr_pars), 1)
     sdVec <- rep(1, ndim)
     list(rVec = corr_pars, sdVec=sdVec)
   }
@@ -683,6 +684,10 @@ error_structure.cor_general <- function(eobj, type, ...){
   covar <- attr(eobj, "covariate")
   ynames <- attr(eobj, "ynames")
   nlev <- NCOL(covar)
+  if(npar == 0){
+    par <- eobj$value
+    npar <- length(par)
+  }
   npar.cor <- npar/nlev
   corr_lev <- lapply(seq_len(nlev), function(l) {
     sigma <- diag(ndim)
@@ -704,6 +709,26 @@ error_structure.cov_general <- function(eobj, type, ...){
   covar <- attr(eobj, "covariate")
   ynames <- attr(eobj, "ynames")
   nlev <- NCOL(covar)
+  #NEW
+  if(npar == 0){
+    par <- eobj$value
+    npar <- length(par)
+#TODO level
+    #NEW
+    ndim <- attr(eobj, "ndim")
+    ind_sd <- cumsum(c(1, ndim - seq_len(ndim - 1) + 1))
+    smat <- sqrt(eobj$value_tmp[, ind_sd])
+    tmp <- sapply(combn(ndim, 2, simplify = F), function(x) smat[,x[1]] * smat[,x[2]])
+    rmat <- eobj$value_tmp[, - ind_sd] / tmp
+
+    cov_n <- lapply(seq_len(NROW(smat)), function(i){
+      R <- diag(ndim) * smat[i,]
+      R[lower.tri(R)] <- rmat[i,]
+      R
+    })
+
+    ###
+  } else{
   npar.cor <- npar/nlev - ndim
   cov_lev <- lapply(seq_len(nlev), function(l) {
     R <- diag(ndim)
@@ -716,6 +741,7 @@ error_structure.cov_general <- function(eobj, type, ...){
   })
   indlev <- apply(covar, 1, function(x) which(x == 1))
   cov_n <- cov_lev[indlev]
+  }
   names(cov_n) <- rownames(attr(eobj, "covariate"))
   cov_n
 }
@@ -727,6 +753,7 @@ error_structure.cor_equi <- function(eobj, type, ...){
   covar <- attr(eobj, "covariate")
   ynames <- attr(eobj, "ynames")
   covar <- attr(eobj, "covariate")
+  if(length(par) == 0) par <- eobj$value
   z <- covar %*% par
   colnames(z) <- "Fisher-z Score"
   r <- z2r(z)
@@ -755,6 +782,7 @@ error_structure.cor_ar1 <- function(eobj, type, ...){
   ndim <- attr(eobj, "ndim")
   covar <- attr(eobj, "covariate")
   ynames <- attr(eobj, "ynames")
+  if(length(par) == 0) par <- eobj$value
   z <- covar %*% par
   colnames(z) <- "Fisher-z Score"
   r <- z2r(z)

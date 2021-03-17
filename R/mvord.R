@@ -16,7 +16,7 @@
 #' @details see \code{\link{mvord}}
 #' @name mvord-package
 #' @aliases mvord-package
-#' @references Hirk R, Hornik K, Vana L (2020). “\pkg{mvord}: An \strong{R} Package for Fitting Multivariate Ordinal Regression Models.” \emph{Journal of Statistical Software}, \strong{93}(4), 1–41. doi: 10.18637/jss.v093.i04 (URL: \url{https://doi.org/10.18637/jss.v093.i04}).
+#' @references Hirk R, Hornik K, Vana L (2020). “\pkg{mvord}: An \strong{R} Package for Fitting Multivariate Ordinal Regression Models.” \emph{Journal of Statistical Software}, \strong{93}(4), 1–41, \doi{10.18637/jss.v093.i04}.
 NULL
 
 #' @title Simulated panel of credit ratings
@@ -496,7 +496,7 @@ NULL
 #'  \code{\link{mvord.control}}, \code{\link{data_cr_panel}},\code{\link{data_cr}},
 #'  \code{\link{data_mvord_panel}},\code{\link{data_mvord}}, \code{\link{data_mvord2}}
 #'
-#' @references Hirk R, Hornik K, Vana L (2020). “\pkg{mvord}: An \strong{R} Package for Fitting Multivariate Ordinal Regression Models.” \emph{Journal of Statistical Software}, \strong{93}(4), 1–41. doi: 10.18637/jss.v093.i04 (URL: \url{https://doi.org/10.18637/jss.v093.i04}).
+#' @references Hirk R, Hornik K, Vana L (2020). “\pkg{mvord}: An \strong{R} Package for Fitting Multivariate Ordinal Regression Models.” \emph{Journal of Statistical Software}, \strong{93}(4), 1–41, \doi{10.18637/jss.v093.i04}.
 #'
 #' @param formula an object of class \code{\link{formula}} of the form \code{y ~ X1 + ... + Xp}.
 #' @param data \code{\link{data.frame}} containing a subject index, an index for the multiple measurements,

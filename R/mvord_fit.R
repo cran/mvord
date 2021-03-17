@@ -46,7 +46,6 @@ mvord.fit <- function(rho){
 
   rho$coef.names <- attributes(rho$x[[1]])$dimnames[[2]]
 
-  rho$coef.constraints
   rho$constraints <- get_constraints(rho)
   # vector of number of parameters for each coefficient
   rho$npar.beta <- 0

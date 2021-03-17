@@ -1,5 +1,4 @@
 ### R code from vignette source 'vignette_mvord.Rnw'
-### Encoding: UTF-8
 
 ###################################################
 ### code chunk number 1: vignette_mvord.Rnw:55-56

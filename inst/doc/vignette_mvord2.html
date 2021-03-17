@@ -12,49 +12,93 @@
 
 <meta name="author" content="Rainer Hirk, Kurt Hornik and Laura Vana" />
 
-<meta name="date" content="2020-11-17" />
+<meta name="date" content="2021-03-17" />
 
 <title>mvord: Additional examples</title>
 
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 
 </style>
 <script>
@@ -81,7 +125,30 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 
-<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
 
 
 
@@ -95,7 +162,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">mvord: Additional examples</h1>
 <h4 class="author">Rainer Hirk, Kurt Hornik and Laura Vana</h4>
-<h4 class="date">2020-11-17</h4>
+<h4 class="date">2021-03-17</h4>
 
 
 <div id="TOC">
@@ -112,11 +179,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 
 <p>Load package <strong>mvord</strong></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(mvord)</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mvord)</span></code></pre></div>
 <p>Load data set</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&quot;data_cr&quot;</span>)
-<span class="kw">str</span>(data_cr, <span class="dt">vec.len =</span> <span class="dv">3</span>)</code></pre></div>
-<pre><code>## 'data.frame':    690 obs. of  10 variables:
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;data_cr&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(data_cr, <span class="at">vec.len =</span> <span class="dv">3</span>)</span></code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    690 obs. of  10 variables:
 ##  $ rater1 : Ord.factor w/ 5 levels &quot;A&quot;&lt;&quot;B&quot;&lt;&quot;C&quot;&lt;&quot;D&quot;&lt;..: 2 3 3 2 5 4 3 4 ...
 ##  $ rater2 : Ord.factor w/ 5 levels &quot;A&quot;&lt;&quot;B&quot;&lt;&quot;C&quot;&lt;&quot;D&quot;&lt;..: 2 4 4 2 5 NA 3 4 ...
 ##  $ rater3 : Ord.factor w/ 6 levels &quot;F&quot;&lt;&quot;G&quot;&lt;&quot;H&quot;&lt;&quot;I&quot;&lt;..: 3 NA NA NA 6 NA 2 5 ...
@@ -127,7 +194,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##  $ PR     : num  0.3779 -0.1503 -0.0521 0.3289 ...
 ##  $ RSIZE  : num  -6.37 -7.84 -7.98 -5.86 ...
 ##  $ BETA   : num  0.836 0.49 0.802 1.137 ...</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(data_cr, <span class="dt">n =</span> <span class="dv">3</span>)</code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(data_cr, <span class="at">n =</span> <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>##   rater1 rater2 rater3 rater4 firm_id       LR       LEV          PR     RSIZE
 ## 1      B      B      H      L       1 1.720041 2.1144513  0.37792213 -6.365053
 ## 2      C      D   &lt;NA&gt;      M       2 1.836574 0.8826725 -0.15032402 -7.839813
@@ -139,11 +206,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="example-1---a-simple-example-with-2-raters" class="section level2">
 <h2>Example 1 - A simple example with 2 raters</h2>
 <p>We introduce a simple example with 2 raters (<code>rater1</code> and <code>rater2</code>) rating a set of firms. The data set <code>data_cr</code> has a wide format and hence, we apply the multiple measurement object <code>MMO2</code> on the left-hand side of the formula object. The firm-level covariates <code>LR</code>, <code>LEV</code>, <code>PR</code>, <code>RSIZE</code>, <code>BETA</code> are passed on the right-hand side of the formula. The thresholds are set equal by the argument <code>thresholds.constraints</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_cor_probit_2raters &lt;-<span class="st"> </span><span class="kw">mvord</span>(<span class="dt">formula =</span> <span class="kw">MMO2</span>(rater1, rater2) <span class="op">~</span><span class="st"> </span><span class="dv">0</span> <span class="op">+</span><span class="st"> </span>LR <span class="op">+</span><span class="st"> </span>LEV <span class="op">+</span><span class="st"> </span>PR <span class="op">+</span><span class="st"> </span>RSIZE <span class="op">+</span><span class="st"> </span>BETA,
-                               <span class="dt">threshold.constraints =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>),
-                               <span class="dt">data =</span> data_cr)</code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>res_cor_probit_2raters <span class="ot">&lt;-</span> <span class="fu">mvord</span>(<span class="at">formula =</span> <span class="fu">MMO2</span>(rater1, rater2) <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> LR <span class="sc">+</span> LEV <span class="sc">+</span> PR <span class="sc">+</span> RSIZE <span class="sc">+</span> BETA,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">threshold.constraints =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">data =</span> data_cr)</span></code></pre></div>
 <p>The results are displayed by:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(res_cor_probit_2raters)</code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_cor_probit_2raters)</span></code></pre></div>
 <pre><code>## 
 ## Call: mvord(formula = MMO2(rater1, rater2) ~ 0 + LR + LEV + PR + RSIZE + 
 ##     BETA, data = data_cr, threshold.constraints = c(1, 1))
@@ -160,7 +227,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## rater1 C|D 11.68478    0.46471  25.145 &lt; 2.2e-16 ***
 ## rater1 D|E 14.00771    0.53773  26.050 &lt; 2.2e-16 ***
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Coefficients:
 ##          Estimate Std. Error  z value  Pr(&gt;|z|)    
@@ -175,15 +242,15 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## BETA 1   1.644008   0.100520  16.3550 &lt; 2.2e-16 ***
 ## BETA 2   1.741845   0.128536  13.5515 &lt; 2.2e-16 ***
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Error Structure:
 ##                    Estimate Std. Error z value  Pr(&gt;|z|)    
 ## corr rater1 rater2 0.872025   0.025461   34.25 &lt; 2.2e-16 ***
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>The coefficients can be extracted by:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">coef</span>(res_cor_probit_2raters)</code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(res_cor_probit_2raters)</span></code></pre></div>
 <pre><code>##        LR 1        LR 2       LEV 1       LEV 2        PR 1        PR 2 
 ##  0.19181645  0.08998178  0.45682446  0.44111540 -2.62668045 -2.76140750 
 ##     RSIZE 1     RSIZE 2      BETA 1      BETA 2 
@@ -192,12 +259,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="example-2---a-simple-example-with-3-raters" class="section level2">
 <h2>Example 2 - A simple example with 3 raters</h2>
 <p>A simple example with 3 raters (<code>rater1</code>, <code>rater2</code> and <code>rater3</code>) is presented. The regression coefficients are set equal by the argument <code>coef.constraints</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_cor_probit_3raters &lt;-<span class="st"> </span><span class="kw">mvord</span>(<span class="dt">formula =</span> <span class="kw">MMO2</span>(rater1, rater2, rater <span class="dv">3</span>) <span class="op">~</span><span class="st"> </span><span class="dv">0</span> <span class="op">+</span><span class="st"> </span>LR <span class="op">+</span><span class="st"> </span>LEV <span class="op">+</span><span class="st"> </span>PR <span class="op">+</span><span class="st"> </span>RSIZE <span class="op">+</span><span class="st"> </span>BETA,
-                               <span class="dt">coef.constraints =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>),
-                               <span class="dt">data =</span> data_cr,
-                               <span class="dt">link =</span> <span class="kw">mvlogit</span>())</code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>res_cor_probit_3raters <span class="ot">&lt;-</span> <span class="fu">mvord</span>(<span class="at">formula =</span> <span class="fu">MMO2</span>(rater1, rater2, rater <span class="dv">3</span>) <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> LR <span class="sc">+</span> LEV <span class="sc">+</span> PR <span class="sc">+</span> RSIZE <span class="sc">+</span> BETA,</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">coef.constraints =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">data =</span> data_cr,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">link =</span> <span class="fu">mvlogit</span>())</span></code></pre></div>
 <p>The results are displayed by:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(res_cor_probit_3raters)</code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_cor_probit_3raters)</span></code></pre></div>
 <pre><code>## 
 ## Call: mvord(formula = MMO2(rater1, rater2, rater3) ~ 0 + LR + LEV + 
 ##     PR + RSIZE + BETA, data = data_cr, link = mvlogit(), coef.constraints = c(1, 
@@ -224,7 +291,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## rater3 I|J 23.25687    1.15044  20.216 &lt; 2.2e-16 ***
 ## rater3 J|K 25.33851    1.22854  20.625 &lt; 2.2e-16 ***
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Coefficients:
 ##          Estimate Std. Error  z value  Pr(&gt;|z|)    
@@ -234,7 +301,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## RSIZE 1 -2.073427   0.108014 -19.1958 &lt; 2.2e-16 ***
 ## BETA 1   3.021155   0.222735  13.5639 &lt; 2.2e-16 ***
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Error Structure:
 ##                    Estimate Std. Error z value  Pr(&gt;|z|)    
@@ -242,9 +309,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## corr rater1 rater3 0.903774   0.024724  36.554 &lt; 2.2e-16 ***
 ## corr rater2 rater3 0.822652   0.045875  17.933 &lt; 2.2e-16 ***
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>The threshold parameters are presented by:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">thresholds</span>(res_cor_probit_3raters)</code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">thresholds</span>(res_cor_probit_3raters)</span></code></pre></div>
 <pre><code>## $rater1
 ##      A|B      B|C      C|D      D|E 
 ## 14.71274 17.46133 20.65831 24.68647 
@@ -260,9 +327,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="example-3a---a-model-of-firm-ratings-assigned-by-multiple-raters-and-an-investment-speculative-grade-indicator" class="section level2">
 <h2>Example 3a - A model of firm ratings assigned by multiple raters and an investment-speculative grade indicator</h2>
 <p>This example presents a four dimensional ordinal regression model with probit link and a general correlation error structure <code>cor_general(~ 1)</code>. The fourth rater only rates the firms on a binary scale: investment grade vs. speculative grade.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_cor_probit_simple &lt;-<span class="st"> </span><span class="kw">mvord</span>(<span class="dt">formula =</span> <span class="kw">MMO2</span>(rater1, rater2, rater3, rater4) <span class="op">~</span><span class="st"> </span><span class="dv">0</span> <span class="op">+</span><span class="st"> </span>LR <span class="op">+</span><span class="st"> </span>LEV <span class="op">+</span><span class="st"> </span>PR <span class="op">+</span><span class="st"> </span>RSIZE <span class="op">+</span><span class="st"> </span>BETA, <span class="dt">data =</span> data_cr)</code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>res_cor_probit_simple <span class="ot">&lt;-</span> <span class="fu">mvord</span>(<span class="at">formula =</span> <span class="fu">MMO2</span>(rater1, rater2, rater3, rater4) <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> LR <span class="sc">+</span> LEV <span class="sc">+</span> PR <span class="sc">+</span> RSIZE <span class="sc">+</span> BETA, <span class="at">data =</span> data_cr)</span></code></pre></div>
 <p>The results are displayed by:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(res_cor_probit_simple)</code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_cor_probit_simple)</span></code></pre></div>
 <pre><code>## 
 ## Call: mvord(formula = MMO2(rater1, rater2, rater3, rater4) ~ 0 + LR + 
 ##     LEV + PR + RSIZE + BETA, data = data_cr)
@@ -290,7 +357,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## rater3 J|K 14.17279    0.72153  19.643 &lt; 2.2e-16 ***
 ## rater4 L|M 13.52691    1.00085  13.515 &lt; 2.2e-16 ***
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Coefficients:
 ##          Estimate Std. Error  z value  Pr(&gt;|z|)    
@@ -315,7 +382,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## BETA 3   1.517633   0.139319  10.8932 &lt; 2.2e-16 ***
 ## BETA 4   1.988644   0.203338   9.7800 &lt; 2.2e-16 ***
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Error Structure:
 ##                    Estimate Std. Error z value  Pr(&gt;|z|)    
@@ -326,9 +393,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## corr rater2 rater4 0.926139   0.031808  29.117 &lt; 2.2e-16 ***
 ## corr rater3 rater4 0.866521   0.051285  16.896 &lt; 2.2e-16 ***
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>The threshold coefficients can be extracted by:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">thresholds</span>(res_cor_probit_simple)</code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">thresholds</span>(res_cor_probit_simple)</span></code></pre></div>
 <pre><code>## $rater1
 ##       A|B       B|C       C|D       D|E 
 ##  8.049203  9.567831 11.349908 13.516375 
@@ -345,7 +412,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##      L|M 
 ## 13.52691</code></pre>
 <p>The regression coefficients are obtained by:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">coef</span>(res_cor_probit_simple)</code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(res_cor_probit_simple)</span></code></pre></div>
 <pre><code>##       LR 1       LR 2       LR 3       LR 4      LEV 1      LEV 2      LEV 3 
 ##  0.2086517  0.1532119  0.1805309  0.1508872  0.4302126  0.4328417  0.3994591 
 ##      LEV 4       PR 1       PR 2       PR 3       PR 4    RSIZE 1    RSIZE 2 
@@ -353,7 +420,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##    RSIZE 3    RSIZE 4     BETA 1     BETA 2     BETA 3     BETA 4 
 ## -1.1964814 -1.5659034  1.6021871  1.8015260  1.5176327  1.9886441</code></pre>
 <p>The error structure for firm with <code>firm_id = 11</code> is displayed by:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">error_structure</span>(res_cor_probit_simple)[[<span class="dv">11</span>]]</code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">error_structure</span>(res_cor_probit_simple)[[<span class="dv">11</span>]]</span></code></pre></div>
 <pre><code>##           rater1    rater2    rater3    rater4
 ## rater1 1.0000000 0.8759965 0.9135876 0.8961703
 ## rater2 0.8759965 1.0000000 0.8316790 0.9261393
@@ -363,16 +430,16 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="example-3b---a-more-elaborate-model-of-ratings-assigned-by-multiple-raters" class="section level2">
 <h2>Example 3b - A more elaborate model of ratings assigned by multiple raters</h2>
 <p>In this example, we extend the setting of the above example by imposing constraints on the regression as well as on the threshold parameters and changing the link function to the multivariate logit link.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_cor_logit &lt;-<span class="st"> </span><span class="kw">mvord</span>(<span class="dt">formula =</span> <span class="kw">MMO2</span>(rater1, rater2, rater3, rater4) <span class="op">~</span>
-<span class="st">    </span><span class="dv">0</span> <span class="op">+</span><span class="st"> </span>LR <span class="op">+</span><span class="st"> </span>LEV <span class="op">+</span><span class="st"> </span>PR <span class="op">+</span><span class="st"> </span>RSIZE <span class="op">+</span><span class="st"> </span>BETA, <span class="dt">data =</span> data_cr, <span class="dt">link =</span> <span class="kw">mvlogit</span>(),
-    <span class="dt">coef.constraints =</span> <span class="kw">cbind</span>(<span class="dt">LR =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>), 
-                             <span class="dt">LEV =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>),
-                             <span class="dt">PR =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>), 
-                             <span class="dt">RSIZE =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>), 
-                             <span class="dt">BETA =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)),
-    <span class="dt">threshold.constraints =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>res_cor_logit <span class="ot">&lt;-</span> <span class="fu">mvord</span>(<span class="at">formula =</span> <span class="fu">MMO2</span>(rater1, rater2, rater3, rater4) <span class="sc">~</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    <span class="dv">0</span> <span class="sc">+</span> LR <span class="sc">+</span> LEV <span class="sc">+</span> PR <span class="sc">+</span> RSIZE <span class="sc">+</span> BETA, <span class="at">data =</span> data_cr, <span class="at">link =</span> <span class="fu">mvlogit</span>(),</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">coef.constraints =</span> <span class="fu">cbind</span>(<span class="at">LR =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>), </span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>                             <span class="at">LEV =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>),</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>                             <span class="at">PR =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>), </span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>                             <span class="at">RSIZE =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>), </span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>                             <span class="at">BETA =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)),</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">threshold.constraints =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</span></code></pre></div>
 <p>The results are displayed by:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(res_cor_logit)</code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_cor_logit)</span></code></pre></div>
 <pre><code>## 
 ## Call: mvord(formula = MMO2(rater1, rater2, rater3, rater4) ~ 0 + LR + 
 ##     LEV + PR + RSIZE + BETA, data = data_cr, link = mvlogit(), 
@@ -399,7 +466,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## rater3 J|K 24.97258    1.18725  21.034 &lt; 2.2e-16 ***
 ## rater4 L|M 23.92770    1.63196  14.662 &lt; 2.2e-16 ***
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Coefficients:
 ##          Estimate Std. Error  z value  Pr(&gt;|z|)    
@@ -415,7 +482,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## BETA 2   2.733088   0.252960  10.8044 &lt; 2.2e-16 ***
 ## BETA 3   3.572691   0.349493  10.2225 &lt; 2.2e-16 ***
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Error Structure:
 ##                    Estimate Std. Error z value  Pr(&gt;|z|)    
@@ -426,9 +493,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## corr rater2 rater4 0.932242   0.032173  28.976 &lt; 2.2e-16 ***
 ## corr rater3 rater4 0.856234   0.058392  14.664 &lt; 2.2e-16 ***
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>The constraints are displayed by:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">constraints</span>(res_cor_logit)</code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">constraints</span>(res_cor_logit)</span></code></pre></div>
 <pre><code>## $LR
 ##     LR 1
 ## A|B    1
@@ -514,22 +581,22 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## J|K      0      1      0
 ## L|M      0      0      1</code></pre>
 <p>Note that the composite likelihood information criteria can be used for model comparison. For objects of class <code>mvord</code> the composite likelihood AIC and BIC are computed by <code>AIC()</code> and <code>BIC()</code>, respectively. The model fits of examples one and two are compared by means of BIC and AIC. We observe that the model of Example 3b has a lower BIC and AIC indicating a better model fit:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">BIC</span>(res_cor_probit_simple, res_cor_logit)</code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">BIC</span>(res_cor_probit_simple, res_cor_logit)</span></code></pre></div>
 <pre><code>##                             df      BIC
 ## res_cor_probit_simple 92.85637 6458.641
 ## res_cor_logit         67.48687 6293.977</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">AIC</span>(res_cor_probit_simple)</code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">AIC</span>(res_cor_probit_simple)</span></code></pre></div>
 <pre><code>## [1] 6037.38</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">AIC</span>(res_cor_logit)</code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">AIC</span>(res_cor_logit)</span></code></pre></div>
 <pre><code>## [1] 5987.81</code></pre>
 <p>The value of the pairwise log-likelihood of the two models can be extracted by:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">logLik</span>(res_cor_probit_simple)</code></pre></div>
-<pre><code>## 'log Lik.' -2925.834 (df=92.85637)</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">logLik</span>(res_cor_logit)</code></pre></div>
-<pre><code>## 'log Lik.' -2926.418 (df=67.48687)</code></pre>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">logLik</span>(res_cor_probit_simple)</span></code></pre></div>
+<pre><code>## &#39;log Lik.&#39; -2925.834 (df=92.85637)</code></pre>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">logLik</span>(res_cor_logit)</span></code></pre></div>
+<pre><code>## &#39;log Lik.&#39; -2926.418 (df=67.48687)</code></pre>
 <p>Marginal predictions are obtained by:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mp &lt;-<span class="st"> </span><span class="kw">marginal_predict</span>(res_cor_logit, <span class="dt">type =</span> <span class="st">&quot;class&quot;</span>)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(data_cr<span class="op">$</span>rater1, mp<span class="op">$</span>rater1)</code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>mp <span class="ot">&lt;-</span> <span class="fu">marginal_predict</span>(res_cor_logit, <span class="at">type =</span> <span class="st">&quot;class&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data_cr<span class="sc">$</span>rater1, mp<span class="sc">$</span>rater1)</span></code></pre></div>
 <pre><code>##    
 ##       A   B   C   D   E
 ##   A  47  23   4   0   0
@@ -537,7 +604,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##   C   0  28 135  38   0
 ##   D   1   2  44 116  17
 ##   E   0   0   0  30  47</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(data_cr<span class="op">$</span>rater2, mp<span class="op">$</span>rater2)</code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data_cr<span class="sc">$</span>rater2, mp<span class="sc">$</span>rater2)</span></code></pre></div>
 <pre><code>##    
 ##       A   B   C   D   E
 ##   A  29  20   8   0   0
@@ -545,7 +612,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##   C   1  18 103  24   0
 ##   D   0   0  35 109   7
 ##   E   0   0   0  13  39</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(data_cr<span class="op">$</span>rater3, mp<span class="op">$</span>rater3)</code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data_cr<span class="sc">$</span>rater3, mp<span class="sc">$</span>rater3)</span></code></pre></div>
 <pre><code>##    
 ##      F  G  H  I  J  K
 ##   F 25  8  2  0  0  0
@@ -554,16 +621,16 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##   I  0  0 28 30  3  2
 ##   J  0  0  2 13 10  7
 ##   K  0  0  0  6  8 23</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(data_cr<span class="op">$</span>rater4, mp<span class="op">$</span>rater4)</code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data_cr<span class="sc">$</span>rater4, mp<span class="sc">$</span>rater4)</span></code></pre></div>
 <pre><code>##    
 ##       L   M
 ##   L 195  40
 ##   M  30 425</code></pre>
 <p>Joint predictions are obtained by:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">jp &lt;-<span class="st"> </span><span class="kw">joint_probabilities</span>(res_cor_logit, 
-                          <span class="dt">response.cat =</span> data_cr[,<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>],  
-                          <span class="dt">type =</span> <span class="st">&quot;prob&quot;</span>)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(data_cr<span class="op">$</span>rater1, jp<span class="op">$</span>rater1)</code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>jp <span class="ot">&lt;-</span> <span class="fu">joint_probabilities</span>(res_cor_logit, </span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">response.cat =</span> data_cr[,<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>],  </span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data_cr<span class="sc">$</span>rater1, jp<span class="sc">$</span>rater1)</span></code></pre></div>
 <pre><code>##    
 ##       A   B   C   D   E
 ##   A  50  20   4   0   0
@@ -571,7 +638,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##   C   0  36 130  35   0
 ##   D   1   2  47 112  18
 ##   E   0   0   0  25  52</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(data_cr<span class="op">$</span>rater2, jp<span class="op">$</span>rater2)</code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data_cr<span class="sc">$</span>rater2, jp<span class="sc">$</span>rater2)</span></code></pre></div>
 <pre><code>##    
 ##       A   B   C   D   E
 ##   A  33  17   7   0   0
@@ -579,7 +646,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##   C   1  24  99  22   0
 ##   D   0   0  39 103   9
 ##   E   0   0   0  10  42</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(data_cr<span class="op">$</span>rater3, jp<span class="op">$</span>rater3)</code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data_cr<span class="sc">$</span>rater3, jp<span class="sc">$</span>rater3)</span></code></pre></div>
 <pre><code>##    
 ##      F  G  H  I  J  K
 ##   F 27  7  1  0  0  0
@@ -588,7 +655,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##   I  0  0 25 35  1  2
 ##   J  0  0  2 17  3 10
 ##   K  0  0  0  9  1 27</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(data_cr<span class="op">$</span>rater4, jp<span class="op">$</span>rater4)</code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data_cr<span class="sc">$</span>rater4, jp<span class="sc">$</span>rater4)</span></code></pre></div>
 <pre><code>##    
 ##       L   M
 ##   L 175  60
@@ -597,9 +664,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="example-4---a-longitudinal-model" class="section level2">
 <h2>Example 4 - A longitudinal model</h2>
 <p>In this example, we present a longitudinal multivariate ordinal probit regression model with a covariate dependent AR(1) error structure using the data set data_cr_panel:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&quot;data_cr_panel&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;mvord&quot;</span>)
-<span class="kw">str</span>(data_cr_panel, <span class="dt">vec.len =</span> <span class="dv">3</span>)</code></pre></div>
-<pre><code>## 'data.frame':    11320 obs. of  9 variables:
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;data_cr_panel&quot;</span>, <span class="at">package =</span> <span class="st">&quot;mvord&quot;</span>)</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(data_cr_panel, <span class="at">vec.len =</span> <span class="dv">3</span>)</span></code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    11320 obs. of  9 variables:
 ##  $ rating : Ord.factor w/ 5 levels &quot;A&quot;&lt;&quot;B&quot;&lt;&quot;C&quot;&lt;&quot;D&quot;&lt;..: 5 3 3 3 3 1 3 3 ...
 ##  $ firm_id: int  1 2 3 4 5 6 7 8 ...
 ##  $ year   : Factor w/ 8 levels &quot;year1&quot;,&quot;year2&quot;,..: 1 1 1 1 1 1 1 1 ...
@@ -609,7 +676,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##  $ RSIZE  : num  1.423 -1.944 2.024 -0.433 ...
 ##  $ BETA   : num  1.148 1.693 0.761 2.24 ...
 ##  $ BSEC   : Factor w/ 8 levels &quot;BSEC1&quot;,&quot;BSEC2&quot;,..: 3 6 3 7 6 7 7 7 ...</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(data_cr_panel, <span class="dt">n =</span> <span class="dv">3</span>)</code></pre></div>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(data_cr_panel, <span class="at">n =</span> <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>##   rating firm_id  year         LR        LEV          PR     RSIZE      BETA
 ## 1      E       1 year1 572.864658 1.20084294  0.14585117  1.422948 1.1481020
 ## 2      C       2 year1   1.379547 0.03022761 -0.03962597 -1.944265 1.6926956
@@ -618,16 +685,16 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## 1 BSEC3
 ## 2 BSEC6
 ## 3 BSEC3</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_AR1_probit &lt;-<span class="st"> </span><span class="kw">mvord</span>(<span class="dt">formula =</span> <span class="kw">MMO</span>(rating, firm_id, year) <span class="op">~</span><span class="st"> </span>LR <span class="op">+</span><span class="st"> </span>LEV <span class="op">+</span>
-<span class="st">  </span>PR <span class="op">+</span><span class="st"> </span>RSIZE <span class="op">+</span><span class="st"> </span>BETA, 
-  <span class="dt">error.structure =</span> <span class="kw">cor_ar1</span>(<span class="op">~</span><span class="st"> </span>BSEC), <span class="dt">link =</span> <span class="kw">mvprobit</span>(),
-  <span class="dt">data =</span> data_cr_panel, 
-  <span class="dt">coef.constraints =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">4</span>), <span class="kw">rep</span>(<span class="dv">2</span>, <span class="dv">4</span>)),
-  <span class="dt">threshold.constraints =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">8</span>), 
-  <span class="dt">threshold.values =</span> <span class="kw">rep</span>(<span class="kw">list</span>(<span class="kw">c</span>(<span class="dv">0</span>, <span class="ot">NA</span>, <span class="ot">NA</span>, <span class="ot">NA</span>)),<span class="dv">8</span>),
-  <span class="dt">control =</span> <span class="kw">mvord.control</span>(<span class="dt">solver =</span> <span class="st">&quot;BFGS&quot;</span>))</code></pre></div>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>res_AR1_probit <span class="ot">&lt;-</span> <span class="fu">mvord</span>(<span class="at">formula =</span> <span class="fu">MMO</span>(rating, firm_id, year) <span class="sc">~</span> LR <span class="sc">+</span> LEV <span class="sc">+</span></span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>  PR <span class="sc">+</span> RSIZE <span class="sc">+</span> BETA, </span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">error.structure =</span> <span class="fu">cor_ar1</span>(<span class="sc">~</span> BSEC), <span class="at">link =</span> <span class="fu">mvprobit</span>(),</span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_cr_panel, </span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">coef.constraints =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">1</span>, <span class="dv">4</span>), <span class="fu">rep</span>(<span class="dv">2</span>, <span class="dv">4</span>)),</span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">threshold.constraints =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="dv">8</span>), </span>
+<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">threshold.values =</span> <span class="fu">rep</span>(<span class="fu">list</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>)),<span class="dv">8</span>),</span>
+<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">mvord.control</span>(<span class="at">solver =</span> <span class="st">&quot;BFGS&quot;</span>))</span></code></pre></div>
 <p>The results of the model can be presented by</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(res_AR1_probit, <span class="dt">short =</span> <span class="ot">TRUE</span>, <span class="dt">call =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_AR1_probit, <span class="at">short =</span> <span class="cn">TRUE</span>, <span class="at">call =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>## Formula: MMO(rating, firm_id, year) ~ LR + LEV + PR + RSIZE + BETA
 ## 
 ##     link threshold nsubjects ndim     logPL     CLAIC     CLBIC fevals
@@ -640,7 +707,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## year1 C|D 2.444887   0.041170  59.385 &lt; 2.2e-16 ***
 ## year1 D|E 3.891073   0.058843  66.127 &lt; 2.2e-16 ***
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Coefficients:
 ##                 Estimate Std. Error  z value  Pr(&gt;|z|)    
@@ -657,7 +724,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## BETA 1         0.0541624  0.0296028   1.8296    0.0673 .  
 ## BETA 2         0.1099998  0.0236754   4.6462 3.382e-06 ***
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Error Structure:
 ##              Estimate Std. Error  z value  Pr(&gt;|z|)    
@@ -670,21 +737,21 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## BSECBSEC7   -0.863911   0.064855 -13.3206 &lt; 2.2e-16 ***
 ## BSECBSEC8   -0.757997   0.078506  -9.6553 &lt; 2.2e-16 ***
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>The default error structure output for AR(1) models:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">error_structure</span>(res_AR1_probit)</code></pre></div>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">error_structure</span>(res_AR1_probit)</span></code></pre></div>
 <pre><code>##         V16         V17         V18         V19         V20         V21 
 ##  1.49039489 -0.55231725 -0.06202790 -0.08559155 -0.06659849 -0.68342920 
 ##         V22         V23 
 ## -0.86391149 -0.75799729</code></pre>
 <p>Correlation parameters <span class="math inline">\(\rho_i\)</span> for each firm are obtained by choosing <code>type = &quot;corr&quot;</code> in <code>error_structure()</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(<span class="kw">error_structure</span>(res_AR1_probit, <span class="dt">type =</span> <span class="st">&quot;corr&quot;</span>), <span class="dt">n =</span> <span class="dv">3</span>)</code></pre></div>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">error_structure</span>(res_AR1_probit, <span class="at">type =</span> <span class="st">&quot;corr&quot;</span>), <span class="at">n =</span> <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>##   Correlation
 ## 1   0.8913315
 ## 2   0.6679130
 ## 3   0.8913315</code></pre>
 <p>Correlation matrices for each specific firm are obtained by choosing <code>type = &quot;sigmas&quot;</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(<span class="kw">error_structure</span>(res_AR1_probit, <span class="dt">type =</span> <span class="st">&quot;sigmas&quot;</span>), <span class="dt">n =</span> <span class="dv">1</span>)</code></pre></div>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">error_structure</span>(res_AR1_probit, <span class="at">type =</span> <span class="st">&quot;sigmas&quot;</span>), <span class="at">n =</span> <span class="dv">1</span>)</span></code></pre></div>
 <pre><code>## $`1`
 ##           year1     year2     year3     year4     year5     year6     year7
 ## year1 1.0000000 0.8913315 0.7944718 0.7081377 0.6311854 0.5625954 0.5014590
@@ -708,9 +775,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="example-5---self-reported-health-status" class="section level2">
 <h2>Example 5 - Self-reported health status</h2>
 <p>In this example we analyze longitudinal data on self-reported health status measured on a five point ordinal scale (5 = <em>poor</em>, 4 = <em>fair</em>, 3 = <em>good</em>, 2 = <em>very good</em> and 1 = <em>excellent</em>) derived from the Health and Retirement Study conducted by the University of Michigan which is available in the <strong>LMest</strong> package:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(data_SRHS_long, <span class="dt">package =</span> <span class="st">&quot;LMest&quot;</span>)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(data_SRHS_long)</code></pre></div>
-<pre><code>## 'data.frame':    56592 obs. of  6 variables:
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(data_SRHS_long, <span class="at">package =</span> <span class="st">&quot;LMest&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(data_SRHS_long)</span></code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    56592 obs. of  6 variables:
 ##  $ id       : num  1 1 1 1 1 1 1 1 2 2 ...
 ##  $ gender   : num  1 1 1 1 1 1 1 1 2 2 ...
 ##  $ race     : num  1 1 1 1 1 1 1 1 1 1 ...
@@ -719,22 +786,22 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ##  $ srhs     : num  4 4 3 3 4 3 3 3 3 3 ...</code></pre>
 <p>The dataset contains a self-reported health status <code>srhs</code> together with covariates such as ethnicity (<code>race</code> coded as 1 = <em>white</em>, 2 = <em>black</em>, 3 = <em>others</em>), <code>gender</code> (coded as 1 = <em>male</em>, 2 = <em>female</em>), <code>education</code> level (coded as 1 = <em>high school</em>, 2 = <em>general educational diploma</em>, 3 = <em>high school graduate</em>, 4 = <em>some college</em>, 5 = <em>college and above</em>) and <code>age</code> for 7074 subjects on 8 different (approximately equally spaced) time occasions.</p>
 <p>We add a time index to the data set:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data_SRHS_long<span class="op">$</span>time &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">8</span>, <span class="kw">length</span>(<span class="kw">unique</span>(data_SRHS_long<span class="op">$</span>id)))</code></pre></div>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>data_SRHS_long<span class="sc">$</span>time <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>, <span class="fu">length</span>(<span class="fu">unique</span>(data_SRHS_long<span class="sc">$</span>id)))</span></code></pre></div>
 <p>We estimate a multivariate ordinal logit model similar to the one of the models employed by <span class="citation">Bartolucci, Pandolfi, and Pennoni (2017)</span>, where for every subject in the sample the errors follow an <span class="math inline">\(AR(1)\)</span> process. Moreover, the threshold and regression coefficients are equal across all years. In order to reduce the computational burden we only consider pairs of observations not more than two time points appart by setting <code>PL.lag = 2</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_srhs &lt;-<span class="st"> </span><span class="kw">mvord</span>(<span class="dt">formula =</span> <span class="kw">MMO</span>(srhs, id, time) <span class="op">~</span><span class="st"> </span><span class="dv">0</span> <span class="op">+</span><span class="st"> </span><span class="kw">factor</span>(gender) <span class="op">+</span>
-<span class="st">    </span><span class="kw">factor</span>(race) <span class="op">+</span><span class="st"> </span><span class="kw">factor</span>(education) <span class="op">+</span><span class="st"> </span>age, 
-    <span class="dt">data =</span> data_SRHS_long,
-    <span class="dt">threshold.constraints =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">8</span>), 
-    <span class="dt">coef.constraints =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">8</span>),
-    <span class="dt">error.structure =</span> <span class="kw">cor_ar1</span>(<span class="op">~</span><span class="st"> </span><span class="dv">1</span>), <span class="dt">link =</span> <span class="kw">mvlogit</span>(), 
-    <span class="dt">PL.lag =</span> <span class="dv">2</span>)</code></pre></div>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>res_srhs <span class="ot">&lt;-</span> <span class="fu">mvord</span>(<span class="at">formula =</span> <span class="fu">MMO</span>(srhs, id, time) <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> <span class="fu">factor</span>(gender) <span class="sc">+</span></span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">factor</span>(race) <span class="sc">+</span> <span class="fu">factor</span>(education) <span class="sc">+</span> age, </span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> data_SRHS_long,</span>
+<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">threshold.constraints =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="dv">8</span>), </span>
+<span id="cb75-5"><a href="#cb75-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">coef.constraints =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="dv">8</span>),</span>
+<span id="cb75-6"><a href="#cb75-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">error.structure =</span> <span class="fu">cor_ar1</span>(<span class="sc">~</span> <span class="dv">1</span>), <span class="at">link =</span> <span class="fu">mvlogit</span>(), </span>
+<span id="cb75-7"><a href="#cb75-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">PL.lag =</span> <span class="dv">2</span>)</span></code></pre></div>
 <p>(runtime 12 minutes).</p>
 <p>The persistence in the reported health status is high. The correlation parameter in the <code>cor_ar1</code> error structure is</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">unique</span>(<span class="kw">error_structure</span>(res_srhs, <span class="dt">type =</span> <span class="st">&quot;corr&quot;</span>))</code></pre></div>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(<span class="fu">error_structure</span>(res_srhs, <span class="at">type =</span> <span class="st">&quot;corr&quot;</span>))</span></code></pre></div>
 <pre><code>##   Correlation
 ## 1   0.8820163</code></pre>
 <p>The estimated parameters are shown by the function <code>summary()</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(res_srhs, <span class="dt">call =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_srhs, <span class="at">call =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>## Formula: MMO(srhs, id, time) ~ 0 + factor(gender) + factor(race) + factor(education) + 
 ##     age
 ## 
@@ -748,7 +815,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## 1 3|4  1.40676    0.11857  11.8644   &lt;2e-16 ***
 ## 1 4|5  3.03358    0.12245  24.7741   &lt;2e-16 ***
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Coefficients:
 ##                        Estimate Std. Error  z value  Pr(&gt;|z|)    
@@ -761,28 +828,28 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## factor(education)5 1 -1.7340257  0.0603490 -28.7333 &lt; 2.2e-16 ***
 ## age 1                 0.0161467  0.0016881   9.5649 &lt; 2.2e-16 ***
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Error Structure:
 ##              Estimate Std. Error z value  Pr(&gt;|z|)    
 ## (Intercept) 1.3847764  0.0088376  156.69 &lt; 2.2e-16 ***
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>In the logit model the coefficients can be interpreted in terms of log-odds ratios. The results suggest that being non-white increases the chances of reporting a worse health status while higher people with education levels tend to report better health. Moreover, every additional year increases the odds of reporting a worse health status by 1.64% (<span class="math inline">\(exp(0.0162628)=1.016396\)</span>).</p>
 </div>
 <div id="example-6---multirater-agreement-data" class="section level2">
 <h2>Example 6 - Multirater agreement data</h2>
 <p>The <strong>mvord</strong> package can also be employed to measure agreement among several rating sources either with or without additional relevant covariate information.</p>
 <p>We use the multirater agreement data from Chapter 5 in <span class="citation">Johnson and Albert (1999)</span>. These data consist of grades assigned to 198 essays by 5 experts, each of whom rated all essays on a 10-point scale. A score of 10 indicates an excellent essay. In addition, the average word length is also available as an essay characteristic.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">N &lt;-<span class="st"> &quot;http://www-math.bgsu.edu/~albert/ord_book/Chapter5/essay_data/N.dat&quot;</span>
-X &lt;-<span class="st"> &quot;http://www-math.bgsu.edu/~albert/ord_book/Chapter5/essay_data/X.dat&quot;</span>
-y  &lt;-<span class="st"> </span><span class="kw">read.delim</span>(<span class="kw">url</span>(N), <span class="dt">header =</span> F, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)
-wl &lt;-<span class="st"> </span><span class="kw">read.delim</span>(<span class="kw">url</span>(X), <span class="dt">header =</span> F, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)[,<span class="dv">2</span>]
-df &lt;-<span class="st"> </span><span class="kw">cbind.data.frame</span>(y, wl)
-<span class="kw">colnames</span>(df)[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>] &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;Judge&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>)
-<span class="kw">save</span>(df, <span class="dt">file =</span>  <span class="st">&quot;df.rda&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="st">&quot;http://www-math.bgsu.edu/~albert/ord_book/Chapter5/essay_data/N.dat&quot;</span></span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="st">&quot;http://www-math.bgsu.edu/~albert/ord_book/Chapter5/essay_data/X.dat&quot;</span></span>
+<span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a>y  <span class="ot">&lt;-</span> <span class="fu">read.delim</span>(<span class="fu">url</span>(N), <span class="at">header =</span> F, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb80-4"><a href="#cb80-4" aria-hidden="true" tabindex="-1"></a>wl <span class="ot">&lt;-</span> <span class="fu">read.delim</span>(<span class="fu">url</span>(X), <span class="at">header =</span> F, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)[,<span class="dv">2</span>]</span>
+<span id="cb80-5"><a href="#cb80-5" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">cbind.data.frame</span>(y, wl)</span>
+<span id="cb80-6"><a href="#cb80-6" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(df)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>] <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;Judge&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)</span>
+<span id="cb80-7"><a href="#cb80-7" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(df, <span class="at">file =</span>  <span class="st">&quot;df.rda&quot;</span>)</span></code></pre></div>
 <p>The traditional measure of agreement between raters in the social sciences is the polychoric correlation. The polychoric correlation can be assessed using the <strong>mvord</strong> package by estimating of a model with no covariates and probit link. The correlation parameters of the <code>cor_general</code> error structure are to be interpretated as the measure of agreement.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(df)</code></pre></div>
+<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df)</span></code></pre></div>
 <pre><code>##   Judge1 Judge2 Judge3 Judge4 Judge5    wl
 ## 1      8      6      9     10      5 4.760
 ## 2      7      5      3      5      3 4.244
@@ -791,12 +858,12 @@ df &lt;-<span class="st"> </span><span class="kw">cbind.data.frame</span>(y, wl)
 ## 5      7      2      7      7      7 4.306
 ## 6     10      6      8     10      6 4.508</code></pre>
 <p>The data is in the wide format (each ordinal response is in one column) so the <code>MMO2</code> object will be used in the <code>formula</code> object:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_essay_<span class="dv">0</span> &lt;-<span class="st"> </span><span class="kw">mvord</span>(
-  <span class="dt">formula =</span> <span class="kw">MMO2</span>(Judge1, Judge2, Judge3, Judge4, Judge5) <span class="op">~</span><span class="st"> </span><span class="op">-</span><span class="dv">1</span>,
-  <span class="dt">data =</span> df, <span class="dt">threshold.constraints =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">5</span>),
-  <span class="dt">coef.constraints =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">5</span>))</code></pre></div>
+<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>res_essay_0 <span class="ot">&lt;-</span> <span class="fu">mvord</span>(</span>
+<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> <span class="fu">MMO2</span>(Judge1, Judge2, Judge3, Judge4, Judge5) <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span>,</span>
+<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df, <span class="at">threshold.constraints =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="dv">5</span>),</span>
+<span id="cb83-4"><a href="#cb83-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">coef.constraints =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="dv">5</span>))</span></code></pre></div>
 <p>(runtime 14 seconds).</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(res_essay_<span class="dv">0</span>, <span class="dt">call =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_essay_0, <span class="at">call =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>## Formula: MMO2(Judge1, Judge2, Judge3, Judge4, Judge5) ~ -1
 ## 
 ##     link threshold nsubjects ndim    logPL    CLAIC    CLBIC fevals
@@ -814,7 +881,7 @@ df &lt;-<span class="st"> </span><span class="kw">cbind.data.frame</span>(y, wl)
 ## Judge1 8|9   1.3344835  0.0806365  16.5494 &lt; 2.2e-16 ***
 ## Judge1 9|10  1.9196999  0.1064901  18.0270 &lt; 2.2e-16 ***
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Coefficients:
 ##      Estimate Std. Error z value Pr(&gt;|z|)
@@ -832,14 +899,14 @@ df &lt;-<span class="st"> </span><span class="kw">cbind.data.frame</span>(y, wl)
 ## corr Judge3 Judge5 0.382999   0.066020  5.8013 6.582e-09 ***
 ## corr Judge4 Judge5 0.693040   0.041727 16.6087 &lt; 2.2e-16 ***
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>The word length can be included as a covariate in the model:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_essay_wl &lt;-<span class="st"> </span><span class="kw">mvord</span>(
-  <span class="dt">formula =</span> <span class="kw">MMO2</span>(Judge1, Judge2, Judge3, Judge4, Judge5) <span class="op">~</span><span class="st"> </span><span class="dv">0</span> <span class="op">+</span><span class="st"> </span>wl,
-  <span class="dt">data =</span> df, <span class="dt">threshold.constraints =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">5</span>),
-  <span class="dt">coef.constraints =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">5</span>))</code></pre></div>
+<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a>res_essay_wl <span class="ot">&lt;-</span> <span class="fu">mvord</span>(</span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> <span class="fu">MMO2</span>(Judge1, Judge2, Judge3, Judge4, Judge5) <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> wl,</span>
+<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df, <span class="at">threshold.constraints =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="dv">5</span>),</span>
+<span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">coef.constraints =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="dv">5</span>))</span></code></pre></div>
 <p>(runtime 0 minutes).</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(res_essay_wl, <span class="dt">call =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_essay_wl, <span class="at">call =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>## Formula: MMO2(Judge1, Judge2, Judge3, Judge4, Judge5) ~ 0 + wl
 ## 
 ##     link threshold nsubjects ndim    logPL    CLAIC    CLBIC fevals
@@ -857,13 +924,13 @@ df &lt;-<span class="st"> </span><span class="kw">cbind.data.frame</span>(y, wl)
 ## Judge1 8|9   3.71636    0.79304  4.6862 2.783e-06 ***
 ## Judge1 9|10  4.31272    0.79820  5.4031 6.551e-08 ***
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Coefficients:
 ##      Estimate Std. Error z value Pr(&gt;|z|)   
 ## wl 1  0.54193    0.17837  3.0382  0.00238 **
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Error Structure:
 ##                    Estimate Std. Error z value  Pr(&gt;|z|)    
@@ -878,18 +945,18 @@ df &lt;-<span class="st"> </span><span class="kw">cbind.data.frame</span>(y, wl)
 ## corr Judge3 Judge5 0.368174   0.067220  5.4772 4.322e-08 ***
 ## corr Judge4 Judge5 0.681338   0.044116 15.4442 &lt; 2.2e-16 ***
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>The probabilities of agreement among all five judges which implied by the model can be computed by the function <code>joint_probabilities()</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">agree_prob_list &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="cf">function</span>(i)
-  <span class="kw">joint_probabilities</span>(res_essay_wl, <span class="kw">rep</span>(i, <span class="dv">5</span>)))
-agree_prob &lt;-<span class="st"> </span><span class="kw">Reduce</span>(<span class="st">&quot;+&quot;</span>, agree_prob_list)
-<span class="kw">summary</span>(agree_prob)</code></pre></div>
+<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a>agree_prob_list <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="cf">function</span>(i)</span>
+<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">joint_probabilities</span>(res_essay_wl, <span class="fu">rep</span>(i, <span class="dv">5</span>)))</span>
+<span id="cb89-3"><a href="#cb89-3" aria-hidden="true" tabindex="-1"></a>agree_prob <span class="ot">&lt;-</span> <span class="fu">Reduce</span>(<span class="st">&quot;+&quot;</span>, agree_prob_list)</span>
+<span id="cb89-4"><a href="#cb89-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(agree_prob)</span></code></pre></div>
 <pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
 ## 0.005150 0.006445 0.008724 0.009701 0.011795 0.023869</code></pre>
 <p>In order to assess the relationship between the average word length and the agreement probabilities, we plot the probabilities of agreement implied by the model against the word length.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(df<span class="op">$</span>wl, agree_prob,
-  <span class="dt">xlab =</span> <span class="st">&quot;word length&quot;</span>, <span class="dt">ylab =</span> <span class="st">&quot;probability of agreement&quot;</span>)</code></pre></div>
-<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(df<span class="sc">$</span>wl, agree_prob,</span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;word length&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;probability of agreement&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
 <!-- \begin{center} -->
 <!-- \begin{figure}[!h] -->
 <!-- \caption{Probabilities of agreement between the five raters and word length} -->
@@ -903,13 +970,13 @@ agree_prob &lt;-<span class="st"> </span><span class="kw">Reduce</span>(<span cl
 <p>The graphic suggests that the judges tend to agree more on the quality of essays with lower average word length than on the essays with larger average word length.</p>
 </div>
 <div id="references" class="section level1 unnumbered">
-<h1>References</h1>
-<div id="refs" class="references">
-<div id="ref-Bartolucci14">
-<p>Bartolucci, Francesco, Silvia Pandolfi, and Fulvia Pennoni. 2017. “LMest: An R Package for Latent Markov Models for Longitudinal Categorical Data.” <em>Journal of Statistical Software</em> 81 (4): 1–38. doi:<a href="https://doi.org/10.18637/jss.v081.i04">10.18637/jss.v081.i04</a>.</p>
+<h1 class="unnumbered">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Bartolucci14" class="csl-entry">
+Bartolucci, Francesco, Silvia Pandolfi, and Fulvia Pennoni. 2017. <span>“<span>LMest</span>: An <span>R</span> Package for Latent Markov Models for Longitudinal Categorical Data.”</span> <em>Journal of Statistical Software</em> 81 (4): 1–38. <a href="https://doi.org/10.18637/jss.v081.i04">https://doi.org/10.18637/jss.v081.i04</a>.
 </div>
-<div id="ref-johnson1999ordinal">
-<p>Johnson, Valen E, and J Albert. 1999. <em>Ordinal Data Modeling</em>. Statistics for Social Science and Public Policy. Springer-Verlag New York Incorporated.</p>
+<div id="ref-johnson1999ordinal" class="csl-entry">
+Johnson, Valen E, and J Albert. 1999. <em>Ordinal Data Modeling</em>. Statistics for Social Science and Public Policy. Springer-Verlag New York Incorporated.
 </div>
 </div>
 </div>

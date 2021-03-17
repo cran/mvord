@@ -740,6 +740,12 @@ mvord:::check(all.equal(
                         0.2403876149104018367098),  tolerance = tolerance))
 
 pjhat_in_mvord2 <- joint_probabilities(res_train, response.cat = c(1,2))
+pjhat_in_mvord2_1 <- joint_probabilities(res_train, response.cat = c(1,1))
+
+p1 <- joint_probabilities(res_train, response.cat = c(1,NA))
+p2 <- joint_probabilities(res_train, response.cat = c(2,NA))
+min(rowSums(cbind(pjhat_in_mvord2/p1, pjhat_in_mvord2_1/p1)))
+
 mvord:::check(all.equal(
   unname(pjhat_in_mvord2[1:10]), c(0.0414494114970503091388565, 0.0007763727128762831775077, 0.0258791356876044154056160,
                                    0.0166994147132800141442033, 0.0468724891285079159342075, 0.0021647187725574168482012,
@@ -888,12 +894,104 @@ mvord:::check(all.equal(
 
 
 
+
+
+
+### example with fixed error structure
+res_train2_vec <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 +X2,
+                           data = dat_train,
+                           link = mvprobit(),
+                           cor_ar1(~1, value = rep(0,length(unique(dat_train$i))), fixed = TRUE))
+
+mvord:::check(all.equal(logLik(res_train2_vec)[[1]], -148.0213745871528772113, tolerance = tolerance))
+
+
+res_train2 <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 +X2,
+                           data = dat_train,
+                           link = mvprobit(),
+                           cor_ar1(~1, value = 0, fixed = TRUE))
+mvord:::check(all.equal(logLik(res_train2_vec)[[1]], -148.0213745871528772113, tolerance = tolerance))
+
+phat_mvord <- predict(res_train2)
+
+phat_mp_mvord <- marginal_predict(res_train2)
+
+pjhat_mvord <- joint_probabilities(res_train2, response.cat = c(1,2))
+
+# res_train2 <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 +X2,
+#                            data = dat_train,
+#                            link = mvprobit(),
+#                            cor_ar1(~1))
+#
+# res_train2_free$rho$optpar
+# res_train2_free$rho$varGamma
+
+res_train2_vec <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 +X2,
+                               data = dat_train,
+                               link = mvprobit(),
+                               cor_equi(~1, value = rep(0,length(unique(dat_train$i))), fixed = TRUE))
+mvord:::check(all.equal(logLik(res_train2_vec)[[1]], -148.0213745871528772113, tolerance = tolerance))
+
+res_train2 <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 +X2,
+                           data = dat_train,
+                           link = mvprobit(),
+                           cor_equi(~1, value = 0, fixed = TRUE))
+mvord:::check(all.equal(logLik(res_train2)[[1]], -148.0213745871528772113, tolerance = tolerance))
+
+phat_mvord <- predict(res_train2)
+
+phat_mp_mvord <- marginal_predict(res_train2)
+
+pjhat_mvord <- joint_probabilities(res_train2, response.cat = c(1,2))
+
+
+# cor_general
+res_train2_vec <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 +X2,
+                               data = dat_train,
+                               link = mvprobit(),
+                               cor_general(~1, value = matrix(rep(0,length(unique(dat_train$i))), ncol = 1), fixed = TRUE))
+mvord:::check(all.equal(logLik(res_train2_vec)[[1]], -148.0213745871528772113, tolerance = tolerance))
+
+res_train2 <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 +X2,
+                           data = dat_train,
+                           link = mvprobit(),
+                           cor_general(~1, value = 0, fixed = TRUE))
+mvord:::check(all.equal(logLik(res_train2)[[1]], -148.0213745871528772113, tolerance = tolerance))
+
+phat_mvord <- predict(res_train2)
+
+phat_mp_mvord <- marginal_predict(res_train2)
+
+pjhat_mvord <- joint_probabilities(res_train2, response.cat = c(1,2))
+
+#cov_general
+res_train2_vec <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 +X2,
+                               data = dat_train,
+                               link = mvprobit(),
+                               cov_general(~1, value = matrix(rep(c(1,0,1),length(unique(dat_train$i))), ncol = 3, byrow= TRUE), fixed = TRUE))
+mvord:::check(all.equal(logLik(res_train2_vec)[[1]], -187.3253828363251329847, tolerance = tolerance))
+
+res_train2 <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 +X2,
+                           data = dat_train,
+                           link = mvprobit(),
+                           error.structure = cov_general(~1, value = c(1,0,1), fixed = TRUE))
+mvord:::check(all.equal(logLik(res_train2)[[1]], -187.3253828363251329847, tolerance = tolerance))
+
+error_structure(res_train2, type ="sigmas")
+
+
+phat_mvord <- predict(res_train2)
+#warnings()
+
+phat_mp_mvord <- marginal_predict(res_train2)
+
+pjhat_mvord <- joint_probabilities(res_train2, response.cat = c(1,2))
+
 ### example with offsets
 res_train2 <- mvord::mvord(formula = MMO(Y) ~ 0 + X1 + offset(X2) + X3,
-                            data = dat_train,
-                            link = mvprobit(),
-                            contrasts = list(X3 = "contr.sum"))
-
+                           data = dat_train,
+                           link = mvprobit(),
+                           contrasts = list(X3 = "contr.sum"))
 #### predict in sample
 phat_in_offset_mvord <- predict(res_train2)
 mvord:::check(all.equal(

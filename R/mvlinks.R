@@ -105,29 +105,29 @@ mvlogit <- function(df = 8L){
                  F_biv = function(x, y, r) {
                    x <- qt(plogis(x), df = df)
                    y <- qt(plogis(y), df = df)
-                   sapply(seq_along(x), function(i)
+                   unlist(lapply(seq_along(x), function(i)
                      biv_nt_prob2(nu = df,
                                   lower = c(-10000, -10000),
                                   upper = c(x[i], y[i]),
-                                  r     = r[i]))},
+                                  r     = r[i])))},
                  F_biv_rect = function(U, L, r) {
-                   U <- qt(plogis(U), df = df)
                    L <- qt(plogis(L), df = df)
-                   L <- replace(L, L == -Inf, -10000)
-                   U <- replace(U, U == Inf, 10000)
-                   sapply(seq_len(nrow(U)), function(i)
+                   U <- qt(plogis(U), df = df)
+                   L[is.infinite(L)] <- -10000
+                   U[is.infinite(U)] <- 10000
+                   unlist(lapply(seq_len(nrow(U)), function(i)
                      biv_nt_prob2(nu = df,
                                   lower = L[i, ],
                                   upper = U[i, ],
-                                  r     = r[i]))},
+                                  r     = r[i])))},
                  F_multi = function(U, L, list_R) {
                    U <- qt(plogis(U), df = df)
                    L <- qt(plogis(L), df = df)
-                   sapply(seq_len(nrow(U)), function(i) sadmvt(df = df,
+                   unlist(lapply(seq_len(nrow(U)), function(i) sadmvt(df = df,
                                                                lower = L[i, ],
                                                                upper = U[i, ],
                                                                mean = rep.int(0, NCOL(U)),
-                                                               S = list_R[[i]]))},
+                                                               S = list_R[[i]])))},
 
                  deriv.fun =  list(
                    dF1dx = dlogis,

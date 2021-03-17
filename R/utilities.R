@@ -298,6 +298,9 @@ transf_par <- function(par, rho) {
   predl <- do.call("rbind",lapply(rho[["combis_fast"]], function(h){
     pred.lower[h[["ind_i"]], h[["combis"]], drop = F]
   }))
+  # h <- rho[["combis_fast"]][[2]]
+  # dim(sigmas$rVec)
+  # nrow(sigmas$rVec)
   predr <- unlist(lapply(rho[["combis_fast"]], function(h){
     sigmas$rVec[h[["ind_i"]],h[["r"]][1]]
   }))
