@@ -1,4 +1,5 @@
 #' @rdname mvord-package
+#' @useDynLib mvord
 #' @title Multivariate Ordinal Regression Models in R.
 #' @description  The R package mvord implements composite likelihood
 #' estimation in the class of multivariate ordinal regression models with probit and logit link.
@@ -41,7 +42,7 @@ NULL
 #' @name data_cr_panel
 #' @docType data
 # #' @keywords datasets
-#' @usage data(data_cr_panel)
+#' @usage data("data_cr_panel", package = "mvord")
 #' @format A data frame with 11320 rows and 9 variables
 NULL
 
@@ -71,7 +72,7 @@ NULL
 #' @name data_cr
 #' @docType data
 # #' @keywords datasets
-#' @usage data(data_cr)
+#' @usage data("data_cr", package = "mvord")
 #' @format A data frame with 690 rows and 11 columns
 NULL
 
@@ -97,7 +98,7 @@ NULL
 #' @name data_mvord2
 #' @docType data
 # #' @keywords datasets
-#' @usage data(data_mvord2)
+#' @usage data("data_mvord2", package = "mvord")
 #' @format A data frame with 1000 rows and 10 variables
 NULL
 
@@ -123,7 +124,7 @@ NULL
 #' @name data_mvord_panel
 #' @docType data
 # #' @keywords datasets
-#' @usage data(data_mvord_panel)
+#' @usage data("data_mvord_panel", package = "mvord")
 #' @format A data frame with 10000 rows and 9 variables
 NULL
 
@@ -156,7 +157,7 @@ NULL
 #' @name data_mvord
 #' @docType data
 # #' @keywords datasets
-#' @usage data(data_mvord)
+#' @usage data("data_mvord", package = "mvord")
 #' @format A data frame with 3000 rows and 9 variables
 NULL
 
@@ -178,8 +179,32 @@ NULL
 #' @name data_mvord_toy
 #' @docType data
 # #' @keywords datasets
-#' @usage data(data_mvord_toy)
+#' @usage data("data_mvord_toy", package = "mvord")
 #' @format A data frame with 100 rows and 6 variables
+NULL
+
+#' Essay data
+#'
+#' The multirater agreement data set is taken from Chapter 5 in "Ordinal Data Modeling",
+#' from Johnson, Valen E and Albert, J. The data consists of grades assigned to
+#' 198 essays by 5 experts, each of whom rated all essays on a 10-point
+#' scale. A score of 10 indicates an excellent essay. In addition, the
+#' average word length is also available as an essay characteristic.
+#'
+#' \itemize{
+#'   \item \code{Judge1} ordinal outcome:  grades assigned by expert 1
+#'   \item \code{Judge2} ordinal outcome:  grades assigned by expert 2
+#'   \item \code{Judge3} ordinal outcome:  grades assigned by expert 3
+#'   \item \code{Judge4} ordinal outcome:  grades assigned by expert 4
+#'   \item \code{Judge5} ordinal outcome:  grades assigned by expert 5
+#'   \item \code{wl} covariate: word length
+#' }
+#'
+#' @name essay_data
+#' @docType data
+# #' @keywords datasets
+#' @usage data("essay_data", package = "mvord")
+#' @format A data frame with 198 rows and 6 variables
 NULL
 
 ##IMPORTS
@@ -188,7 +213,9 @@ NULL
 #' @importFrom pbivnorm pbivnorm
 #' @importFrom MASS polr
 #' @importFrom utils combn data write.table
-#' @importFrom mnormt sadmvn sadmvt
+#' @importFrom mnormt sadmvn
+#' @importFrom mnormt sadmvt
+#' @importFrom mvtnorm pmvt
 #' @importFrom Matrix bdiag
 #' @importFrom numDeriv grad hessian
 #' @import minqa
@@ -214,7 +241,7 @@ NULL
 #' @details
 #' \describe{
 #' \item{Implementation \code{MMO}:}{
-#'   \itemize{
+#'   \describe{
 #'     \item{\code{data}:}{
 #' In \code{MMO} we use a long format for the input of data, where each row contains a subject index
 #' (\code{i}), a multiple measurement index (\code{j}), an ordinal
@@ -253,13 +280,13 @@ NULL
 #' \item{\code{formula}}{
 #' The ordinal responses (e.g., \code{rating}) are passed by a \code{formula} object.
 #' Intercepts can be included or excluded in the model depending on the model paramterization:
-#' \itemize{
-#' \item {Model without intercept:} If the intercept should be removed the \code{formula} for a given response (\code{rating})
+#' \describe{
+#' \item{Model without intercept:}{ If the intercept should be removed the \code{formula} for a given response (\code{rating})
 #' and covariates (\code{X1} to \code{Xp}) has the following form:
 #'
 #'      \code{formula = MMO(rating, firm_id, rater_id) ~ 0 + X1 + ... + Xp}.
-#'
-#' \item {Model with intercept:} If one wants to include an intercept in the model, there are two equivalent possibilities
+#' }
+#' \item{Model with intercept:}{ If one wants to include an intercept in the model, there are two equivalent possibilities
 #' to set the model \code{formula}. Either one includes the intercept explicitly by:
 #'
 #'     \code{formula = MMO(rating, firm_id, rater_id) ~ 1 + X1 + ... + Xp},
@@ -271,8 +298,9 @@ NULL
 #' }
 #' }
 #' }
+#' }
 #' \item{Implementation \code{MMO2}:}{
-#'   \itemize{
+#'   \describe{
 #'     \item{\code{data}:}{The data structure applied by \code{MMO2} is slightly simplified, where the multiple ordinal
 #' observations as well as the covariates are stored as columns in a \code{\link{data.frame}}. Each subject \eqn{i}
 #' corresponds to one row of the data frame, where all outcomes (with missing
@@ -465,13 +493,13 @@ NULL
 #'
 #' An object of \code{\link{class}} \code{"mvord"} is a list containing the following components:
 #'
-#' \itemize{
+#' \describe{
 #'  \item{\code{beta}}{
 #'
 #'  a named \code{\link{matrix}} of regression coefficients}
-#'  \item{\code{theta}}
+#'  \item{\code{theta}}{
 #'
-#'  a named \code{\link{list}}{ of threshold parameters}
+#'  a named \code{\link{list}} of threshold parameters}
 #'   \item{\code{error.struct}}{
 #'
 #'   an object of class \code{\link{error_struct}} containing the parameters of the error
@@ -710,6 +738,7 @@ mvord <- function(formula,
   rho$formula.input <- formula
   rho$PL.lag <- PL.lag
   rho$solver <- control$solver
+  rho$combis <- control$combis
   rho$control <- control$solver.optimx.control
   check_args_optimizer(rho)
   check_args_error.structure(error.structure, data)
@@ -908,22 +937,22 @@ summary.mvord <- function(object, short = TRUE, call = TRUE, ...){
   invisible(summary.output)
 }
 
-print.summary.mvord <- function(summary.output, ...){
-  if(!is.null(summary.output)){
+print.summary.mvord <- function(x, ...){
+  if(!is.null(x)){
     cat("\nCall: ",
-        summary.output$call, "\n\n", sep = "")
+        x$call, "\n\n", sep = "")
   }
   cat("Formula: ")
-  print(summary.output$formula, ...)
+  print(x$formula, ...)
   cat("\n")
-  write.table(summary.output$info, row.names = FALSE, col.names = FALSE, quote = FALSE)
+  write.table(x$info, row.names = FALSE, col.names = FALSE, quote = FALSE)
   cat("\n")
     cat("Thresholds:\n")
-    if(ncol(summary.output$thresholds) > 1) printCoefmat(summary.output$thresholds) else print(summary.output$thresholds, ...)
+    if(ncol(x$thresholds) > 1) printCoefmat(x$thresholds) else print(x$thresholds, ...)
     cat("\nCoefficients:\n")
-    if(ncol(summary.output$coefficients) > 1) print(summary.output$coefficients) else print(summary.output$coefficients, ...)
+    if(ncol(x$coefficients) > 1) print(x$coefficients) else print(x$coefficients, ...)
   cat("\nError Structure:\n")
-  if(ncol(summary.output$error.structure) > 1) printCoefmat(summary.output$error.structure) else print(summary.output$error.structure, ...)
+  if(ncol(x$error.structure) > 1) printCoefmat(x$error.structure) else print(x$error.structure, ...)
 
 }
 

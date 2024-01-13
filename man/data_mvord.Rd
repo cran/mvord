@@ -4,9 +4,11 @@
 \name{data_mvord}
 \alias{data_mvord}
 \title{Simulated credit ratings}
-\format{A data frame with 3000 rows and 9 variables}
+\format{
+A data frame with 3000 rows and 9 variables
+}
 \usage{
-data(data_mvord)
+data("data_mvord", package = "mvord")
 }
 \description{
 A simulated data set where three different raters (\code{rater1, rater2} and \code{rater3})

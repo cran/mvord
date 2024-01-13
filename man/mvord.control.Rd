@@ -4,13 +4,21 @@
 \alias{mvord.control}
 \title{Control functions for mvord()}
 \usage{
-mvord.control(se = TRUE, start.values = NULL, solver = "newuoa",
-  solver.optimx.control = list(maxit = 2e+05, trace = 0, kkt = FALSE))
+mvord.control(
+  se = TRUE,
+  start.values = NULL,
+  combis = NULL,
+  solver = "newuoa",
+  solver.optimx.control = list(maxit = 2e+05, trace = 0, kkt = FALSE)
+)
 }
 \arguments{
 \item{se}{logical, if \code{TRUE} standard errors are computed.}
 
-\item{start.values}{vector of (optional) starting values.}
+\item{start.values}{list of (optional) starting values for thresholds and coefficients.}
+
+\item{combis}{list of length equal to the number of combinations of responses that should enter the pairwise likelihood. Each element contains one pair of integers corresponding to two responses. Defaults to NULL, in which case all pairs are considered.
+Should only be used if user knows the ordering of the responses in the analysis.}
 
 \item{solver}{character string containing the name of the applicable solver of \code{\link{optimx}} (default is \code{"newuoa"})
 or wrapper function for user defined solver.}

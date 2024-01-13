@@ -5,7 +5,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(mvord)
 
 ## -----------------------------------------------------------------------------
-data("data_cr")
+data("data_cr", package = "mvord")
 str(data_cr, vec.len = 3)
 head(data_cr, n = 3)
 
@@ -38,34 +38,34 @@ summary(res_cor_probit_2raters)
 coef(res_cor_probit_2raters)
 
 ## ----eval = FALSE-------------------------------------------------------------
-#  res_cor_probit_3raters <- mvord(formula = MMO2(rater1, rater2, rater 3) ~ 0 + LR + LEV + PR + RSIZE + BETA,
+#  res_cor_logit_3raters <- mvord(formula = MMO2(rater1, rater2, rater 3) ~ 0 + LR + LEV + PR + RSIZE + BETA,
 #                                 coef.constraints = c(1, 1, 1),
 #                                 data = data_cr,
 #                                 link = mvlogit())
 
 ## ----echo = FALSE, results = 'hide', eval = TRUE------------------------------
 cache <- TRUE
-FILE <- "res_cor_probit_3raters.rda"
+FILE <- "res_cor_logit_3raters.rda"
 if (cache & file.exists(FILE)) {
   load(FILE)
 } else {
   if (cache) {
-res_cor_probit_3raters <- mvord(formula = MMO2(rater1, rater2, rater3) ~ 0 + LR + LEV + PR + RSIZE + BETA,
+res_cor_logit_3raters <- mvord(formula = MMO2(rater1, rater2, rater3) ~ 0 + LR + LEV + PR + RSIZE + BETA,
                                coef.constraints = c(1, 1, 1),
                                data = data_cr,
                                link = mvlogit())
-res_cor_probit_3raters <- mvord:::reduce_size.mvord(res_cor_probit_3raters)
-  save(res_cor_probit_3raters, file  = FILE)
+res_cor_logit_3raters <- mvord:::reduce_size.mvord(res_cor_logit_3raters)
+  save(res_cor_logit_3raters, file  = FILE)
   } else {
       if(file.exists(FILE)) file.remove(FILE)
   }
 }
 
 ## -----------------------------------------------------------------------------
-summary(res_cor_probit_3raters)
+summary(res_cor_logit_3raters)
 
 ## -----------------------------------------------------------------------------
-thresholds(res_cor_probit_3raters)
+thresholds(res_cor_logit_3raters)
 
 ## ----eval = FALSE-------------------------------------------------------------
 #  res_cor_probit_simple <- mvord(formula = MMO2(rater1, rater2, rater3, rater4) ~ 0 + LR + LEV + PR + RSIZE + BETA, data = data_cr)
@@ -233,19 +233,16 @@ head(error_structure(res_AR1_probit, type = "corr"), n = 3)
 head(error_structure(res_AR1_probit, type = "sigmas"), n = 1)
 
 ## ----include=FALSE------------------------------------------------------------
-load("data_SRHS_long.rda")
+# load("data_SRHS_long.rda")
 
-## ----eval=FALSE, include=TRUE-------------------------------------------------
-#  data(data_SRHS_long, package = "LMest")
+## ----eval=TRUE, include=TRUE--------------------------------------------------
+data(data_SRHS_long, package = "LMest")
 
 ## -----------------------------------------------------------------------------
 str(data_SRHS_long)
 
-## -----------------------------------------------------------------------------
-data_SRHS_long$time <- rep(1:8, length(unique(data_SRHS_long$id)))
-
 ## ----eval=FALSE, include=TRUE-------------------------------------------------
-#  res_srhs <- mvord(formula = MMO(srhs, id, time) ~ 0 + factor(gender) +
+#  res_srhs <- mvord(formula = MMO(srhs, id, t) ~ 0 + factor(gender) +
 #  	factor(race) + factor(education) + age,
 #  	data = data_SRHS_long,
 #  	threshold.constraints = rep(1, 8),
@@ -259,7 +256,7 @@ if (cache & file.exists(FILE)) {
   load(FILE)
 } else {
   if (cache) {
-    res_srhs <- mvord(formula = MMO(srhs, id, time) ~ 0 +  factor(gender) +
+    res_srhs <- mvord(formula = MMO(srhs, id, t) ~ 0 +  factor(gender) +
    	    factor(race) + factor(education) + age,
                   data = data_SRHS_long,
                   link = mvlogit(),
@@ -267,7 +264,7 @@ if (cache & file.exists(FILE)) {
                   coef.constraints = rep(1, 8),
                   error.structure = cor_ar1(~1), PL.lag = 2)
    res_srhs <- mvord:::reduce_size.mvord(res_srhs)
-    save(res_srhs, file  = FILE)
+   save(res_srhs, file  = FILE)
   } else {
       if(file.exists(FILE)) file.remove(FILE)
   }
@@ -279,25 +276,26 @@ unique(error_structure(res_srhs, type = "corr"))
 ## -----------------------------------------------------------------------------
 summary(res_srhs, call = FALSE)
 
-## ----eval=FALSE, include=TRUE-------------------------------------------------
+## ----echo=FALSE, eval=FALSE---------------------------------------------------
+#  ## links are broken
 #  N <- "http://www-math.bgsu.edu/~albert/ord_book/Chapter5/essay_data/N.dat"
 #  X <- "http://www-math.bgsu.edu/~albert/ord_book/Chapter5/essay_data/X.dat"
 #  y  <- read.delim(url(N), header = F, sep = "")
 #  wl <- read.delim(url(X), header = F, sep = "")[,2]
-#  df <- cbind.data.frame(y, wl)
-#  colnames(df)[1:5] <- paste0("Judge", 1:5)
-#  save(df, file =  "df.rda")
+#  essay_data <- cbind.data.frame(y, wl)
+#  colnames(essay_data)[1:5] <- paste0("Judge", 1:5)
+#  save(essay_data, file =  "essay_data.rda")
 
-## ----include=FALSE------------------------------------------------------------
-load(file =  "df.rda")
+## ----include=TRUE-------------------------------------------------------------
+data("essay_data", package = "mvord")
 
 ## -----------------------------------------------------------------------------
-head(df)
+head(essay_data)
 
 ## ----eval=FALSE, include=TRUE-------------------------------------------------
 #  res_essay_0 <- mvord(
 #    formula = MMO2(Judge1, Judge2, Judge3, Judge4, Judge5) ~ -1,
-#    data = df, threshold.constraints = rep(1, 5),
+#    data = essay_data, threshold.constraints = rep(1, 5),
 #    coef.constraints = rep(1, 5))
 
 ## ----message=FALSE, warning=FALSE, include=FALSE------------------------------
@@ -308,12 +306,12 @@ if (cache & file.exists(FILE)) {
   if (cache) {
     res_essay_wl <- mvord(
       formula = MMO2(Judge1, Judge2, Judge3, Judge4, Judge5) ~ 0 + wl,
-      data = df, threshold.constraints = rep(1, 5),
+      data = essay_data, threshold.constraints = rep(1, 5),
       coef.constraints = rep(1, 5))
     res_essay_wl <- mvord:::reduce_size2.mvord(res_essay_wl)
     res_essay_0 <- mvord(
       formula = MMO2(Judge1, Judge2, Judge3, Judge4, Judge5) ~ -1,
-      data = df, threshold.constraints = rep(1, 5),
+      data = essay_data, threshold.constraints = rep(1, 5),
       coef.constraints = rep(1,5))
     res_essay_0 <- mvord:::reduce_size.mvord(res_essay_0)
     save(res_essay_0, res_essay_wl, file  = FILE)
@@ -328,7 +326,7 @@ summary(res_essay_0, call = FALSE)
 ## ----eval=FALSE, include=TRUE-------------------------------------------------
 #  res_essay_wl <- mvord(
 #    formula = MMO2(Judge1, Judge2, Judge3, Judge4, Judge5) ~ 0 + wl,
-#    data = df, threshold.constraints = rep(1, 5),
+#    data = essay_data, threshold.constraints = rep(1, 5),
 #    coef.constraints = rep(1, 5))
 
 ## -----------------------------------------------------------------------------
@@ -341,6 +339,6 @@ agree_prob <- Reduce("+", agree_prob_list)
 summary(agree_prob)
 
 ## ----fig.align='center', fig.width=6, fig.height=6----------------------------
-plot(df$wl, agree_prob,
+plot(essay_data$wl, agree_prob,
   xlab = "word length", ylab = "probability of agreement")
 

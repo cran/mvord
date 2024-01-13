@@ -20,7 +20,7 @@
 #' of \code{\link{class}} \code{'mvlink'}.
 #' An object of \code{\link{class}} \code{'mvlink'} is a list containing the following components:
 #'
-#' \itemize{
+#' \describe{
 #'  \item{\code{name}}{
 #'
 #'  name of the multivariate link function}
@@ -59,7 +59,7 @@
 #'   \item{\code{deriv.fun}}{
 #'
 #'   (needed for computation of analytic standard errors) a list containing the following gradient functions:
-#'         \itemize{
+#'         \describe{
 #'            \item{\code{dF1dx}}{ derivative \eqn{dF_1(x)/dx} function,}
 #'            \item{\code{dF2dx}}{ derivative \eqn{dF_2(x,y,r)/dx} function,}
 #'            \item{\code{dF2dr}}{ derivative \eqn{dF_2(x,y,r)/dr } function.}
@@ -111,8 +111,8 @@ mvlogit <- function(df = 8L){
                                   upper = c(x[i], y[i]),
                                   r     = r[i])))},
                  F_biv_rect = function(U, L, r) {
-                   L <- qt(plogis(L), df = df)
                    U <- qt(plogis(U), df = df)
+                   L <- qt(plogis(L), df = df)
                    L[is.infinite(L)] <- -10000
                    U[is.infinite(U)] <- 10000
                    unlist(lapply(seq_len(nrow(U)), function(i)
@@ -123,11 +123,11 @@ mvlogit <- function(df = 8L){
                  F_multi = function(U, L, list_R) {
                    U <- qt(plogis(U), df = df)
                    L <- qt(plogis(L), df = df)
-                   unlist(lapply(seq_len(nrow(U)), function(i) sadmvt(df = df,
-                                                               lower = L[i, ],
-                                                               upper = U[i, ],
-                                                               mean = rep.int(0, NCOL(U)),
-                                                               S = list_R[[i]])))},
+                   unlist(lapply(seq_len(nrow(U)), function(i)
+                     pmvt(df = df,
+                          lower = L[i, ],
+                          upper = U[i, ],
+                          sigma = list_R[[i]])))},
 
                  deriv.fun =  list(
                    dF1dx = dlogis,

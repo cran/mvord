@@ -4,11 +4,22 @@
 \alias{mvord}
 \title{Multivariate Ordinal Regression Models.}
 \usage{
-mvord(formula, data, error.structure = cor_general(~1), link = mvprobit(),
-  response.levels = NULL, coef.constraints = NULL, coef.values = NULL,
-  threshold.constraints = NULL, threshold.values = NULL,
-  weights.name = NULL, offset = NULL, PL.lag = NULL, contrasts = NULL,
-  control = mvord.control())
+mvord(
+  formula,
+  data,
+  error.structure = cor_general(~1),
+  link = mvprobit(),
+  response.levels = NULL,
+  coef.constraints = NULL,
+  coef.values = NULL,
+  threshold.constraints = NULL,
+  threshold.values = NULL,
+  weights.name = NULL,
+  offset = NULL,
+  PL.lag = NULL,
+  contrasts = NULL,
+  control = mvord.control()
+)
 }
 \arguments{
 \item{formula}{an object of class \code{\link{formula}} of the form \code{y ~ X1 + ... + Xp}.}
@@ -62,13 +73,13 @@ and the function \cr
 
 An object of \code{\link{class}} \code{"mvord"} is a list containing the following components:
 
-\itemize{
+\describe{
  \item{\code{beta}}{
 
  a named \code{\link{matrix}} of regression coefficients}
- \item{\code{theta}}
+ \item{\code{theta}}{
 
- a named \code{\link{list}}{ of threshold parameters}
+ a named \code{\link{list}} of threshold parameters}
   \item{\code{error.struct}}{
 
   an object of class \code{\link{error_struct}} containing the parameters of the error
@@ -102,7 +113,7 @@ structure as wide data format.
 \details{
 \describe{
 \item{Implementation \code{MMO}:}{
-  \itemize{
+  \describe{
     \item{\code{data}:}{
 In \code{MMO} we use a long format for the input of data, where each row contains a subject index
 (\code{i}), a multiple measurement index (\code{j}), an ordinal
@@ -141,13 +152,13 @@ the names of the levels of the ordered categories in ascending or descending ord
 \item{\code{formula}}{
 The ordinal responses (e.g., \code{rating}) are passed by a \code{formula} object.
 Intercepts can be included or excluded in the model depending on the model paramterization:
-\itemize{
-\item {Model without intercept:} If the intercept should be removed the \code{formula} for a given response (\code{rating})
+\describe{
+\item{Model without intercept:}{ If the intercept should be removed the \code{formula} for a given response (\code{rating})
 and covariates (\code{X1} to \code{Xp}) has the following form:
 
      \code{formula = MMO(rating, firm_id, rater_id) ~ 0 + X1 + ... + Xp}.
-
-\item {Model with intercept:} If one wants to include an intercept in the model, there are two equivalent possibilities
+}
+\item{Model with intercept:}{ If one wants to include an intercept in the model, there are two equivalent possibilities
 to set the model \code{formula}. Either one includes the intercept explicitly by:
 
     \code{formula = MMO(rating, firm_id, rater_id) ~ 1 + X1 + ... + Xp},
@@ -159,8 +170,9 @@ or by
 }
 }
 }
+}
 \item{Implementation \code{MMO2}:}{
-  \itemize{
+  \describe{
     \item{\code{data}:}{The data structure applied by \code{MMO2} is slightly simplified, where the multiple ordinal
 observations as well as the covariates are stored as columns in a \code{\link{data.frame}}. Each subject \eqn{i}
 corresponds to one row of the data frame, where all outcomes (with missing

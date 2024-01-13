@@ -115,7 +115,7 @@ formula.error_struct <-
   ## Accessor for the covariate formula
   function(x, ...) eval(attr(x, "formula"))
 
-get_covariate.error_struct <- function(eobj, data.x, contrasts) {
+get_covariate.error_struct <- function(eobj, data.x, contrasts, ...) {
   covar_mat <- lapply(data.x, function(x)
     suppressWarnings(model.matrix(formula(eobj),
                                   model.frame(formula(eobj), x, na.action = function(x) x),
@@ -139,7 +139,7 @@ get_covariate.error_struct <- function(eobj, data.x, contrasts) {
 initialize.error_struct <-
   ## initializes some attributes of error_struct objects
   ## takes as data the output on mvord_data
-  function(eobj, data, contrasts)
+  function(eobj, data, contrasts, ...)
   {
     attr(eobj, "ynames") <- colnames(data$y)
     #attr(eobj, "subjnames") <- rownames(data$y)
@@ -153,21 +153,21 @@ initialize.error_struct <-
 update.error_struct <-
   ## initializes some attributes of error_struct objects
   ## takes as data the output on mvord_data
-  function(eobj, data, contrasts)
+  function(object, data, contrasts, ...)
   {
-    attr(eobj, "ynames") <- colnames(data$y)
-    #attr(eobj, "subjnames") <- rownames(data$y)
-    attr(eobj, "ndim") <- length(data$x)
-    attr(eobj, "nobs") <- nrow(data$y)
-    attr(eobj, "covariate") <-
-      get_covariate(eobj, data.x = data$x, contrasts = contrasts)
-    eobj
+    attr(object, "ynames") <- colnames(data$y)
+    #attr(object, "subjnames") <- rownames(data$y)
+    attr(object, "ndim") <- length(data$x)
+    attr(object, "nobs") <- nrow(data$y)
+    attr(object, "covariate") <-
+      get_covariate(object, data.x = data$x, contrasts = contrasts)
+    object
   }
 
 finalize.error_struct <-
   ## initializes some attributes of error_struct objects
   ## takes as data the output on mvord_data
-  function(eobj, tpar)
+  function(eobj, tpar, ...)
   {
     eobj <- finalize_fun(eobj, tpar)
 
@@ -187,7 +187,7 @@ finalize.error_struct <-
 ###############################
 ### Methods for cov_general ###
 ###############################
-start_values.cov_general <- function(eobj) {
+start_values.cov_general <- function(eobj, ...) {
   ## builds starting values for the correlation structure
   tmp <- double(attr(eobj, "npar"))
   ## TODO for the given values
@@ -195,7 +195,7 @@ start_values.cov_general <- function(eobj) {
 }
 
 init_fun.cov_general <-
-  function(eobj,  data, contrasts)
+  function(eobj,  data, contrasts, ...)
   {
     form <- formula(eobj)
     if (length(all.vars(form)) > 1)
@@ -231,7 +231,7 @@ init_fun.cov_general <-
 ## ind_sd <- cumsum(c(1, ndim - seq_len(ndim - 1) + 1))
 build_error_struct_fixed.cov_general <-
   ## builds the correlation matrix when fixed = T of cor_general objects
-  function(eobj, tpar = NULL)
+  function(eobj, tpar = NULL, rveclen = NULL, ...)
   {
     ## takes the transformed parameters and builds initializes some attributes of cor_general objects
     ndim <- attr(eobj, "ndim")
@@ -244,7 +244,7 @@ build_error_struct_fixed.cov_general <-
 
 
 build_error_struct.cov_general <-
-  function(eobj, tpar)
+  function(eobj, tpar, rveclen = NULL, ...)
   {
     ## takes the transformed parameters and builds/initializes some attributes of
     ## cor_general objects
@@ -270,12 +270,12 @@ build_error_struct.cov_general <-
     pos <- npar.cor * nlev
     sd_lev <- sapply(1:nlev,
                      function(l) exp(tpar[pos + (l - 1) * ndim + seq_len(ndim)]))
-    sdVec <- covar %*% t(sd_lev)
+    sdVec <- tcrossprod(covar, sd_lev)
     return(list(rVec = rVec, sdVec = sdVec))
   }
 
 finalize_fun.cov_general <-
-  function(eobj, tpar)
+  function(eobj, tpar, ...)
   {
     ## takes the transformed parameters and finalizez cor_general eobjs
     if (eobj$fixed){
@@ -334,7 +334,7 @@ finalize_fun.cov_general <-
 #################################
 #### Methods for cor_general ####
 #################################
-start_values.cor_general <- function(eobj) {
+start_values.cor_general <- function(eobj, ...) {
   ## builds starting values for the correlation structure
   tmp <- double(attr(eobj, "npar"))
   ## TODO for the given values
@@ -342,7 +342,7 @@ start_values.cor_general <- function(eobj) {
 }
 
 init_fun.cor_general <-
-  function(eobj,  data, contrasts)
+  function(eobj,  data, contrasts, ...)
   {
     ## initializes some attributes of cor_general eobjs
     form <- formula(eobj)
@@ -381,7 +381,7 @@ init_fun.cor_general <-
 
 build_error_struct_fixed.cor_general <-
   ## builds the correlation matrix when fixed = T of cor_general objects
-  function(eobj, tpar = NULL)
+  function(eobj, tpar = NULL, rveclen = NULL, ...)
   {
     ## takes the transformed parameters and builds initializes some attributes of cor_general objects
     sd <- rep.int(1, attr(eobj, "ndim"))
@@ -390,7 +390,7 @@ build_error_struct_fixed.cor_general <-
 
 
 build_error_struct.cor_general <-
-  function(eobj, tpar)
+  function(eobj, tpar, rveclen = NULL, ...)
   {
     ## takes the transformed parameters and builds initializes some attributes of cor_general eobjs
     ndim <- attr(eobj, "ndim")
@@ -418,7 +418,7 @@ build_error_struct.cor_general <-
   }
 
 finalize_fun.cor_general <-
-  function(eobj, tpar)
+  function(eobj, tpar, ...)
   {
   if (eobj$fixed){
     attr(eobj, "par") <- numeric(0)
@@ -467,7 +467,7 @@ finalize_fun.cor_general <-
 #############################
 #### Methods for cor_ar1 ####
 #############################
-start_values.cor_ar1 <- function(eobj) {
+start_values.cor_ar1 <- function(eobj, ...) {
   ## builds starting values for the correlation structure
   if (eobj$fixed) {
     tmp <- double(0)
@@ -488,7 +488,7 @@ start_values.cor_ar1 <- function(eobj) {
 }
 
 init_fun.cor_ar1 <-
-  function(eobj,  data, contrasts)
+  function(eobj,  data, contrasts, ...)
   {
     ## initializes some attributes of cor_equi eobjs
     #form <- formula(eobj)
@@ -516,10 +516,9 @@ init_fun.cor_ar1 <-
 #eobj <- rho[["error.structure"]]
 build_error_struct_fixed.cor_ar1 <-
   ## builds the correlation matrix when fixed = T of cor_ar1 objects
-  function(eobj, tpar = NULL){
+  function(eobj, tpar = NULL, rveclen = NULL, ...){
     r <- eobj$value_tmp
     ndim <- attr(eobj, "ndim")
-    npar1 <- ndim * (ndim - 1)/2
     corr_pars <- do.call(rbind, lapply(seq_along(r), function(i){
       sigma <- diag(ndim)
       sigma[lower.tri(sigma)]  <- r[i]^sequence((ndim-1):1)
@@ -532,7 +531,7 @@ build_error_struct_fixed.cor_ar1 <-
   }
 
 build_error_struct.cor_ar1 <-
-  function(eobj, tpar)
+  function(eobj, tpar, rveclen = NULL, ...)
   {
     ## takes the transformed parameters and builds initializes some attributes of cor_general eobjs
     ndim <- attr(eobj, "ndim")
@@ -552,7 +551,7 @@ build_error_struct.cor_ar1 <-
   }
 
 finalize_fun.cor_ar1 <-
-  function(eobj, tpar)
+  function(eobj, tpar, ...)
   {
     covar <- attr(eobj, "covariate")
     attr(eobj, "par") <- tpar
@@ -562,7 +561,7 @@ finalize_fun.cor_ar1 <-
 ##############################
 #### Methods for cor_equi ####
 ##############################
-start_values.cor_equi <- function(eobj) {
+start_values.cor_equi <- function(eobj, ...) {
   ## builds starting values for the correlation structure
   if (eobj$fixed) {
     tmp <- double(0)
@@ -584,7 +583,7 @@ start_values.cor_equi <- function(eobj) {
 }
 
 init_fun.cor_equi <-
-  function(eobj,  data, contrasts)
+  function(eobj,  data, contrasts, ...)
   {
     ## initializes some attributes of cor_equi eobjs
     #form <- formula(eobj)
@@ -609,13 +608,13 @@ init_fun.cor_equi <-
   }
 
 build_error_struct_fixed.cor_equi <-
-  function(eobj, tpar = NULL)
+  function(eobj, tpar = NULL, rveclen = NULL, ...)
   {
     ## tpar argument: transformed parameters (from optimizer)
     ## builds the correlation and standard deviation parameters for cor_equi eobjs
     r <- eobj$value_tmp
     ndim <- attr(eobj, "ndim")
-    npar1 <- ndim * (ndim - 1)/2
+    npar1 <- rveclen #ndim * (ndim - 1)/2
     corr_pars <- matrix(rep(r, npar1), ncol = npar1)
     if (is.null(ncol(corr_pars)))
       dim(corr_pars) <- c(length(corr_pars), 1)
@@ -624,7 +623,7 @@ build_error_struct_fixed.cor_equi <-
   }
 
 build_error_struct.cor_equi <-
-  function(eobj, tpar)
+  function(eobj, tpar, rveclen = NULL, ...)
   {
     ## tpar argument: transformed parameters (from optimizer)
     ## builds the correlation and standard deviation parameters for cor_equi eobjs
@@ -632,7 +631,7 @@ build_error_struct.cor_equi <-
     covar <- attr(eobj, "covariate")
     z <- covar %*% tpar
     r <- z2r(z)
-    npar1 <- ndim * (ndim - 1)/2
+    npar1 <- rveclen#ndim * (ndim - 1)/2
     corr_pars <- matrix(rep(r, npar1), ncol = npar1)
     if (is.null(ncol(corr_pars)))
       dim(corr_pars) <- c(length(corr_pars), 1)
@@ -641,7 +640,7 @@ build_error_struct.cor_equi <-
   }
 
 finalize_fun.cor_equi <-
-  function(eobj, tpar)
+  function(eobj, tpar, ...)
   {
     ## finalizes some attributes of cor_equi eobjs
     ndim <- attr(eobj, "ndim")
@@ -657,26 +656,27 @@ finalize_fun.cor_equi <-
 #' @description
 #' A generic function which extracts for each subject the estimated
 #' error structure parameters from objects of class \code{'mvord'}.
-#' @param object an object of class \code{'mvord'}.
+#' @param eobj an object of class \code{'mvord'}.
 #' @param type choose type \code{"sigmas"}, \code{"alpha"}, \code{"corr"}, or \code{"z"}.
 #' @param ... further arguments passed to or from other methods.
-#' @details \itemize{
-#' \item{\code{sigmas}} {extracts the correlation/covariance matrices corresponding to each subject.
+#' @details \describe{
+#' \item{\code{sigmas}}{extracts the correlation/covariance matrices corresponding to each subject.
 #'             Applicable in line with \code{cor_general, cov_general, cor_equi, cor_ar1}.}
-#' \item{\code{alpha}} {extracts the parameters of the covariate dependent error structure.
+#' \item{\code{alpha}}{extracts the parameters of the covariate dependent error structure.
 #' Applicable in line with \code{cor_equi, cor_ar1}.}
-#' \item{\code{corr}} {extracts the subject-specific correlation parameters. Applicable in
+#' \item{\code{corr}}{extracts the subject-specific correlation parameters. Applicable in
 #' line with \code{cor_equi}, \code{cor_ar1}.}
-#' \item{\code{z}} {extracts the subject-specific Fisher-z score. Applicable in line
+#' \item{\code{z}}{extracts the subject-specific Fisher-z score. Applicable in line
 #' with \code{cor_equi, cor_ar1}.}}
 #' @export
-error_structure <- function(object, type, ...) UseMethod("error_structure")
+error_structure <- function(eobj, type, ...) UseMethod("error_structure")
 #' @rdname error_structure
 #' @export
-error_structure.mvord <- function(object, type = NULL, ...)  {
-  val <- error_structure(object$error.struct, type = type , ...)
+error_structure.mvord <- function(eobj, type = NULL, ...)  {
+  val <- error_structure(eobj$error.struct, type = type , ...)
   val
 }
+#' @export
 error_structure.cor_general <- function(eobj, type, ...){
   par <- attr(eobj, "par")
   npar <- attr(eobj, "npar")# npar <- length(par)
@@ -702,6 +702,7 @@ error_structure.cor_general <- function(eobj, type, ...){
   corr_n
 }
 
+#' @export
 error_structure.cov_general <- function(eobj, type, ...){
   npar <- attr(eobj, "npar")
   par <- attr(eobj, "par")
@@ -746,6 +747,7 @@ error_structure.cov_general <- function(eobj, type, ...){
   cov_n
 }
 
+#' @export
 error_structure.cor_equi <- function(eobj, type, ...){
   npar <- attr(eobj, "npar")
   par <- attr(eobj, "par")
@@ -776,6 +778,7 @@ error_structure.cor_equi <- function(eobj, type, ...){
   return(par)
 }
 
+#' @export
 error_structure.cor_ar1 <- function(eobj, type, ...){
   npar <- attr(eobj, "npar")
   par <- attr(eobj, "par")
