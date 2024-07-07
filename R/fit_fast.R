@@ -77,7 +77,6 @@ transf_par_fast <- function(par, rho) {
 }
 
 
-
 PLfun_fast <- function(par, rho){
   tmp <- transf_par_fast(par, rho)
   #r_mat <- tmp[["corr_par"]]#[, rho$dummy_pl_lag == 1, drop = F]

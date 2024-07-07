@@ -116,8 +116,10 @@ check_args_input1 <- function(rho, data){
   #data
   if(any(!(all.vars(rho$formula) %in% colnames(data)))) stop("All variables in formula have to exist in data.", call. = FALSE)
   ## index
-  if(!all(rho$index %in% colnames(data))) stop("index names do not match with column names of data", call.=FALSE)
-  if (any(duplicated(data[, rho$index]))) stop("Duplicated indexes: Observation(s) have the same subject and measurement index", call. = FALSE)
+  if (!is.null(rho$index)) {
+    if(!all(rho$index %in% colnames(data))) stop("index names do not match with column names of data", call.=FALSE)
+    if (any(duplicated(data[, rho$index]))) stop("Duplicated indexes: Observation(s) have the same subject and measurement index", call. = FALSE)
+  }
   # PL.lag
   if(!is.null(rho$PL.lag)) {
     if (rho$PL.lag <= 0) stop("PL.lag must be greater than 0", call. = FALSE)
@@ -352,9 +354,9 @@ transf_thresholds_fixall <- function(gamma, rho, betatilde){
   betatildemu <- betatilde * rho$mat_center_scale
   # br <- ifdrop(crossprod(rho$contr_theta, betatildemu[,1]))
   lapply(seq_len(rho$ndim), function(j) {
-    br <- ifelse(length(betatildemu) == 0, 0, drop(crossprod(rho$contr_theta, betatildemu[,1]))[rho$inds.cat[[..l..]]])
     ..l.. <- match(rho$threshold.constraints[j],
                    rho$threshold.constraints)
+    br <- ifelse(length(betatildemu) == 0, 0, drop(crossprod(rho$contr_theta, betatildemu[,1]))[rho$inds.cat[[..l..]]])
     rho$threshold.values[[j]] - br
   })
 }
@@ -698,9 +700,9 @@ set_offset_up <- function(rho){
 #' @param start.values list of (optional) starting values for thresholds and coefficients.
 #' @param combis list of length equal to the number of combinations of responses that should enter the pairwise likelihood. Each element contains one pair of integers corresponding to two responses. Defaults to NULL, in which case all pairs are considered.
 #'    Should only be used if user knows the ordering of the responses in the analysis.
-#' @param solver character string containing the name of the applicable solver of \code{\link{optimx}} (default is \code{"newuoa"})
+#' @param solver character string containing the name of the applicable solver of \code{\link[optimx]{optimx}} (default is \code{"newuoa"})
 #'  or wrapper function for user defined solver.
-#' @param solver.optimx.control a list of control arguments to be passed to \code{\link{optimx}}. See \code{\link{optimx}}.
+#' @param solver.optimx.control a list of control arguments to be passed to \code{\link[optimx]{optimx}}. See \code{\link[optimx]{optimx}}.
 # #' @param scale If \code{scale = TRUE}, then for each response the corresponding covariates of \code{\link{class}} \code{"numeric"} are standardized before fitting,
 # #'  i.e., by substracting the mean and dividing by the standard deviation.
 #' @seealso \code{\link{mvord}}

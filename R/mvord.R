@@ -764,8 +764,10 @@ mvord <- function(formula,
   ##  check if data is a data.frame
   if(!is.data.frame(data)) {
     warning("data has to be of type data.frame. Automatically applied as.data.frame() to data.")
-    data <- as.data.frame(data)
   }
+  ##  Apply as.data.frame() in any case -> fixes the issue with tibbles
+  data <- as.data.frame(data)
+
   ### MMO ###
   if(formula[[2]][[1]] == "MMO"){
     rho <- initialize_MMO(rho, formula, data, error.structure, contrasts)
@@ -937,10 +939,11 @@ summary.mvord <- function(object, short = TRUE, call = TRUE, ...){
   invisible(summary.output)
 }
 
+
+#' @export
 print.summary.mvord <- function(x, ...){
   if(!is.null(x)){
-    cat("\nCall: ",
-        x$call, "\n\n", sep = "")
+    cat("\nCall: ", gsub("  ", "", deparse(x$call)), "\n\n", sep = "")
   }
   cat("Formula: ")
   print(x$formula, ...)
@@ -986,7 +989,7 @@ thresholds.mvord <- function(object, ...) object$theta
 # #' @export
 claic <- function(object) UseMethod("claic")
 # #' @rdname claic
-# #' @export
+#' @export
 claic.mvord <- function(object) ifelse(object$rho$se, object$rho$claic, NA)
 
 
@@ -998,7 +1001,7 @@ claic.mvord <- function(object) ifelse(object$rho$se, object$rho$claic, NA)
 # #' @export
 clbic <- function(object) UseMethod("clbic")
 # #' @rdname clbic
-# #' @export
+#' @export
 clbic.mvord <- function(object) ifelse(object$rho$se, object$rho$clbic, NA)
 
 
@@ -1010,7 +1013,7 @@ clbic.mvord <- function(object) ifelse(object$rho$se, object$rho$clbic, NA)
 # #' @export
 logPL <- function(object) UseMethod("logPL")
 # #' @rdname logPL
-# #' @export
+#' @export
 logPL.mvord <- function(object) as.numeric(-object$rho$objective)
 
 
