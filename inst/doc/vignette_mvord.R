@@ -97,25 +97,25 @@ names_constraints(formula, data = data_mvord_toy)
 
 
 ###################################################
-### code chunk number 12: vignette_mvord.Rnw:1496-1497
+### code chunk number 12: predict_prob
 ###################################################
 predict(res, subjectID =  1:6)
 
 
 ###################################################
-### code chunk number 13: vignette_mvord.Rnw:1500-1501
+### code chunk number 13: predict_cumprob
 ###################################################
 predict(res, type = "cum.prob", subjectID =  1:6)
 
 
 ###################################################
-### code chunk number 14: vignette_mvord.Rnw:1504-1505
+### code chunk number 14: predict_class
 ###################################################
 predict(res, type = "class", subjectID =  1:6)
 
 
 ###################################################
-### code chunk number 15: vignette_mvord.Rnw:1577-1580
+### code chunk number 15: vignette_mvord.Rnw:1576-1579
 ###################################################
 data("data_cr", package = "mvord")
 head(data_cr, n = 3)
@@ -141,14 +141,14 @@ par(op)
 
 
 ###################################################
-### code chunk number 17: vignette_mvord.Rnw:1618-1620 (eval = FALSE)
+### code chunk number 17: vignette_mvord.Rnw:1617-1619 (eval = FALSE)
 ###################################################
 ## res_cor_probit_simple <- mvord(formula = MMO2(rater1, rater2, rater3,
 ##   rater4) ~ 0 + LR + LEV + PR + RSIZE + BETA, data = data_cr)
 
 
 ###################################################
-### code chunk number 18: vignette_mvord.Rnw:1622-1636
+### code chunk number 18: res_cor_probit_simple
 ###################################################
 FILE <- "res_cor_probit_simple.rda"
 if (cache & file.exists(FILE)) {
@@ -167,31 +167,31 @@ res_cor_probit_simple <- mvord:::reduce_size.mvord(res_cor_probit_simple)
 
 
 ###################################################
-### code chunk number 19: vignette_mvord.Rnw:1642-1643
+### code chunk number 19: summary_res_cor_probit_simple
 ###################################################
 summary(res_cor_probit_simple, call = FALSE)
 
 
 ###################################################
-### code chunk number 20: vignette_mvord.Rnw:1668-1669
+### code chunk number 20: vignette_mvord.Rnw:1667-1668
 ###################################################
 thresholds(res_cor_probit_simple)
 
 
 ###################################################
-### code chunk number 21: vignette_mvord.Rnw:1672-1673
+### code chunk number 21: vignette_mvord.Rnw:1671-1672
 ###################################################
 coef(res_cor_probit_simple)
 
 
 ###################################################
-### code chunk number 22: vignette_mvord.Rnw:1677-1678
+### code chunk number 22: vignette_mvord.Rnw:1676-1677
 ###################################################
 error_structure(res_cor_probit_simple)[[11]]
 
 
 ###################################################
-### code chunk number 23: vignette_mvord.Rnw:1713-1718 (eval = FALSE)
+### code chunk number 23: vignette_mvord.Rnw:1712-1717 (eval = FALSE)
 ###################################################
 ## res_cor_logit <- mvord(formula = MMO2(rater1, rater2, rater3, rater4) ~
 ##   0 + LR + LEV + PR + RSIZE + BETA, data = data_cr, link = mvlogit(),
@@ -201,7 +201,7 @@ error_structure(res_cor_probit_simple)[[11]]
 
 
 ###################################################
-### code chunk number 24: vignette_mvord.Rnw:1721-1742
+### code chunk number 24: vignette_mvord.Rnw:1720-1741
 ###################################################
 FILE <- "res_cor_logit.rda"
 if (cache & file.exists(FILE)) {
@@ -227,13 +227,13 @@ res_cor_logit <- mvord:::reduce_size2.mvord(res_cor_logit)
 
 
 ###################################################
-### code chunk number 25: vignette_mvord.Rnw:1747-1748
+### code chunk number 25: vignette_mvord.Rnw:1746-1747
 ###################################################
 summary(res_cor_logit, call = FALSE)
 
 
 ###################################################
-### code chunk number 26: vignette_mvord.Rnw:1771-1772
+### code chunk number 26: vignette_mvord.Rnw:1770-1771
 ###################################################
 constraints(res_cor_logit)$BETA
 
@@ -331,7 +331,7 @@ par(op)
 
 
 ###################################################
-### code chunk number 28: vignette_mvord.Rnw:1885-1894
+### code chunk number 28: vignette_mvord.Rnw:1884-1893
 ###################################################
 BICvec <- c(BIC(res_cor_probit_simple), BIC(res_cor_logit))
 AICvec <- c(AIC(res_cor_probit_simple), AIC(res_cor_logit))
@@ -345,7 +345,7 @@ print(xtable::xtable(tab),
 
 
 ###################################################
-### code chunk number 29: vignette_mvord.Rnw:1907-1910
+### code chunk number 29: vignette_mvord.Rnw:1906-1909
 ###################################################
 data("data_cr_panel")
 str(data_cr_panel, vec.len = 3)
@@ -353,7 +353,7 @@ head(data_cr_panel, n = 3)
 
 
 ###################################################
-### code chunk number 30: vignette_mvord.Rnw:1964-1969 (eval = FALSE)
+### code chunk number 30: vignette_mvord.Rnw:1963-1968 (eval = FALSE)
 ###################################################
 ## res_AR1_probit <- mvord(formula = MMO(rating, firm_id, year) ~ LR + LEV +
 ##   PR + RSIZE + BETA, error.structure = cor_ar1(~ BSEC), link = mvprobit(),
@@ -363,7 +363,7 @@ head(data_cr_panel, n = 3)
 
 
 ###################################################
-### code chunk number 31: vignette_mvord.Rnw:1971-1992
+### code chunk number 31: vignette_mvord.Rnw:1970-1991
 ###################################################
 FILE <- "res_AR1_probit.rda"
 if (cache & file.exists(FILE)) {
@@ -389,25 +389,25 @@ res_AR1_probit <- mvord(
 
 
 ###################################################
-### code chunk number 32: vignette_mvord.Rnw:1998-1999
+### code chunk number 32: vignette_mvord.Rnw:1997-1998
 ###################################################
 summary(res_AR1_probit, short = TRUE, call = FALSE)
 
 
 ###################################################
-### code chunk number 33: vignette_mvord.Rnw:2005-2006
+### code chunk number 33: vignette_mvord.Rnw:2004-2005
 ###################################################
 error_structure(res_AR1_probit)
 
 
 ###################################################
-### code chunk number 34: vignette_mvord.Rnw:2009-2010
+### code chunk number 34: vignette_mvord.Rnw:2008-2009
 ###################################################
 head(error_structure(res_AR1_probit, type = "corr"), n = 3)
 
 
 ###################################################
-### code chunk number 35: vignette_mvord.Rnw:2013-2014
+### code chunk number 35: vignette_mvord.Rnw:2012-2013
 ###################################################
 head(error_structure(res_AR1_probit, type = "sigmas"), n = 1)
 

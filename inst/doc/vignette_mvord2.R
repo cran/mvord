@@ -38,7 +38,8 @@ summary(res_cor_probit_2raters)
 coef(res_cor_probit_2raters)
 
 ## ----eval = FALSE-------------------------------------------------------------
-#  res_cor_logit_3raters <- mvord(formula = MMO2(rater1, rater2, rater 3) ~ 0 + LR + LEV + PR + RSIZE + BETA,
+#  res_cor_logit_3raters <- mvord(formula = MMO2(rater1, rater2, rater3) ~ 0 +
+#                                   LR + LEV + PR + RSIZE + BETA,
 #                                 coef.constraints = c(1, 1, 1),
 #                                 data = data_cr,
 #                                 link = mvlogit())
@@ -158,10 +159,30 @@ table(data_cr$rater2, mp$rater2)
 table(data_cr$rater3, mp$rater3)
 table(data_cr$rater4, mp$rater4)
 
+## ----eval = TRUE--------------------------------------------------------------
+jp <- predict(res_cor_logit, type = "prob")
+head(jp)
+
+## ----eval = TRUE--------------------------------------------------------------
+jp_AAFL <- joint_probabilities(res_cor_logit, 
+                          response.cat = c("A", "A", "F", "L"),  
+                          type = "prob")
+head(jp_AAFL)
+
+## ----eval = TRUE--------------------------------------------------------------
+nc <- 5 # number of classes for rater 1 and 2
+jp_mat <- matrix(nrow = nrow(data_cr), ncol = nc)
+for (cl in 1:nc) {
+  jp_mat[, cl] <- joint_probabilities(
+    res_cor_logit, 
+    response.cat = c(LETTERS[cl], LETTERS[cl], "F", "L"),  
+    type = "prob")
+}
+jp2 <- rowSums(jp_mat)
+head(jp2)
+
 ## ----eval = FALSE-------------------------------------------------------------
-#  jp <- joint_probabilities(res_cor_logit,
-#                            response.cat = data_cr[,1:4],
-#                            type = "prob")
+#  jpred <- predict(res_cor_logit, type = "class")
 
 ## ----echo = FALSE, results = 'hide', eval = TRUE------------------------------
 FILE <- "jp.rda"
@@ -169,18 +190,18 @@ if (cache & file.exists(FILE)) {
   load(FILE)
 } else {
   if (cache) {
-jp <- predict(res_cor_logit, type = "class")
-  save(jp, file  = FILE)
+  jpred <- predict(res_cor_logit, type = "class")
+  save(jpred, file  = FILE)
   } else {
       if(file.exists(FILE)) file.remove(FILE)
   }
 }
 
 ## -----------------------------------------------------------------------------
-table(data_cr$rater1, jp$rater1)
-table(data_cr$rater2, jp$rater2)
-table(data_cr$rater3, jp$rater3)
-table(data_cr$rater4, jp$rater4)
+table(data_cr$rater1, jpred$rater1)
+table(data_cr$rater2, jpred$rater2)
+table(data_cr$rater3, jpred$rater3)
+table(data_cr$rater4, jpred$rater4)
 
 ## -----------------------------------------------------------------------------
 data("data_cr_panel", package = "mvord")
