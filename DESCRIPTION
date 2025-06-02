@@ -1,7 +1,7 @@
 Package: mvord
 Title: Multivariate Ordinal Regression Models
-Version: 1.2.5
-Date: 2024-08-26
+Version: 1.2.6
+Date: 2025-06-02
 Authors@R: c(
     person("Rainer", "Hirk", role = c("aut")),
     person("Kurt", "Hornik", role = c("aut"), 
@@ -17,18 +17,18 @@ License: GPL-3
 Depends: minqa, BB, ucminf, dfoptim, R (>= 3.5.0)
 Imports: MASS, pbivnorm, stats, optimx, mnormt, numDeriv, Matrix,
         mvtnorm
-Suggests: knitr, rmarkdown, xtable, colorspace, LMest, VGAM
+Suggests: knitr, rmarkdown, xtable, colorspace, VGAM
 VignetteBuilder: knitr
 URL: https://github.com/lauravana/mvord
 BugReports: https://github.com/lauravana/mvord/issues
 Encoding: UTF-8
 NeedsCompilation: yes
-RoxygenNote: 7.3.1
-Packaged: 2024-08-30 09:59:55 UTC; lauravanagur
+RoxygenNote: 7.3.2
+Packaged: 2025-06-02 13:14:35 UTC; lauravanagur
 Author: Rainer Hirk [aut],
-  Kurt Hornik [aut] (<https://orcid.org/0000-0003-4198-9911>),
-  Laura Vana [aut, cre] (<https://orcid.org/0000-0002-9613-7604>),
+  Kurt Hornik [aut] (ORCID: <https://orcid.org/0000-0003-4198-9911>),
+  Laura Vana [aut, cre] (ORCID: <https://orcid.org/0000-0002-9613-7604>),
   Alan Gentz [ctb]
 Maintainer: Laura Vana <laura.vana@tuwien.ac.at>
 Repository: CRAN
-Date/Publication: 2024-08-30 11:18:22 UTC
+Date/Publication: 2025-06-02 14:00:02 UTC

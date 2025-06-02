@@ -10,9 +10,9 @@ str(data_cr, vec.len = 3)
 head(data_cr, n = 3)
 
 ## ----eval = FALSE-------------------------------------------------------------
-#  res_cor_probit_2raters <- mvord(formula = MMO2(rater1, rater2) ~ 0 + LR + LEV + PR + RSIZE + BETA,
-#                                 threshold.constraints = c(1, 1),
-#                                 data = data_cr)
+# res_cor_probit_2raters <- mvord(formula = MMO2(rater1, rater2) ~ 0 + LR + LEV + PR + RSIZE + BETA,
+#                                threshold.constraints = c(1, 1),
+#                                data = data_cr)
 
 ## ----echo = FALSE, results = 'hide', eval = TRUE------------------------------
 cache <- TRUE
@@ -38,11 +38,11 @@ summary(res_cor_probit_2raters)
 coef(res_cor_probit_2raters)
 
 ## ----eval = FALSE-------------------------------------------------------------
-#  res_cor_logit_3raters <- mvord(formula = MMO2(rater1, rater2, rater3) ~ 0 +
-#                                   LR + LEV + PR + RSIZE + BETA,
-#                                 coef.constraints = c(1, 1, 1),
-#                                 data = data_cr,
-#                                 link = mvlogit())
+# res_cor_logit_3raters <- mvord(formula = MMO2(rater1, rater2, rater3) ~ 0 +
+#                                  LR + LEV + PR + RSIZE + BETA,
+#                                coef.constraints = c(1, 1, 1),
+#                                data = data_cr,
+#                                link = mvlogit())
 
 ## ----echo = FALSE, results = 'hide', eval = TRUE------------------------------
 cache <- TRUE
@@ -69,7 +69,7 @@ summary(res_cor_logit_3raters)
 thresholds(res_cor_logit_3raters)
 
 ## ----eval = FALSE-------------------------------------------------------------
-#  res_cor_probit_simple <- mvord(formula = MMO2(rater1, rater2, rater3, rater4) ~ 0 + LR + LEV + PR + RSIZE + BETA, data = data_cr)
+# res_cor_probit_simple <- mvord(formula = MMO2(rater1, rater2, rater3, rater4) ~ 0 + LR + LEV + PR + RSIZE + BETA, data = data_cr)
 
 ## ----echo = FALSE, results = 'hide', eval = TRUE------------------------------
 cache <- TRUE
@@ -101,14 +101,14 @@ coef(res_cor_probit_simple)
 error_structure(res_cor_probit_simple)[[11]]
 
 ## ----eval = FALSE-------------------------------------------------------------
-#  res_cor_logit <- mvord(formula = MMO2(rater1, rater2, rater3, rater4) ~
-#      0 + LR + LEV + PR + RSIZE + BETA, data = data_cr, link = mvlogit(),
-#      coef.constraints = cbind(LR = c(1, 1, 1, 1),
-#                               LEV = c(1, 2, 3, 4),
-#                               PR = c(1, 1, 1, 1),
-#                               RSIZE = c(1, 1, 1, 2),
-#                               BETA = c(1, 1, 2, 3)),
-#      threshold.constraints = c(1, 1, 2, 3))
+# res_cor_logit <- mvord(formula = MMO2(rater1, rater2, rater3, rater4) ~
+#     0 + LR + LEV + PR + RSIZE + BETA, data = data_cr, link = mvlogit(),
+#     coef.constraints = cbind(LR = c(1, 1, 1, 1),
+#                              LEV = c(1, 2, 3, 4),
+#                              PR = c(1, 1, 1, 1),
+#                              RSIZE = c(1, 1, 1, 2),
+#                              BETA = c(1, 1, 2, 3)),
+#     threshold.constraints = c(1, 1, 2, 3))
 
 ## ----echo = FALSE, results = 'hide', eval = TRUE------------------------------
 FILE <- "res_cor_logit.rda"
@@ -182,7 +182,7 @@ jp2 <- rowSums(jp_mat)
 head(jp2)
 
 ## ----eval = FALSE-------------------------------------------------------------
-#  jpred <- predict(res_cor_logit, type = "class")
+# jpred <- predict(res_cor_logit, type = "class")
 
 ## ----echo = FALSE, results = 'hide', eval = TRUE------------------------------
 FILE <- "jp.rda"
@@ -209,14 +209,14 @@ str(data_cr_panel, vec.len = 3)
 head(data_cr_panel, n = 3)
 
 ## ----eval=F-------------------------------------------------------------------
-#  res_AR1_probit <- mvord(formula = MMO(rating, firm_id, year) ~ LR + LEV +
-#    PR + RSIZE + BETA,
-#    error.structure = cor_ar1(~ BSEC), link = mvprobit(),
-#    data = data_cr_panel,
-#    coef.constraints = c(rep(1, 4), rep(2, 4)),
-#    threshold.constraints = rep(1, 8),
-#    threshold.values = rep(list(c(0, NA, NA, NA)),8),
-#    control = mvord.control(solver = "BFGS"))
+# res_AR1_probit <- mvord(formula = MMO(rating, firm_id, year) ~ LR + LEV +
+#   PR + RSIZE + BETA,
+#   error.structure = cor_ar1(~ BSEC), link = mvprobit(),
+#   data = data_cr_panel,
+#   coef.constraints = c(rep(1, 4), rep(2, 4)),
+#   threshold.constraints = rep(1, 8),
+#   threshold.values = rep(list(c(0, NA, NA, NA)),8),
+#   control = mvord.control(solver = "BFGS"))
 
 ## ----echo = FALSE, results = 'hide', eval = TRUE------------------------------
 FILE <- "res_AR1_probit.rda"
@@ -257,19 +257,20 @@ head(error_structure(res_AR1_probit, type = "sigmas"), n = 1)
 # load("data_SRHS_long.rda")
 
 ## ----eval=TRUE, include=TRUE--------------------------------------------------
-data(data_SRHS_long, package = "LMest")
+data_path <- system.file("extdata", "data_SRHS_long.rda", package = "mvord")
+data_SRHS_long <- get(load(data_path))
 
 ## -----------------------------------------------------------------------------
 str(data_SRHS_long)
 
 ## ----eval=FALSE, include=TRUE-------------------------------------------------
-#  res_srhs <- mvord(formula = MMO(srhs, id, t) ~ 0 + factor(gender) +
-#  	factor(race) + factor(education) + age,
-#  	data = data_SRHS_long,
-#  	threshold.constraints = rep(1, 8),
-#  	coef.constraints = rep(1, 8),
-#  	error.structure = cor_ar1(~ 1), link = mvlogit(),
-#  	PL.lag = 2)
+# res_srhs <- mvord(formula = MMO(srhs, id, t) ~ 0 + factor(gender) +
+# 	factor(race) + factor(education) + age,
+# 	data = data_SRHS_long,
+# 	threshold.constraints = rep(1, 8),
+# 	coef.constraints = rep(1, 8),
+# 	error.structure = cor_ar1(~ 1), link = mvlogit(),
+# 	PL.lag = 2)
 
 ## ----include=FALSE------------------------------------------------------------
 FILE <- "res_srhs.rda"
@@ -298,14 +299,14 @@ unique(error_structure(res_srhs, type = "corr"))
 summary(res_srhs, call = FALSE)
 
 ## ----echo=FALSE, eval=FALSE---------------------------------------------------
-#  ## links are broken
-#  N <- "http://www-math.bgsu.edu/~albert/ord_book/Chapter5/essay_data/N.dat"
-#  X <- "http://www-math.bgsu.edu/~albert/ord_book/Chapter5/essay_data/X.dat"
-#  y  <- read.delim(url(N), header = F, sep = "")
-#  wl <- read.delim(url(X), header = F, sep = "")[,2]
-#  essay_data <- cbind.data.frame(y, wl)
-#  colnames(essay_data)[1:5] <- paste0("Judge", 1:5)
-#  save(essay_data, file =  "essay_data.rda")
+# ## links are broken
+# N <- "http://www-math.bgsu.edu/~albert/ord_book/Chapter5/essay_data/N.dat"
+# X <- "http://www-math.bgsu.edu/~albert/ord_book/Chapter5/essay_data/X.dat"
+# y  <- read.delim(url(N), header = F, sep = "")
+# wl <- read.delim(url(X), header = F, sep = "")[,2]
+# essay_data <- cbind.data.frame(y, wl)
+# colnames(essay_data)[1:5] <- paste0("Judge", 1:5)
+# save(essay_data, file =  "essay_data.rda")
 
 ## ----include=TRUE-------------------------------------------------------------
 data("essay_data", package = "mvord")
@@ -314,10 +315,10 @@ data("essay_data", package = "mvord")
 head(essay_data)
 
 ## ----eval=FALSE, include=TRUE-------------------------------------------------
-#  res_essay_0 <- mvord(
-#    formula = MMO2(Judge1, Judge2, Judge3, Judge4, Judge5) ~ -1,
-#    data = essay_data, threshold.constraints = rep(1, 5),
-#    coef.constraints = rep(1, 5))
+# res_essay_0 <- mvord(
+#   formula = MMO2(Judge1, Judge2, Judge3, Judge4, Judge5) ~ -1,
+#   data = essay_data, threshold.constraints = rep(1, 5),
+#   coef.constraints = rep(1, 5))
 
 ## ----message=FALSE, warning=FALSE, include=FALSE------------------------------
 FILE <- "res_essay.rda"
@@ -345,10 +346,10 @@ if (cache & file.exists(FILE)) {
 summary(res_essay_0, call = FALSE)
 
 ## ----eval=FALSE, include=TRUE-------------------------------------------------
-#  res_essay_wl <- mvord(
-#    formula = MMO2(Judge1, Judge2, Judge3, Judge4, Judge5) ~ 0 + wl,
-#    data = essay_data, threshold.constraints = rep(1, 5),
-#    coef.constraints = rep(1, 5))
+# res_essay_wl <- mvord(
+#   formula = MMO2(Judge1, Judge2, Judge3, Judge4, Judge5) ~ 0 + wl,
+#   data = essay_data, threshold.constraints = rep(1, 5),
+#   coef.constraints = rep(1, 5))
 
 ## -----------------------------------------------------------------------------
 summary(res_essay_wl, call = FALSE)
