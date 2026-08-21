@@ -3,7 +3,7 @@ library(MASS)
 
 
 #data(data_toy_example)
-tolerance <- 1e-6
+tolerance <- 1e-5
 
 mult.obs <- 2
 sigma <- matrix(c(1,0.8,0.8,1), ncol = 2)
@@ -1043,4 +1043,3 @@ mvord:::check(all.equal(
 #                            data = as_tibble(data_toy_example)),
 #                      error = function(e) NA)
 # stopifnot(!is.na(res_tbl2))
-

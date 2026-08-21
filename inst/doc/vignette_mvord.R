@@ -410,5 +410,3 @@ head(error_structure(res_AR1_probit, type = "corr"), n = 3)
 ### code chunk number 35: vignette_mvord.Rnw:2012-2013
 ###################################################
 head(error_structure(res_AR1_probit, type = "sigmas"), n = 1)
-
-
